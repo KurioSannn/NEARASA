@@ -1,0 +1,21 @@
+<?php
+
+namespace App\Http\Middleware;
+
+use Illuminate\Http\Request;
+use Inertia\Middleware;
+
+class HandleInertiaRequests extends Middleware
+{
+    protected $rootView = 'app';
+
+    public function share(Request $request): array
+    {
+        return [...parent::share($request),
+            'location' => fn () => $request->session()->get('search_location'),
+            'mapTiles' => config('nearasa.map_tiles'),
+            'auth' => fn () => ['user' => $request->user()?->only(['id', 'name', 'email', 'is_demo', 'public_name']), 'favorites' => $request->user()?->favorites()->pluck('businesses.id')->all() ?? []],
+            'flash' => fn () => ['success' => $request->session()->get('success')],
+        ];
+    }
+}

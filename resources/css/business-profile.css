@@ -1,0 +1,154 @@
+.business-public { min-width:0; overflow-wrap:anywhere; }
+.business-public :is(h1,h2,h3,h4,p,dd,strong,small,figcaption,a) { overflow-wrap:anywhere; }
+.business-public .business-heading { position:relative; align-items:flex-start; flex-wrap:wrap; }
+.profile-business-identity { display:flex; align-items:center; gap:1rem; min-width:0; flex:1 1 16rem; }
+.profile-business-heading-copy { min-width:0; }
+.business-public .business-heading h1 { overflow-wrap:anywhere; }
+.business-public .detail-price { flex:0 0 auto; padding-top:.25rem; }
+.business-public .detail-status { line-height:1.6; flex-wrap:wrap; }
+.business-public .detail-tabs { gap:1.5rem; flex-wrap:wrap; margin-top:1.5rem; row-gap:0; }
+.business-public .detail-tabs button { min-height:3rem; font-size:var(--text-body); }
+.business-public .detail-columns { grid-template-columns:minmax(0,1fr) minmax(0,20.625rem); }
+.business-public .detail-panel { scroll-margin-top:1.5rem; }
+.business-public .business-description { max-width:45rem; }
+.profile-preserve-lines { white-space:pre-wrap; }
+.profile-section-stack { display:flex; flex-direction:column; gap:2rem; }
+.profile-section-stack>section { min-width:0; }
+.profile-section-intro { font-size:var(--text-body); line-height:1.7; color:var(--muted); margin-top:.75rem; }
+.profile-facts { margin:1.5rem 0 0; padding:0; font-size:var(--text-body); }
+.profile-facts>div { display:grid; grid-template-columns:minmax(7rem,.7fr) minmax(0,1fr); gap:1rem; padding:.875rem 0; border-bottom:1px solid var(--line); }
+.profile-facts dt { color:var(--muted); }
+.profile-facts dd { margin:0; line-height:1.6; }
+.profile-contact-list,.profile-action-links { list-style:none; padding:0; margin:1rem 0 0; }
+.profile-contact-list { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.5rem 1rem; }
+.profile-contact-list a { display:flex; align-items:center; gap:.75rem; min-width:0; min-height:4.5rem; padding:.75rem 0; border-bottom:1px solid var(--line); }
+.profile-contact-list a>span { min-width:0; flex:1; }
+.profile-contact-list a>svg { color:var(--muted); }
+.profile-contact-list a:hover strong { color:var(--accent); }
+.profile-contact-list small { display:block; color:var(--muted); font-size:var(--text-caption); margin-bottom:.25rem; }
+.profile-contact-list strong { display:block; font-size:var(--text-body); font-weight:550; line-height:1.6; }
+.profile-action-links { display:flex; flex-wrap:wrap; gap:.75rem; }
+.profile-action-links li { min-width:0; max-width:100%; }
+.profile-action-links .button { padding:.75rem 1rem; min-height:2.75rem; font-size:var(--text-small); gap:.75rem; text-align:left; }
+.profile-external-note { display:block; margin-top:.5rem; font-size:var(--text-caption); color:var(--muted); line-height:1.6; }
+.profile-pdf-link { display:flex; align-items:center; gap:.75rem; border:1px solid var(--line); border-radius:.75rem; padding:1rem; font-size:var(--text-body); margin-bottom:1.5rem; color:var(--accent); min-height:3rem; }
+.profile-pdf-link>span { min-width:0; flex:1; }
+.profile-pdf-link:hover { background:var(--soft); }
+.business-public .menu-item { align-items:flex-start; gap:1.5rem; }
+.business-public .menu-item p { font-size:var(--text-body); line-height:1.7; }
+.business-public .menu-category { font-size:var(--text-caption); line-height:1.6; }
+.profile-sold-out { display:inline-block; margin-top:.75rem; border:1px solid var(--line); border-radius:.375rem; padding:.25rem .5rem; font-size:var(--text-caption); line-height:1.4; color:var(--muted); background:var(--soft); }
+.profile-photo-button { position:relative; display:block; padding:0; overflow:hidden; background:var(--soft); color:var(--ink); }
+.profile-photo-button>img { width:100%; height:100%; object-fit:cover; }
+.profile-photo-button:focus-visible { outline-offset:4px; }
+.profile-photo-expand { display:grid; place-items:center; position:absolute; right:.5rem; bottom:.5rem; width:1.75rem; height:1.75rem; border-radius:.5rem; background:var(--surface); color:var(--ink); box-shadow:0 1px 4px #3b2b261f; }
+.profile-cover-photo { width:100%; height:100%; }
+.profile-cover-photo>img { object-position:center; }
+.business-public .profile-menu-photo { flex:0 0 6.875rem; height:6.875rem; border-radius:.9375rem; }
+.business-public .profile-menu-photo>img { width:100%; height:100%; border-radius:0; }
+.profile-business-logo { flex:0 0 4rem; width:4rem; height:4rem; border-radius:.875rem; border:1px solid var(--line); background:var(--surface); }
+.profile-business-logo>img { object-fit:contain; }
+.profile-business-logo .profile-photo-expand { display:none; }
+.profile-heading-favorite { position:relative; flex:0 0 2.75rem; height:2.75rem; }
+.profile-heading-favorite .favorite-button { top:0; right:0; width:2.75rem; height:2.75rem; border:1px solid var(--line); }
+.profile-gallery { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:1.5rem 1rem; }
+.profile-gallery figure { min-width:0; margin:0; }
+.profile-gallery .profile-photo-button { width:100%; aspect-ratio:4/3; border-radius:.875rem; }
+.profile-gallery .profile-gallery-logo>img { object-fit:contain; background:var(--surface); }
+.profile-gallery figcaption { font-size:var(--text-small); color:var(--muted); line-height:1.6; margin-top:.625rem; }
+.profile-photo-dialog { max-width:60rem; width:calc(100% - 2rem); max-height:92dvh; margin:auto; padding:1rem; border:1px solid var(--line); border-radius:1rem; color:var(--ink); background:var(--surface); overflow:auto; }
+.profile-photo-dialog::backdrop { background:#1e1612c7; }
+.profile-photo-dialog-heading { display:flex; align-items:center; justify-content:space-between; gap:1rem; margin-bottom:1rem; }
+.profile-photo-dialog-heading h2 { font-size:1rem; line-height:1.5; overflow-wrap:anywhere; }
+.profile-photo-dialog-heading>.icon-button { flex:none; }
+.profile-photo-dialog>img { width:100%; height:auto; max-height:65dvh; object-fit:contain; border-radius:.5rem; }
+.profile-photo-dialog>p { margin-top:1rem; white-space:pre-wrap; font-size:var(--text-body); line-height:1.7; overflow-wrap:anywhere; }
+.business-public .post-choices button { color:var(--ink); min-height:3.5rem; }
+.profile-post-choice-copy { flex:1; min-width:0; }
+.business-public .post-choices strong { font-size:var(--text-body); line-height:1.6; }
+.business-public .post-choices small { font-size:var(--text-small); line-height:1.6; }
+.business-public .post-choices .radio-dot { flex-shrink:0; }
+.profile-address { font-size:var(--text-body); color:var(--muted); line-height:1.7; margin-top:.75rem; }
+.profile-landmark { font-size:var(--text-body); line-height:1.7; margin-top:.75rem; display:flex; flex-direction:column; gap:.25rem; }
+.profile-landmark strong { font-weight:550; }
+.profile-landmark>span { color:var(--muted); }
+.profile-closure-note { margin-top:1rem; padding:.875rem 1rem; border-left:3px solid var(--accent); background:var(--soft); font-size:var(--text-body); line-height:1.7; }
+.profile-hours { display:flex; flex-direction:column; gap:2rem; }
+.business-public .schedule-list { margin:1rem 0 0; font-size:var(--text-body); }
+.business-public .schedule-list>div { gap:1rem; line-height:1.7; }
+.business-public .schedule-list dt { min-width:0; }
+.business-public .schedule-list dd { flex-shrink:0; text-align:right; max-width:65%; }
+.business-public .schedule-list dd>span { display:block; }
+.profile-amenity-group,.profile-service-area { margin-top:1.25rem; }
+.profile-post-amenities h4 { margin:0; font-size:var(--text-body); font-weight:550; }
+.profile-amenity-group ul { display:flex; flex-wrap:wrap; gap:.5rem; list-style:none; padding:0; margin:.75rem 0 0; }
+.profile-amenity-group li { padding:.5rem .75rem; border:1px solid var(--line); border-radius:.5rem; font-size:var(--text-small); line-height:1.5; }
+.profile-service-area p { margin-top:.5rem; font-size:var(--text-body); line-height:1.7; color:var(--muted); }
+.business-public .visit-card>p { font-size:var(--text-body); line-height:1.7; align-items:flex-start; }
+.business-public .visit-card>p>svg { margin-top:.125rem; }
+.business-public .visit-card .profile-visit-landmark { display:block; }
+.business-public .visit-card .profile-visit-closure { display:block; padding:.75rem; background:var(--soft); border-radius:.5rem; color:var(--ink); }
+.business-public .visit-card>.button { font-size:var(--text-small); gap:.5rem; }
+.business-public .visit-card>.button-outline { margin-top:1rem; }
+.business-public .visit-note { font-size:var(--text-caption); }
+.profile-updates { margin-top:1.5rem; }
+.profile-update { padding:1.5rem 0; border-top:1px solid var(--line); }
+.profile-update:first-child { padding-top:0; border-top:0; }
+.profile-update .eyebrow { line-height:1.5; }
+.profile-update-dates { display:flex; flex-wrap:wrap; gap:.25rem 1rem; margin-top:.625rem; font-size:var(--text-small); line-height:1.6; color:var(--muted); }
+.profile-update-body { font-size:.875rem; color:var(--muted); line-height:1.8; margin-top:.875rem; }
+.profile-update-photo { margin-top:1rem; width:100%; aspect-ratio:16/10; border-radius:.875rem; }
+.profile-update-photo>img { object-fit:contain; }
+.profile-update-link { display:inline-flex; max-width:100%; white-space:normal; font-size:var(--text-body); margin-top:1rem; min-height:2.75rem; align-items:center; gap:.5rem; color:var(--accent); }
+
+.profile-visit-actions { display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin:18px 0 8px; }
+.profile-visit-actions .button { min-height:48px; font-size:var(--text-body); gap:10px; }
+.business-public .profile-owner-link { margin-bottom:4px; }
+.business-public .detail-status { margin-top:8px; }
+@media (max-width:767px) {
+  .profile-visit-actions { margin-top:14px; }
+  .profile-visit-actions .button { flex:1; padding:11px 12px; justify-content:center; min-width:0; }
+  .profile-post-picker { margin-top:12px; padding:12px; }
+  .profile-post-select select { font-size:var(--text-input); }
+  .business-public .business-heading { gap:6px; }
+  .business-public .detail-post-name { margin-top:4px; }
+}
+
+@media (max-width:1100px) {
+  .business-public .detail-columns { grid-template-columns:minmax(0,1fr) minmax(0,17.5rem); }
+  .profile-contact-list { grid-template-columns:minmax(0,1fr); }
+}
+@media (max-width:767px) {
+  .business-public .business-heading { gap:1rem; }
+  .profile-business-identity { flex-basis:100%; gap:.75rem; }
+  .profile-business-logo { width:3rem; height:3rem; flex-basis:3rem; border-radius:.75rem; }
+  .business-public .detail-price { text-align:left; display:flex; gap:.5rem; align-items:baseline; padding:0; }
+  .business-public .detail-price small { font-size:var(--text-caption); }
+  .business-public .detail-price strong { font-size:1rem; margin:0; }
+  .business-public .detail-status { font-size:var(--text-small); }
+  .business-public .business-description { font-size:var(--text-body); margin-top:1rem; }
+  .business-public .detail-tabs { gap:0 1.25rem; margin-top:1.25rem; }
+  .business-public .detail-tabs button { font-size:var(--text-small); }
+  .business-public .detail-columns { display:flex; }
+  .profile-section-stack { gap:1.75rem; }
+  .business-public .menu-item { gap:1rem; }
+  .business-public .profile-menu-photo { flex-basis:5.5rem; height:5.5rem; border-radius:.75rem; }
+  .profile-photo-expand { width:1.5rem; height:1.5rem; right:.375rem; bottom:.375rem; }
+  .business-public .about-copy { font-size:var(--text-body); }
+  .profile-gallery { gap:1.25rem .75rem; }
+  .profile-gallery figcaption { font-size:var(--text-caption); }
+  .profile-heading-favorite { margin-left:auto; }
+  .profile-facts>div { gap:.75rem; grid-template-columns:minmax(6rem,.75fr) minmax(0,1fr); }
+}
+@media (max-width:370px) {
+  .business-public .detail-tabs { gap:0 1rem; }
+  .business-public .detail-tabs button { font-size:var(--text-small); }
+  .business-public .schedule-list { font-size:var(--text-small); }
+  .business-public .schedule-list>div { gap:.5rem; }
+  .profile-gallery { grid-template-columns:minmax(0,1fr); }
+  .profile-action-links { flex-direction:column; }
+  .profile-action-links .button { width:100%; justify-content:space-between; }
+}
+@media (prefers-reduced-motion:reduce) {
+  .business-public *,.profile-photo-dialog { animation:none!important; transition:none!important; scroll-behavior:auto!important; }
+}

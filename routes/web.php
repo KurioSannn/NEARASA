@@ -1,0 +1,66 @@
+<?php
+
+use App\Http\Controllers\AccountController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BusinessController;
+use App\Http\Controllers\CommunityController;
+use App\Http\Controllers\ExploreController;
+use App\Http\Controllers\FavoriteController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\MapExploreController;
+use App\Http\Controllers\MerchantController;
+use App\Http\Controllers\MerchantGalleryController;
+use App\Http\Controllers\MerchantMediaController;
+use App\Http\Controllers\MerchantMenuController;
+use App\Http\Controllers\MerchantOperationsController;
+use App\Http\Controllers\MerchantPostController;
+use App\Http\Controllers\MerchantUpdateController;
+use App\Http\Controllers\PublicOwnerController;
+use App\Http\Controllers\StoreLocationController;
+use Illuminate\Support\Facades\Route;
+
+Route::get('/', HomeController::class)->name('home');
+Route::get('/jelajah', ExploreController::class)->name('explore');
+Route::get('/peta', MapExploreController::class)->name('map.explore');
+Route::get('/usaha/{business:slug}', BusinessController::class)->name('business.show');
+Route::get('/pemilik/{user}', [PublicOwnerController::class, 'show'])->name('owner.show');
+Route::post('/interaksi', [CommunityController::class, 'interaction'])->middleware('throttle:120,1');
+Route::get('/media/{file}', MerchantMediaController::class)->where('file', '[a-zA-Z0-9]{40}\.(?:jpg|jpeg|png|webp|pdf)')->name('merchant.photo');
+Route::post('/lokasi', [StoreLocationController::class, 'store'])->middleware('throttle:60,1')->name('location.store');
+Route::delete('/lokasi', [StoreLocationController::class, 'destroy'])->middleware('throttle:60,1')->name('location.destroy');
+
+Route::get('/masuk', [AuthController::class, 'create'])->name('login');
+Route::post('/masuk', [AuthController::class, 'store'])->middleware('throttle:6,1')->name('login.store');
+Route::post('/masuk/demo', [AuthController::class, 'demo'])->middleware('throttle:10,1')->name('login.demo');
+Route::middleware('auth')->group(function () {
+    Route::patch('/akun/nama-publik', [PublicOwnerController::class, 'update']);
+    Route::get('/riwayat', [PublicOwnerController::class, 'history'])->name('history');
+    Route::post('/usaha/{business:slug}/pos/{post}/ulasan', [CommunityController::class, 'review'])->middleware('throttle:10,1');
+    Route::post('/usaha/{business:slug}/pos/{post}/laporan-tutup', [CommunityController::class, 'report'])->middleware('throttle:10,1');
+    Route::post('/kelola-usaha/laporan/{report}/selesai', [CommunityController::class, 'resolve']);
+    Route::patch('/kelola-usaha/{business:slug}/pos/{post}/menu/{menu}/ketersediaan', [MerchantOperationsController::class, 'availability']);
+    Route::post('/kelola-usaha/{business:slug}/pos/{post}/jam-hari-ini', [MerchantOperationsController::class, 'storeTodayHours']);
+    Route::delete('/kelola-usaha/{business:slug}/pos/{post}/jam-hari-ini', [MerchantOperationsController::class, 'destroyTodayHours']);
+    Route::post('/keluar', [AuthController::class, 'destroy'])->name('logout');
+    Route::get('/akun', AccountController::class)->name('account');
+    Route::get('/favorit', [FavoriteController::class, 'index'])->name('favorites');
+    Route::post('/favorit/{business:slug}', [FavoriteController::class, 'store']);
+    Route::delete('/favorit/{business:slug}', [FavoriteController::class, 'destroy']);
+    Route::get('/kelola-usaha', [MerchantController::class, 'index'])->name('merchant.index');
+    Route::get('/kelola-usaha/pengaturan', [MerchantController::class, 'manage'])->name('merchant.manage');
+    Route::get('/kelola-usaha/laporan', [MerchantController::class, 'reportIndex'])->name('merchant.reports');
+    Route::get('/kelola-usaha/{business:slug}', [MerchantController::class, 'edit'])->name('merchant.edit');
+    Route::patch('/kelola-usaha/{business:slug}', [MerchantController::class, 'update'])->name('merchant.update');
+    Route::post('/kelola-usaha/{business:slug}/menu', [MerchantMenuController::class, 'store']);
+    Route::patch('/kelola-usaha/{business:slug}/menu/{menu}', [MerchantMenuController::class, 'update']);
+    Route::delete('/kelola-usaha/{business:slug}/menu/{menu}', [MerchantMenuController::class, 'destroy']);
+    Route::post('/kelola-usaha/{business:slug}/pos', [MerchantPostController::class, 'store']);
+    Route::patch('/kelola-usaha/{business:slug}/pos/{post}', [MerchantPostController::class, 'update']);
+    Route::delete('/kelola-usaha/{business:slug}/pos/{post}', [MerchantPostController::class, 'destroy']);
+    Route::post('/kelola-usaha/{business:slug}/foto', [MerchantGalleryController::class, 'store']);
+    Route::patch('/kelola-usaha/{business:slug}/foto/{photo}', [MerchantGalleryController::class, 'update']);
+    Route::delete('/kelola-usaha/{business:slug}/foto/{photo}', [MerchantGalleryController::class, 'destroy']);
+    Route::post('/kelola-usaha/{business:slug}/kabar', [MerchantUpdateController::class, 'store']);
+    Route::patch('/kelola-usaha/{business:slug}/kabar/{update}', [MerchantUpdateController::class, 'update']);
+    Route::delete('/kelola-usaha/{business:slug}/kabar/{update}', [MerchantUpdateController::class, 'destroy']);
+});
