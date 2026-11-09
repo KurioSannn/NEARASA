@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { ArrowRight, Eye, Store } from 'lucide-react';
+import { Eye, Store } from 'lucide-react';
 import MerchantLayout from '@/layouts/MerchantLayout';
 import Dialog from '@/components/Dialog';
 import type { MerchantBusiness } from '@/types/business-profile';
@@ -62,7 +62,7 @@ function BusinessWorkspace({ business, operations, merchantNavigation }: Props &
     return () => { window.removeEventListener('beforeunload', preventExit); remove(); };
   }, [hasDraft]);
   return <><div className="owner-workspace"><header className="owner-page-heading"><div><h1>Kelola usaha</h1></div></header>
-    <div className="owner-business-context"><div><label htmlFor="owner-business-select">Usaha yang dikelola</label><div className="owner-business-picker"><img src={businessCover(business)} alt="" width={44} height={44} /><select id="owner-business-select" value={business.slug} onChange={event => router.get(managementUrl(event.target.value), {}, { preserveState: false })}>{merchantNavigation.businesses.map(item => <option key={item.id} value={item.slug}>{item.name}</option>)}</select></div></div>{business.status === 'published' ? <Link className="owner-text-link" href={`/usaha/${business.slug}${postId ? `?post=${postId}` : ''}`}><Eye size={19} aria-hidden="true" />Lihat publik<ArrowRight size={16} aria-hidden="true" /></Link> : <span className="owner-caption">Draf · belum tampil di pencarian</span>}</div>
+    <div className="owner-business-context"><div><label htmlFor="owner-business-select">Usaha yang dikelola</label><div className="owner-business-picker"><img src={businessCover(business)} alt="" width={44} height={44} /><select id="owner-business-select" value={business.slug} onChange={event => router.get(managementUrl(event.target.value), {}, { preserveState: false })}>{merchantNavigation.businesses.map(item => <option key={item.id} value={item.slug}>{item.name}</option>)}</select></div></div>{business.status === 'published' ? <Link className="owner-text-link" href={`/usaha/${business.slug}${postId ? `?post=${postId}` : ''}`}><Eye size={19} aria-hidden="true" />Lihat publik</Link> : <span className="owner-caption">Draf · belum tampil di pencarian</span>}</div>
     <div className="owner-work-tabs" role="tablist" aria-label="Bagian Kelola usaha">{tabs.map((tab, index) => <button type="button" role="tab" id={`owner-tab-${tab.key}`} aria-controls={`owner-panel-${tab.key}`} aria-selected={active === tab.key} tabIndex={active === tab.key ? 0 : -1} key={tab.key} onClick={() => changeContext(tab.key)} onKeyDown={event => {
       let next = index;
       if (event.key === 'ArrowRight') next = (index + 1) % tabs.length;

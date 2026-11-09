@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, router, usePage } from '@inertiajs/react';
-import { ArrowRight, ChevronDown, ChevronRight, FileText, LayoutDashboard, LogOut, Store, UserRound } from 'lucide-react';
+import { ChevronDown, ChevronRight, FileText, LayoutDashboard, LogOut, Store, UserRound } from 'lucide-react';
 import type { SharedProps } from '@/types/catalog';
 import type { MerchantNavigation } from '@/types/merchant';
 
@@ -29,14 +29,14 @@ export default function MerchantLayout({ children }: { children: React.ReactNode
     return () => { document.removeEventListener('pointerdown', close); document.removeEventListener('keydown', escape); };
   }, []);
   return <div className="merchant-shell merchant-redesign">
-    <aside className="merchant-sidebar"><Link href="/kelola-usaha" className="wordmark" aria-label="NEARASA, dashboard pemilik">nearasa<span>.</span></Link>
+    <aside className="merchant-sidebar"><Link href="/kelola-usaha" className="wordmark" aria-label="NEARASA, dashboard pemilik">nearasa</Link>
       <nav aria-label="Navigasi pemilik">{nav.map(({ key, label, href, icon: Icon }) => <Link key={key} href={href} className={active === key ? 'selected' : ''} aria-current={active === key ? 'page' : undefined}><Icon size={21} aria-hidden="true" /><span>{label}</span>{key === 'reports' && merchantNavigation.pending_reports > 0 && <span className="owner-nav-count" aria-label={`${merchantNavigation.pending_reports} perlu diperiksa`}>{merchantNavigation.pending_reports}</span>}</Link>)}</nav>
       <div className="owner-sidebar-foot"><Store size={20} aria-hidden="true" /><p>Ruang pemilik<span>Informasi yang kamu atur tampil di profil usahamu.</span></p></div>
     </aside>
     <div className="merchant-main"><header className="merchant-topbar">
-      <Link href="/kelola-usaha" className="wordmark">nearasa<span>.</span></Link>
+      <Link href="/kelola-usaha" className="wordmark">nearasa</Link>
       <nav className="owner-breadcrumb" aria-label="Jejak halaman"><span>Ruang pemilik</span><ChevronRight size={14} aria-hidden="true" /><span aria-current="page">{nav.find(item => item.key === active)?.label}</span></nav>
-      <div className="owner-header-actions"><Link href="/" className="owner-public-link">Lihat NEARASA<ArrowRight size={17} aria-hidden="true" /></Link>
+      <div className="owner-header-actions"><Link href="/" className="owner-public-link">Lihat NEARASA</Link>
         <details ref={account} className="owner-account"><summary aria-label={`Menu akun ${auth.user?.public_name || auth.user?.name || ''}`}><span className="owner-avatar">{(auth.user?.public_name || auth.user?.name || 'P').slice(0, 1).toLocaleUpperCase('id-ID')}</span><ChevronDown size={15} aria-hidden="true" /></summary><div className="owner-account-menu"><p>{auth.user?.public_name || auth.user?.name}<small>{auth.user?.email}</small></p><Link href="/akun"><UserRound size={16} aria-hidden="true" />Akun saya</Link>{auth.user && merchantNavigation.businesses.some(business => business.status === 'published') && <Link href={`/pemilik/${auth.user.id}`}><Store size={16} aria-hidden="true" />Profil publik pemilik</Link>}<button type="button" onClick={() => router.post('/keluar')}><LogOut size={16} aria-hidden="true" />Keluar akun</button></div></details>
       </div>
     </header><main id="main-content" className="merchant-content" aria-busy={navigating}>

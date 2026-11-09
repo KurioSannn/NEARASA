@@ -57,7 +57,10 @@ export default function DiscoveryMap({ pins, location, radius, tileUrl, selected
       unwatch = watchTiles(tileLayer, notify);
       tileLayer.addTo(instance);
       layers.current = L.layerGroup().addTo(instance);
-      frame = requestAnimationFrame(() => { if (!disposed) instance.invalidateSize(); });
+      const invalidate = () => { if (!disposed && map.current) map.current.invalidateSize(); };
+      frame = requestAnimationFrame(invalidate);
+      setTimeout(invalidate, 100);
+      setTimeout(invalidate, 350);
       setReady(true);
     }).catch(() => { if (!disposed) { retryBusy.current = false; setFailed(true); setTileStatus('error'); } });
     return () => {
@@ -67,16 +70,31 @@ export default function DiscoveryMap({ pins, location, radius, tileUrl, selected
   }, [tileUrl, importVersion]);
 
   useEffect(() => {
+    if (!ready || !container.current || !map.current) return;
+    const instance = map.current;
+    const ro = new ResizeObserver(() => {
+      instance.invalidateSize();
+    });
+    ro.observe(container.current);
+    return () => ro.disconnect();
+  }, [ready]);
+
+  useEffect(() => {
     const L = leaflet.current, instance = map.current;
     if (!ready || !L || !instance) return;
     const bounds = L.latLngBounds([]);
     pins.forEach(pin => bounds.extend([pin.post.latitude, pin.post.longitude]));
     if (location) {
       bounds.extend([location.latitude, location.longitude]);
-      if (radius !== 'unlimited') bounds.extend(L.latLng(location.latitude, location.longitude).toBounds(radius * 2000));
     }
-    if (bounds.isValid()) instance.fitBounds(bounds, { padding: [42, 42], maxZoom: 15, animate: false });
-    else instance.setView([-7.365, 112.72], 12);
+    if (pins.length === 0 && location && radius !== 'unlimited') {
+      bounds.extend(L.latLng(location.latitude, location.longitude).toBounds(radius * 1000));
+    }
+    if (bounds.isValid()) {
+      instance.fitBounds(bounds, { padding: [54, 54], maxZoom: 15, animate: false });
+    } else {
+      instance.setView([-7.365, 112.72], 12);
+    }
   }, [ready, pins, location, radius, fitVersion]);
 
   useEffect(() => {
@@ -87,11 +105,27 @@ export default function DiscoveryMap({ pins, location, radius, tileUrl, selected
       group.clearLayers();
       addBusinessMarkers(L, instance, group, pins, selectedId, id => selection.current.onSelect(id));
       if (location) {
-        const origin = L.marker([location.latitude, location.longitude], { icon: L.divIcon({ className: 'discovery-origin-icon', html: '<span></span>', iconSize: [24, 24], iconAnchor: [12, 12] }), title: 'Titik pencarian: ' + location.label, zIndexOffset: 2000 }).addTo(group);
+        const origin = L.marker([location.latitude, location.longitude], {
+          icon: L.divIcon({ className: 'discovery-origin-icon', html: '<span><i class="origin-pulse"></i></span>', iconSize: [24, 24], iconAnchor: [12, 12] }),
+          title: 'Titik pencarian: ' + location.label,
+          zIndexOffset: 800,
+        }).addTo(group);
         origin.getElement()?.setAttribute('aria-label', 'Titik pencarian: ' + location.label);
-        const label = document.createElement('span'); label.textContent = 'Titik pencarian';
-        origin.bindTooltip(label, { permanent: true, direction: 'right', offset: [12, 0], className: 'origin-tooltip' });
-        if (radius !== 'unlimited') L.circle([location.latitude, location.longitude], { radius: radius * 1000, color: '#3154D9', weight: 1.5, dashArray: '5 7', fillOpacity: 0.025, interactive: false, className: 'discovery-radius' }).addTo(group);
+        const label = document.createElement('span');
+        label.textContent = 'Titik pencarian: ' + location.label;
+        origin.bindTooltip(label, { direction: 'top', offset: [0, -14], className: 'origin-tooltip' });
+        if (radius !== 'unlimited') {
+          L.circle([location.latitude, location.longitude], {
+            radius: radius * 1000,
+            color: '#cbb8aa',
+            weight: 1.5,
+            dashArray: '6 8',
+            fillColor: '#b74a2b',
+            fillOpacity: 0.03,
+            interactive: false,
+            className: 'discovery-radius',
+          }).addTo(group);
+        }
       }
       if (focused?.startsWith('nearasa-map-pin-')) document.getElementById(focused)?.focus();
     };
@@ -123,6 +157,6 @@ export default function DiscoveryMap({ pins, location, radius, tileUrl, selected
     </div>}
     {recovered && tileStatus === 'ready' && <p className="map-recovered-toast" role="status"><Check size={18} aria-hidden="true" />Peta sudah dimuat</p>}
     {covered && <span className="map-fallback-attribution">© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap contributors</a></span>}
-    {!covered && <div className="discovery-map-legend" aria-label="Keterangan peta"><span><MapPin size={13} aria-hidden="true" />Pos jualan</span>{location && <span><i className="legend-origin" />Titik pencarian</span>}</div>}
+    {!covered && <div className="discovery-map-legend" aria-label="Keterangan peta"><span><MapPin size={13} aria-hidden="true" />Tempat kuliner</span>{location && <span><i className="legend-origin" />Titik pencarian</span>}</div>}
   </div>;
 }

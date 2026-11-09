@@ -1,7 +1,7 @@
 import { Head, usePage } from '@inertiajs/react';
 import { useEffect, useMemo, useState } from 'react';
-import DiscoveryHeading from '@/components/DiscoveryHeading';
 import CustomerLayout, { useUi } from '@/layouts/CustomerLayout';
+import DiscoveryHeading from '@/components/DiscoveryHeading';
 import CatalogToolbar from '@/components/CatalogToolbar';
 import FilterPanel from '@/components/FilterPanel';
 import DiscoveryMap from '@/components/maps/DiscoveryMap';
@@ -18,6 +18,7 @@ export default function MapExplore({ pins, focus, filters, options, location, ma
   const selected = mapPins.find(pin => pin.post.id === selectedId);
   const select = (id: number | null) => setSelection({ url, id, source: 'marker' });
   const selectResult = (id: number) => setSelection({ url, id, source: 'list' });
+
   useEffect(() => {
     if (selection.url !== url || !selectedId || selection.source === 'profile') return;
     if (selection.source === 'marker' && !matchMedia('(max-width: 767px)').matches) return;
@@ -25,17 +26,70 @@ export default function MapExplore({ pins, focus, filters, options, location, ma
     summary?.focus({ preventScroll: true });
     summary?.scrollIntoView({ block: 'nearest', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
   }, [selection, url, selectedId]);
+
   const closeSelection = () => {
     const control = document.getElementById(`nearasa-map-${selection.source === 'list' ? 'result' : 'pin'}-${selected?.post.id}`);
     select(null);
     control?.focus();
   };
-  return <><Head title="Peta kuliner" /><div className="map-discovery-page">
-    <DiscoveryHeading title="Peta kuliner" />
-    <CatalogToolbar filters={filters} onFilter={() => setFilterOpen(true)} map count={pins.length} businessCount={new Set(pins.map(pin => pin.id)).size} />
-    <div className="map-discovery-workspace"><MapResults pins={pins} selectedId={selected?.post.id ?? null} onSelect={selectResult} onLocation={openLocation} filters={filters} onFilter={() => setFilterOpen(true)} /><div className="map-stage"><DiscoveryMap pins={mapPins} location={location} radius={filters.radius} tileUrl={mapTiles} selectedId={selected?.post.id ?? null} onSelect={select} listHref={catalogUrl(filters)} />{selected && <MapSelection pin={selected} filters={filters} outsideSearch={focus?.post.id === selected.post.id} onClose={closeSelection} />}</div></div>
-    <p className="map-discovery-note">Jarak garis lurus. Status mengikuti jadwal pemilik.</p>
-    {filterOpen && <FilterPanel filters={filters} options={options} base="/peta" onClose={() => setFilterOpen(false)} />}
-  </div></>;
+
+  return (
+    <>
+      <Head title="Peta kuliner" />
+      <div className="map-discovery-page">
+        <DiscoveryHeading title="Peta kuliner" />
+        <CatalogToolbar
+          filters={filters}
+          options={options}
+          onFilter={() => setFilterOpen(true)}
+          map
+          count={pins.length}
+          businessCount={new Set(pins.map(pin => pin.id)).size}
+        />
+
+        <div className="map-discovery-workspace">
+          <MapResults
+            pins={pins}
+            selectedId={selected?.post.id ?? null}
+            onSelect={selectResult}
+            onLocation={openLocation}
+            filters={filters}
+            onFilter={() => setFilterOpen(true)}
+          />
+
+          <section className="map-stage" aria-label="Kanvas peta interaktif">
+            <DiscoveryMap
+              pins={mapPins}
+              location={location}
+              radius={filters.radius}
+              tileUrl={mapTiles}
+              selectedId={selected?.post.id ?? null}
+              onSelect={select}
+              listHref={catalogUrl(filters)}
+            />
+            {selected && (
+              <MapSelection
+                pin={selected}
+                filters={filters}
+                outsideSearch={focus?.post.id === selected.post.id}
+                onClose={closeSelection}
+              />
+            )}
+          </section>
+        </div>
+
+        <p className="map-discovery-note">Perkiraan jarak dari titik pilihan · Jam buka mengikuti jadwal gerai.</p>
+
+        {filterOpen && (
+          <FilterPanel
+            filters={filters}
+            options={options}
+            base="/peta"
+            onClose={() => setFilterOpen(false)}
+          />
+        )}
+      </div>
+    </>
+  );
 }
 MapExplore.layout = (page: React.ReactNode) => <CustomerLayout>{page}</CustomerLayout>;

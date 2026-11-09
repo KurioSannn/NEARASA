@@ -1,5 +1,5 @@
 import { Head, Link, usePage } from '@inertiajs/react';
-import { AlertTriangle, ArrowRight, BookOpen, CalendarDays, CheckCircle2, ChevronDown, ChevronRight, Eye, FileText, Info, MapPin, MessageCircle, Store, UserRound } from 'lucide-react';
+import { AlertTriangle, BookOpen, CalendarDays, CheckCircle2, ChevronDown, ChevronRight, Eye, FileText, Info, MapPin, MessageCircle, Store, UserRound } from 'lucide-react';
 import MerchantLayout from '@/layouts/MerchantLayout';
 import { merchantDate, type DailyOperation } from '@/components/merchant/DailyOperations';
 import { businessCover } from '@/types/business-images';
@@ -42,7 +42,7 @@ export default function Dashboard({ businesses, operations, statistics, reports,
     <div className="owner-summaries">{summaries.map(({ label, value, suffix, icon: Icon, href, className }) => <Link href={href} className={`owner-summary ${className}`} key={label}><div><Icon size={22} aria-hidden="true" /><span>{label}</span></div><strong>{number(value)}{suffix && <small>{suffix}</small>}</strong><ChevronRight className="owner-summary-arrow" size={19} aria-hidden="true" /></Link>)}</div>
     <div className="owner-dashboard-grid"><Interactions statistics={statistics} /><section className="owner-panel owner-attention" aria-labelledby="owner-attention-title"><header className="owner-panel-heading"><h2 id="owner-attention-title">Perlu diperiksa</h2>{pending > 0 && <span className="owner-count amber">{pending}</span>}</header>
       {firstReport ? <article className="owner-report-highlight"><AlertTriangle size={22} aria-hidden="true" /><div><h3>Laporan pos tutup</h3><strong>{firstReport.business_name}</strong><span>{firstReport.post_name}</span><p>{firstReport.note || 'Konsumen menemukan pos tutup. Periksa kondisi dan informasi pos ini.'}</p><small>{merchantDate(firstReport.created_at)}</small></div><Link href={`/kelola-usaha/laporan?status=pending#laporan-${firstReport.id}`} className="owner-button"><FileText size={17} aria-hidden="true" />Buka laporan</Link></article>
-        : <div className="owner-calm-state"><CheckCircle2 size={30} aria-hidden="true" /><h3>Belum ada yang perlu diperiksa</h3><p>Laporan pelanggan untuk seluruh pos akan muncul di sini.</p><Link className="owner-text-link" href="/kelola-usaha/laporan">Lihat laporan<ArrowRight size={16} aria-hidden="true" /></Link></div>}
+        : <div className="owner-calm-state"><CheckCircle2 size={30} aria-hidden="true" /><h3>Belum ada yang perlu diperiksa</h3><p>Laporan pelanggan untuk seluruh pos akan muncul di sini.</p><Link className="owner-text-link" href="/kelola-usaha/laporan">Lihat laporan</Link></div>}
       <p className="owner-inline-hint"><Info size={16} aria-hidden="true" />Laporan tidak otomatis mengubah jam atau menutup pos.</p>
     </section></div>
     <section className="owner-panel owner-today" id="pos-hari-ini" aria-labelledby="owner-today-title"><header className="owner-panel-heading"><div><h2 id="owner-today-title">Ringkasan pos hari ini</h2><p>Status mengikuti jadwal dan jam khusus pemilik · WIB</p></div></header>

@@ -11,7 +11,13 @@ export function FavoriteControl({ business }: { business: BusinessCardData }) {
   const saved = props.auth.favorites.includes(business.id);
   return <button type="button" className={'discovery-favorite' + (saved ? ' is-saved' : '')} aria-pressed={saved}
     aria-label={(saved ? 'Hapus ' : 'Simpan ') + business.name + (saved ? ' dari favorit' : ' ke favorit')}
-    onClick={() => toggleFavorite(business.slug, business.id)}><Heart size={23} aria-hidden="true" /></button>;
+    onClick={(e) => {
+      e.stopPropagation();
+      toggleFavorite(business.slug, business.id);
+    }}
+  >
+    <Heart size={16} aria-hidden="true" />
+  </button>;
 }
 
 export function PostFacts({ business, address = false, distance = true }: { business: BusinessCardData; address?: boolean; distance?: boolean }) {
@@ -47,9 +53,24 @@ export default function DiscoveryResultCard({ business, noOrigin = false }: { bu
   const { url } = usePage();
   const detail = '/usaha/' + business.slug + '?' + new URLSearchParams({ post: String(business.post.id), from: url });
   return <article className={'discovery-result-card' + (allMenusSoldOut(business) ? ' all-sold-out' : '')}>
-    <Link className="discovery-result-photo" href={detail} tabIndex={-1} aria-hidden="true"><img src={businessCover(business)} width="600" height="420" alt="" loading="lazy" /></Link>
-    <div className="discovery-result-identity"><h2><Link href={detail}>{business.name}</Link></h2><p className="discovery-post-name">{business.post.name}</p><PostFacts business={business} address={noOrigin} /></div>
-    <div className="discovery-result-menu"><MenuMatch business={business} /><PostRating business={business} /></div>
-    <div className="discovery-result-actions"><FavoriteControl business={business} /><Link href={detail} className="discovery-result-open" aria-label={'Lihat ' + business.name + ', ' + business.post.name}><ChevronRight size={23} /></Link></div>
+    <Link className="discovery-result-photo" href={detail} tabIndex={-1} aria-hidden="true">
+      <img src={businessCover(business)} width="600" height="420" alt={`Foto tempat ${business.name}`} loading="lazy" />
+    </Link>
+    <div className="discovery-result-content">
+      <div className="discovery-result-identity">
+        <div className="discovery-result-title-row">
+          <h2><Link href={detail}>{business.name}</Link></h2>
+          <PostRating business={business} />
+        </div>
+        <p className="discovery-post-name">{business.post.name}</p>
+        <PostFacts business={business} address={noOrigin} />
+      </div>
+      <div className="discovery-result-menu">
+        <MenuMatch business={business} />
+      </div>
+    </div>
+    <div className="discovery-result-actions">
+      <FavoriteControl business={business} />
+    </div>
   </article>;
 }

@@ -12,6 +12,7 @@ export const useUi = () => useContext(UiContext);
 export default function CustomerLayout({ children }: { children: ReactNode }) {
   const { props, url } = usePage<SharedProps>();
   const home = url.split('?')[0] === '/';
+  const isMap = url.split('?')[0] === '/peta';
   const collection = /^\/(akun|favorit|riwayat|pemilik)(?:[/?]|$)/.test(url);
   const [locationOpen, setLocationOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -28,11 +29,23 @@ export default function CustomerLayout({ children }: { children: ReactNode }) {
     else router.post('/favorit/' + slug, {}, options);
   };
   return <UiContext.Provider value={{ openLocation: () => setLocationOpen(true), openAccount, toggleFavorite, isNavigating: loading }}>
-    <div className={'customer-layout discovery-shell' + (home ? ' home-shell' : '') + (collection ? ' collection-shell' : '')}>
+    <div className={'customer-layout discovery-shell' + (home ? ' home-shell' : '') + (collection ? ' collection-shell' : '') + (isMap ? ' map-shell' : '')}>
       <a className="skip-link" href="#main">Langsung ke isi</a>
       <DesktopHeader discovery />
       <main id="main" className="app-main" tabIndex={-1} aria-busy={loading}>{children}</main>
-      <footer className="site-footer"><Link className="wordmark" href="/">nearasa<span>.</span></Link><p>Good food is closer than you think.</p><span>Katalog contoh · Sidoarjo & Surabaya</span></footer>
+      <footer className="site-footer">
+        <Link className="footer-brand" href="/" aria-label="NEARASA beranda">
+          <img
+            src="/images/logo/nearasa-logo-colored.png"
+            alt="NEARASA Kuliner Lokal"
+            className="footer-logo"
+            width="92"
+            height="40"
+          />
+        </Link>
+        <p>Rasa lokal terdekat di sekitarmu.</p>
+        <span>Panduan kuliner UMKM · Sidoarjo & Surabaya</span>
+      </footer>
       <MobilePillNav />
       {locationOpen && <LocationPicker location={props.location} areas={props.options.areas} tileUrl={props.mapTiles} onClose={() => setLocationOpen(false)} />}
     </div>
