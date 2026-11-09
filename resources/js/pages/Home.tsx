@@ -35,6 +35,7 @@ export default function Home({ businesses, filters, options, location, recommend
             </Link>
           </div>
         </div>
+
         <ConsumerPhoto className="home-hero-food" src="/images/brand/nearasa-food-hero-v1.png" alt="Ilustrasi sajian kuliner khas lokal" eager />
       </section>
 
