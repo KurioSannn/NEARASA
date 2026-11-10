@@ -14,7 +14,7 @@ class HandleInertiaRequests extends Middleware
         return [...parent::share($request),
             'location' => fn () => $request->session()->get('search_location'),
             'mapTiles' => config('nearasa.map_tiles'),
-            'auth' => fn () => ['user' => $request->user()?->only(['id', 'name', 'email', 'is_demo', 'public_name']), 'favorites' => $request->user()?->favorites()->pluck('businesses.id')->all() ?? []],
+            'auth' => fn () => ['user' => $request->user()?->only(['id', 'name', 'email', 'is_demo', 'public_name', 'avatar']), 'favorites' => $request->user()?->favorites()->pluck('businesses.id')->all() ?? []],
             'flash' => fn () => ['success' => $request->session()->get('success')],
         ];
     }

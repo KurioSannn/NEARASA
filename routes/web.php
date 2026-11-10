@@ -33,6 +33,10 @@ Route::get('/masuk', [AuthController::class, 'create'])->name('login');
 Route::post('/masuk', [AuthController::class, 'store'])->middleware('throttle:6,1')->name('login.store');
 Route::post('/masuk/demo', [AuthController::class, 'demo'])->middleware('throttle:10,1')->name('login.demo');
 Route::middleware('auth')->group(function () {
+    Route::post('/akun/foto', [AccountController::class, 'updateAvatar'])->name('account.avatar.store');
+    Route::delete('/akun/foto', [AccountController::class, 'destroyAvatar'])->name('account.avatar.destroy');
+    Route::patch('/akun/profil', [AccountController::class, 'updateProfile'])->name('account.profile');
+    Route::put('/akun/sandi', [AccountController::class, 'updatePassword'])->name('account.password');
     Route::patch('/akun/nama-publik', [PublicOwnerController::class, 'update']);
     Route::get('/riwayat', [PublicOwnerController::class, 'history'])->name('history');
     Route::post('/usaha/{business:slug}/pos/{post}/ulasan', [CommunityController::class, 'review'])->middleware('throttle:10,1');

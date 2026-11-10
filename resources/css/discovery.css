@@ -118,11 +118,190 @@ html:has(.discovery-shell),body:has(.discovery-shell) { background:#fff8f0; }
   color: var(--ink);
   font-size: 13px;
   font-weight: 650;
+  cursor: pointer;
   transition: all .15s ease;
 }
-.discovery-shell .account-button:hover {
+.discovery-shell .account-button:hover,
+.discovery-shell .account-button-active {
   background: #ebded4;
-  border-color: rgba(59, 43, 38, 0.15);
+  border-color: rgba(59, 43, 38, 0.2);
+}
+.account-dropdown-wrapper {
+  position: relative;
+  display: inline-block;
+}
+.account-chevron {
+  transition: transform .2s ease;
+  color: var(--muted);
+}
+.account-chevron-open {
+  transform: rotate(180deg);
+  color: var(--accent);
+}
+.header-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 285px;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  box-shadow: 0 14px 38px rgba(59, 43, 38, 0.12), 0 3px 10px rgba(59, 43, 38, 0.04);
+  padding: 8px;
+  z-index: 1200;
+  animation: dropdownPop .16s cubic-bezier(0.16, 1, 0.3, 1);
+  transform-origin: top right;
+}
+@keyframes dropdownPop {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+.dropdown-user-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 10px 10px;
+}
+.discovery-avatar-img {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+.dropdown-user-avatar,
+.dropdown-user-avatar-img {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+.dropdown-user-avatar {
+  background: var(--soft);
+  color: var(--accent);
+  border: 1.5px solid rgba(183, 74, 43, 0.18);
+  font-size: 16px;
+  font-weight: 750;
+  display: grid;
+  place-items: center;
+}
+.dropdown-user-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 1px;
+}
+.dropdown-user-name {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dropdown-user-email {
+  font-size: 11.5px;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dropdown-user-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--accent);
+  background: var(--soft);
+  padding: 1px 7px;
+  border-radius: 8px;
+  margin-top: 3px;
+  width: fit-content;
+}
+.dropdown-divider {
+  height: 1px;
+  background: var(--line);
+  margin: 5px 0;
+}
+.dropdown-nav-items {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  text-decoration: none;
+  color: var(--ink);
+  transition: background .13s ease;
+}
+.dropdown-item:hover {
+  background: var(--soft);
+  text-decoration: none;
+}
+.dropdown-item-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  display: grid;
+  place-items: center;
+  color: var(--accent);
+  flex-shrink: 0;
+  transition: all .13s ease;
+}
+.dropdown-item:hover .dropdown-item-icon {
+  background: #ffffff;
+  border-color: rgba(183, 74, 43, 0.25);
+}
+.dropdown-item-copy {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.dropdown-item-copy strong {
+  font-size: 12.5px;
+  font-weight: 650;
+  color: var(--ink);
+  line-height: 1.3;
+}
+.dropdown-item-copy small {
+  font-size: 10.5px;
+  color: var(--muted);
+}
+.dropdown-logout-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: #b91c1c;
+  font-size: 12.5px;
+  font-weight: 650;
+  cursor: pointer;
+  text-align: left;
+  transition: background .13s ease;
+}
+.dropdown-logout-item:hover:not(:disabled) {
+  background: #fef2f2;
+}
+.dropdown-logout-item:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 .discovery-avatar {
   width: 28px;
