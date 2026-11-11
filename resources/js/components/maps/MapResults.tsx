@@ -98,23 +98,9 @@ export function MapResults({
                     aria-label={'Ringkasan ' + pin.name + ', ' + pin.post.name}
                     onClick={() => onSelect(pin.post.id)}
                   >
-                    {/* Left: Framed Photo with Status Overlay */}
-                    <div className="map-result-photo">
-                      <img
-                        src={businessCover(pin)}
-                        alt={`Foto tempat ${pin.name}`}
-                        loading="lazy"
-                        width="100"
-                        height="100"
-                      />
-                      <span className={'photo-status-badge' + (pin.is_open ? ' is-open' : ' is-closed')}>
-                        {pin.is_open ? 'Buka' : 'Tutup'}
-                      </span>
-                    </div>
-
-                    {/* Right: Clean Structured Details */}
+                    {/* Left: Clean Structured Details (Refrensi 2 Style) */}
                     <div className="map-result-copy">
-                      {/* Top Row: Business Name */}
+                      {/* Top Row: Business Name & Open Status */}
                       <div className="map-result-title-row">
                         <strong className="map-result-title">{pin.name}</strong>
                       </div>
@@ -139,7 +125,7 @@ export function MapResults({
                         )}
                       </div>
 
-                      {/* Bottom: Matched Menu on Left, Confident Bold Price on Right */}
+                      {/* Bottom: Matched Menu on Left, Confident Bold Price */}
                       <div className="map-result-bottom-row">
                         <span className="map-result-menu-title" title={menu ? menu.name : undefined}>
                           <span className="menu-kicker">Menu:</span> {menu ? menu.name : 'Pilihan harian'}
@@ -149,6 +135,25 @@ export function MapResults({
                           <strong className="price-val">{rupiah(price)}</strong>
                         </div>
                       </div>
+                    </div>
+
+                    {/* Right: Framed Photo with Floating Action Badge (Refrensi 2 Style) */}
+                    <div className="map-result-photo-wrap">
+                      <div className="map-result-photo">
+                        <img
+                          src={businessCover(pin)}
+                          alt={`Foto tempat ${pin.name}`}
+                          loading="lazy"
+                          width="100"
+                          height="100"
+                        />
+                        <span className={'photo-status-badge' + (pin.is_open ? ' is-open' : ' is-closed')}>
+                          {pin.is_open ? 'Buka' : 'Tutup'}
+                        </span>
+                      </div>
+                      <span className={`map-result-floating-btn ${isSelected ? 'is-selected' : ''}`}>
+                        {isSelected ? 'TERPILIH' : 'PILIH'}
+                      </span>
                     </div>
                   </button>
 

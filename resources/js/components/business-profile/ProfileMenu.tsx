@@ -1,20 +1,109 @@
-import { ArrowUpRight, ChevronDown, FileText, Utensils } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { ArrowUpRight, Check, FileText, MapPin, Search, Utensils, X } from 'lucide-react';
 import { menuSoldOut, rupiah, type Business, type SellingPost } from '@/types/catalog';
 import { ProfilePhoto } from './ProfilePhotos';
 import { trackInteraction } from './profile-utils';
 
 export default function ProfileMenu({ business, post }: { business: Business; post?: SellingPost }) {
+  const [activeGroup, setActiveGroup] = useState<string>('Semua');
+  const [searchQuery, setSearchQuery] = useState<string>('');
+
   const allSoldOut = business.menus.length > 0 && business.menus.every(menu => menuSoldOut(menu, post?.id));
-  const groups = [...new Set(business.menus.map(menu => menu.group || 'Menu lainnya'))];
+  const rawGroups = useMemo(
+    () => [...new Set(business.menus.map(menu => menu.group || 'Menu lainnya'))],
+    [business.menus]
+  );
+
+  const filterOptions = useMemo(() => ['Semua', ...rawGroups], [rawGroups]);
+
+  // Filter menus based on active category chip and search query
+  const filteredMenus = useMemo(() => {
+    let list = business.menus;
+    if (activeGroup !== 'Semua') {
+      list = list.filter(m => (m.group || 'Menu lainnya') === activeGroup);
+    }
+    const q = searchQuery.trim().toLowerCase();
+    if (q) {
+      list = list.filter(
+        m =>
+          m.name.toLowerCase().includes(q) ||
+          (m.category && m.category.toLowerCase().includes(q)) ||
+          (m.description && m.description.toLowerCase().includes(q))
+      );
+    }
+    return list;
+  }, [business.menus, activeGroup, searchQuery]);
+
+  // Groups to render
+  const visibleGroups = useMemo(() => {
+    if (activeGroup !== 'Semua') {
+      return [activeGroup];
+    }
+    const activeGroupsInFiltered = new Set(filteredMenus.map(m => m.group || 'Menu lainnya'));
+    return rawGroups.filter(g => activeGroupsInFiltered.has(g));
+  }, [activeGroup, filteredMenus, rawGroups]);
 
   return (
-    <>
-      <div className="section-header">
-        <div>
+    <div className="profile-menu-container">
+      {/* 1. Header Row: Title & Subtitle on left, Search input on right */}
+      <div className="profile-menu-header-row">
+        <div className="profile-menu-title-block">
           <h2>Daftar Menu</h2>
-          {post && <p className="profile-menu-post">Ketersediaan menu di {post.name}.</p>}
+          {post && (
+            <p className="profile-menu-subtitle">
+              <span>Ketersediaan menu di {post.name}.</span>
+              <span className="profile-menu-loc-pin" aria-hidden="true">
+                <MapPin size={13} />
+              </span>
+            </p>
+          )}
         </div>
+
+        {business.menus.length > 0 && (
+          <div className="profile-menu-search-box">
+            <Search size={15} className="profile-menu-search-icon" aria-hidden="true" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              placeholder="Cari menu di pos ini..."
+              aria-label="Cari menu di pos ini"
+              className="profile-menu-search-input"
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                className="profile-menu-search-clear"
+                onClick={() => setSearchQuery('')}
+                aria-label="Hapus pencarian"
+              >
+                <X size={13} />
+              </button>
+            )}
+          </div>
+        )}
       </div>
+
+      {/* 2. Category Filter Pills */}
+      {filterOptions.length > 1 && (
+        <div className="profile-menu-filter-chips" role="tablist" aria-label="Kategori menu">
+          {filterOptions.map(option => {
+            const isActive = activeGroup === option;
+            return (
+              <button
+                key={option}
+                type="button"
+                role="tab"
+                aria-selected={isActive}
+                className={`profile-menu-chip ${isActive ? 'is-active' : ''}`}
+                onClick={() => setActiveGroup(option)}
+              >
+                {option}
+              </button>
+            );
+          })}
+        </div>
+      )}
 
       {allSoldOut && (
         <p className="profile-stock-note" role="status">
@@ -38,85 +127,114 @@ export default function ProfileMenu({ business, post }: { business: Business; po
         </div>
       )}
 
-      {groups.length > 1 && (
-        <div className="profile-menu-quick-groups" role="navigation" aria-label="Lompat ke kelompok menu">
-          {groups.map(group => (
-            <a key={group} href={`#menu-group-${encodeURIComponent(group)}`} className="menu-group-chip">
-              {group}
-            </a>
-          ))}
+      {business.menus.length > 0 && filteredMenus.length === 0 && (
+        <div className="profile-empty-state profile-menu-search-empty">
+          <Search size={28} aria-hidden="true" />
+          <h3>Menu tidak ditemukan</h3>
+          <p>Tidak ada menu yang sesuai dengan pencarian &ldquo;{searchQuery}&rdquo;.</p>
+          <button
+            type="button"
+            className="button button-outline"
+            onClick={() => {
+              setSearchQuery('');
+              setActiveGroup('Semua');
+            }}
+          >
+            Lihat semua menu
+          </button>
         </div>
       )}
 
+      {/* 3. Grouped 2-Column Card Grid */}
       <div className="profile-menu-groups">
-        {groups.map(group => (
-          <section
-            className="profile-menu-group"
-            id={`menu-group-${encodeURIComponent(group)}`}
-            key={group}
-            aria-label={group}
-          >
-            <h3 className="profile-group-title">{group}</h3>
-            <div className="menu-list">
-              {business.menus
-                .filter(menu => (menu.group || 'Menu lainnya') === group)
-                .map(menu => {
+        {visibleGroups.map(group => {
+          const items = filteredMenus.filter(menu => (menu.group || 'Menu lainnya') === group);
+          if (!items.length) return null;
+
+          return (
+            <section
+              className="profile-menu-group"
+              id={`menu-group-${encodeURIComponent(group)}`}
+              key={group}
+              aria-label={group}
+            >
+              <h3 className="profile-group-title">{group}</h3>
+
+              <div className="profile-menu-grid">
+                {items.map(menu => {
                   const soldOut = menuSoldOut(menu, post?.id);
                   const track = () => {
                     if (post) trackInteraction(business.id, post.id, 'menu_open', menu.id);
                   };
+
                   return (
                     <article
-                      className={`menu-item profile-menu-item ${soldOut ? 'is-sold-out' : ''}`}
+                      className={`profile-menu-card-ref ${soldOut ? 'is-sold-out' : ''}`}
                       key={String(post?.id) + '-' + menu.id}
                     >
-                      {menu.photo ? (
-                        <div className="profile-menu-photo-wrap">
-                          <ProfilePhoto
-                            src={menu.photo}
-                            alt={menu.name}
-                            caption={menu.description || undefined}
-                            className="profile-menu-photo"
-                            onOpen={track}
-                          />
-                          {soldOut && <span className="profile-photo-sold-out">Habis</span>}
+                      {/* Left: Info Block */}
+                      <div className="profile-menu-card-info">
+                        {/* Top Badge Row */}
+                        <div className="profile-menu-card-badges">
+                          {menu.category && (
+                            <span className="profile-menu-badge-cat">{menu.category}</span>
+                          )}
+                          {soldOut ? (
+                            <span className="profile-menu-badge-stock is-soldout">
+                              <X size={11} strokeWidth={2.8} aria-hidden="true" />
+                              <span>Habis</span>
+                            </span>
+                          ) : (
+                            <span className="profile-menu-badge-stock is-available">
+                              <Check size={11} strokeWidth={2.8} aria-hidden="true" />
+                              <span>Tersedia</span>
+                            </span>
+                          )}
                         </div>
-                      ) : (
-                        <span className="profile-menu-no-photo" aria-hidden="true">
-                          <Utensils size={22} />
-                        </span>
-                      )}
-                      <div className="profile-menu-main">
-                        <div className="profile-menu-title-row">
-                          <h4>{menu.name}</h4>
-                          {soldOut && <span className="profile-sold-badge">Habis di pos ini</span>}
-                        </div>
+
+                        {/* Title */}
+                        <h4 className="profile-menu-card-title">{menu.name}</h4>
+
+                        {/* Price */}
+                        <strong className="profile-menu-card-price">{rupiah(menu.price)}</strong>
+
+                        {/* Description */}
                         {menu.description && (
-                          <p className="profile-menu-description profile-preserve-lines">{menu.description}</p>
+                          <p className="profile-menu-card-desc profile-preserve-lines">
+                            {menu.description}
+                          </p>
                         )}
-                        <strong className="profile-menu-price">{rupiah(menu.price)}</strong>
-                        {(menu.description || menu.category) && (
-                          <details className="profile-menu-details">
-                            <summary
-                              onClick={event => {
-                                if (!(event.currentTarget.parentElement as HTMLDetailsElement).open) track();
-                              }}
-                            >
-                              <span>Rincian menu</span>
-                              <ChevronDown size={14} aria-hidden="true" />
-                            </summary>
-                            {menu.category && <p className="menu-detail-cat">Kategori: {menu.category}</p>}
-                            {menu.description && <p className="profile-preserve-lines">{menu.description}</p>}
-                          </details>
+                      </div>
+
+                      {/* Right: Photo Container */}
+                      <div className="profile-menu-card-photo-col">
+                        {menu.photo ? (
+                          <div className="profile-menu-card-photo-wrap">
+                            <ProfilePhoto
+                              src={menu.photo}
+                              alt={menu.name}
+                              caption={menu.description || undefined}
+                              className="profile-menu-card-photo-btn"
+                              onOpen={track}
+                            />
+                            {soldOut && (
+                              <div className="profile-menu-photo-soldout-overlay" aria-hidden="true" />
+                            )}
+                          </div>
+                        ) : (
+                          <div className="profile-menu-card-no-photo" aria-hidden="true">
+                            <Utensils size={24} />
+                          </div>
                         )}
                       </div>
                     </article>
                   );
                 })}
-            </div>
-          </section>
-        ))}
+              </div>
+            </section>
+          );
+        })}
       </div>
-    </>
+    </div>
   );
 }

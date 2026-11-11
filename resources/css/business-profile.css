@@ -6,7 +6,7 @@
 .business-public .business-heading h1 { overflow-wrap:anywhere; }
 .business-public .detail-price { flex:0 0 auto; padding-top:.25rem; }
 .business-public .detail-status { line-height:1.6; flex-wrap:wrap; }
-.business-public .detail-tabs { gap:1.5rem; flex-wrap:wrap; margin-top:1.5rem; row-gap:0; }
+.business-public .detail-tabs { gap:1.5rem; flex-wrap:nowrap; margin-top:1.5rem; row-gap:0; }
 .business-public .detail-tabs button { min-height:3rem; font-size:var(--text-body); }
 .business-public .detail-columns { grid-template-columns:minmax(0,1fr) minmax(0,20.625rem); }
 .business-public .detail-panel { scroll-margin-top:1.5rem; }

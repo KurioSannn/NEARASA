@@ -76,6 +76,12 @@ export default function BusinessDetail({
 
   const showTab = (next: DetailTab, scroll = false) => {
     setTab(next);
+    const tabEl = document.getElementById('profile-nav-' + next);
+    tabEl?.scrollIntoView({
+      block: 'nearest',
+      inline: 'center',
+      behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth',
+    });
     if (scroll) {
       tabBar.current?.scrollIntoView({
         block: 'start',
@@ -92,8 +98,10 @@ export default function BusinessDetail({
     else if (event.key === 'End') next = tabs.length - 1;
     else return;
     event.preventDefault();
-    showTab(tabs[next].key);
-    document.getElementById('profile-nav-' + tabs[next].key)?.focus();
+    const nextKey = tabs[next].key;
+    showTab(nextKey);
+    const nextEl = document.getElementById('profile-nav-' + nextKey);
+    nextEl?.focus();
   };
 
   const favoriteButton = (

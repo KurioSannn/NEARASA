@@ -14,48 +14,11 @@ export default function BusinessCard({ business, row = false }: { business: Busi
   const soldOut = allMenusSoldOut(business);
   const hasRating = Boolean(business.rating && business.rating.average !== null && business.rating.count > 0);
   const isTopRated = Boolean(business.rating && business.rating.average !== null && business.rating.average >= 4.5);
+  const price = menu ? menu.price : business.min_price;
 
   return (
-    <article className={`business-card ${row ? 'card-row' : ''} ${soldOut ? 'card-sold-out' : ''}`}>
-      {/* Top Header: Title & Circular Action Button (Ruang Edit style) */}
-      <div className="card-top">
-        <div className="card-heading-wrap">
-          <h3 className="card-name">
-            <Link href={detailUrl}>{business.name}</Link>
-          </h3>
-          <p className="card-sub-info">
-            <span className="card-post-name">{business.post.name}</span>
-            {business.distance !== null ? (
-              <span className="card-distance-dot">· {distanceLabel(business.distance)}</span>
-            ) : business.kind ? (
-              <span className="card-distance-dot">· {business.kind}</span>
-            ) : null}
-          </p>
-        </div>
-
-        <div className="card-top-actions">
-          {!row && (
-            <button
-              type="button"
-              className={`card-heart-btn ${saved ? 'is-saved' : ''}`}
-              aria-pressed={saved}
-              onClick={() => toggleFavorite(business.slug, business.id)}
-              aria-label={`${saved ? 'Hapus' : 'Simpan'} ${business.name}${saved ? ' dari' : ' ke'} favorit`}
-            >
-              <Heart size={16} aria-hidden="true" />
-            </button>
-          )}
-          <Link
-            className="card-arrow-btn"
-            href={detailUrl}
-            aria-label={`Buka menu ${business.name}, ${business.post.name}`}
-          >
-            <ArrowUpRight size={17} aria-hidden="true" />
-          </Link>
-        </div>
-      </div>
-
-      {/* Middle: Inner Framed Image (Ruang Edit & Starbucks style) */}
+    <article className={`business-card ref-card-a ${row ? 'card-row' : ''} ${soldOut ? 'card-sold-out' : ''}`}>
+      {/* 1. Top Framed Hero Media (Refrensi 1 Style) */}
       <div className="card-photo-wrap">
         <Link href={detailUrl} tabIndex={-1} aria-hidden="true" className="card-photo-link">
           <img
@@ -67,6 +30,8 @@ export default function BusinessCard({ business, row = false }: { business: Busi
             height="400"
           />
         </Link>
+
+        {/* Floating Top-Left Status Badge */}
         <div className="card-photo-badges">
           {soldOut ? (
             <span className="card-status-badge is-soldout">Habis</span>
@@ -81,36 +46,75 @@ export default function BusinessCard({ business, row = false }: { business: Busi
             <span className="card-status-badge is-closed">Tutup</span>
           )}
         </div>
+
+        {!row && (
+          <button
+            type="button"
+            className={`card-heart-btn ${saved ? 'is-saved' : ''}`}
+            aria-pressed={saved}
+            onClick={() => toggleFavorite(business.slug, business.id)}
+            aria-label={`${saved ? 'Hapus' : 'Simpan'} ${business.name}${saved ? ' dari' : ' ke'} favorit`}
+          >
+            <Heart size={16} aria-hidden="true" />
+          </button>
+        )}
+
+        {/* Translucent Banner Ribbon (like 'Free Delivery until...' in Ref 1) */}
+        <div className="card-photo-ribbon">
+          <span>{business.post.day_schedule?.label || postStatus(business.post)}</span>
+        </div>
       </div>
 
-      {/* Bottom: Culinary Highlights & Bold Price (Starbucks style) */}
-      <div className="card-bottom">
-        <div className="card-culinary-info">
-          {menu ? (
-            <p className="card-menu-line">
-              <span className="card-menu-kicker">Menu:</span>
-              <strong className="card-menu-title">{menu.name}</strong>
-              {menuSoldOut(menu, business.post.id) && <span className="card-menu-soldout"> (Habis)</span>}
-            </p>
-          ) : (
-            <p className="card-menu-line">
-              <span className="card-menu-title">Menu harian UMKM</span>
-            </p>
+      {/* 2. Bottom: Title, Price & Action (Refrensi B style: title left, price+action right) */}
+      <div className="card-details-block">
+        <div className="card-title-row">
+          <h3 className="card-name">
+            <Link href={detailUrl}>{business.name}</Link>
+          </h3>
+        </div>
+
+        <p className="card-sub-info">
+          <span className="card-post-name">{business.post.name}</span>
+          {hasRating && (
+            <span className="card-rating-inline">
+              <Star size={11} fill="#d97706" color="#d97706" aria-hidden="true" />
+              <strong>{business.rating?.average?.toFixed(1)}</strong>
+            </span>
           )}
-          <div className="card-meta-details">
-            <span className="card-schedule-tag">{business.post.day_schedule?.label || postStatus(business.post)}</span>
-            {hasRating && (
-              <span className="card-rating-tag">
-                <Star size={11} fill="#d97706" color="#d97706" aria-hidden="true" />
-                <strong>{business.rating?.average?.toFixed(1)}</strong>
+        </p>
+
+        {/* 3. Bottom Row: Attribute Pills left, Price+Action right (like Ref B) */}
+        <div className="card-bottom-row">
+          <div className="card-attribute-tags" role="group" aria-label="Karakteristik kuliner">
+            {menu && (
+              <span className="card-attr-pill highlighted" title={menu.name}>
+                {menu.name}
+                {menuSoldOut(menu, business.post.id) && ' (Habis)'}
+              </span>
+            )}
+            {business.kind && (
+              <span className="card-attr-pill">
+                {business.kind}
+              </span>
+            )}
+            {business.distance !== null && (
+              <span className="card-attr-pill">
+                {distanceLabel(business.distance)}
               </span>
             )}
           </div>
-        </div>
 
-        <div className="card-pricing">
-          <span className="card-price-kicker">Mulai</span>
-          <strong className="card-price-value">{rupiah(menu ? menu.price : business.min_price)}</strong>
+          <div className="card-price-action">
+            <span className="card-bottom-price">{rupiah(price)}</span>
+            <Link
+              className="card-order-action"
+              href={detailUrl}
+              aria-label={`Buka menu ${business.name}, ${business.post.name}`}
+            >
+              <span>Menu</span>
+              <ArrowUpRight size={13} aria-hidden="true" />
+            </Link>
+          </div>
         </div>
       </div>
     </article>

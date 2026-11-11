@@ -1,20 +1,23 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { ArrowRight, Clock, Compass, Map, MapPin, Navigation, Search, SlidersHorizontal, Store, Utensils } from 'lucide-react';
 import { useState } from 'react';
 import CustomerLayout, { useUi } from '@/layouts/CustomerLayout';
 import SearchField from '@/components/SearchField';
 import FoodCategory from '@/components/FoodCategory';
 import BusinessCard from '@/components/BusinessCard';
+import TrendingBusinessCard from '@/components/TrendingBusinessCard';
 import ConsumerPhoto from '@/components/ConsumerPhoto';
 import FilterPanel from '@/components/FilterPanel';
 import EmptyCatalog from '@/components/EmptyCatalog';
-import { cardKey, catalogUrl, type CatalogProps } from '@/types/catalog';
+import HomeMapPreview from '@/components/HomeMapPreview';
+import { cardKey, catalogUrl, type CatalogProps, type SharedProps } from '@/types/catalog';
 import { groupBusinessLocations } from '@/types/consumer-pages';
 
 export default function Home({ businesses, filters, options, location, recommendations = [] }: CatalogProps) {
   const [filterOpen, setFilterOpen] = useState(false);
   const { openLocation } = useUi();
-  const choices = groupBusinessLocations(businesses).slice(0, 4).map(group => group[0]);
+  const { mapTiles } = usePage<SharedProps>().props;
+  const choices = groupBusinessLocations(businesses).slice(0, 3).map(group => group[0]);
   const personal = groupBusinessLocations(recommendations).slice(0, 4).map(group => group[0]);
 
   return <>
@@ -76,19 +79,26 @@ export default function Home({ businesses, filters, options, location, recommend
         </section>
       )}
 
-      <section className="home-catalog" aria-labelledby="home-choices-title">
+      <section className="home-catalog home-trending-section" aria-labelledby="home-choices-title">
         <header className="home-section-heading">
           <div>
             <h2 id="home-choices-title">{location ? 'Pilihan di sekitarmu' : 'Pilihan untuk dicoba'}</h2>
-            <p>Rekomendasi gerai & warung kuliner terdekat siap santap hari ini.</p>
+            <p>Rekomendasi gerai & warung kuliner teratas siap santap hari ini.</p>
           </div>
           <Link href={catalogUrl(filters)} className="home-section-link">
             Lihat semua <ArrowRight size={15} aria-hidden="true" />
           </Link>
         </header>
         {choices.length ? (
-          <div className="business-grid">
-            {choices.map(business => <BusinessCard key={cardKey(business)} business={business} />)}
+          <div className="home-trending-grid">
+            {choices.map((business, index) => (
+              <TrendingBusinessCard
+                key={cardKey(business)}
+                business={business}
+                isHighlighted={index % 3 === 1}
+                rank={index + 1}
+              />
+            ))}
           </div>
         ) : (
           <EmptyCatalog filters={filters} base="/" />
@@ -127,45 +137,12 @@ export default function Home({ businesses, filters, options, location, recommend
           </div>
         </div>
 
-        <div className="home-map-callout-visual" aria-hidden="true">
-          <div className="mock-map-canvas">
-            <div className="mock-map-roads" />
-            
-            <div className="mock-map-center">
-              <div className="mock-center-dot" />
-              <div className="mock-center-pulse" />
-            </div>
-
-            <div className="mock-map-pin pin-1">
-              <span className="mock-pin-disc">
-                <Utensils size={13} />
-              </span>
-              <div className="mock-pin-card">
-                <strong>Dapur Griya</strong>
-                <small>&middot; 783 m</small>
-              </div>
-            </div>
-
-            <div className="mock-map-pin pin-2">
-              <span className="mock-pin-disc">
-                <Utensils size={13} />
-              </span>
-              <div className="mock-pin-card">
-                <strong>Pizza Sore</strong>
-                <small className="pin-open-tag">Buka</small>
-              </div>
-            </div>
-
-            <div className="mock-map-pin pin-3">
-              <span className="mock-pin-disc">
-                <Store size={13} />
-              </span>
-              <div className="mock-pin-card">
-                <strong>Burger Pos</strong>
-                <small>&middot; 1,2 km</small>
-              </div>
-            </div>
-          </div>
+        <div className="home-map-callout-visual">
+          <HomeMapPreview
+            businesses={businesses}
+            location={location}
+            tileUrl={mapTiles}
+          />
         </div>
       </section>
 

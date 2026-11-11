@@ -24,7 +24,13 @@ export default function LocationMap({ latitude, longitude, tileUrl, onSelect }: 
     import('leaflet').then(L => {
       if (disposed || !container.current) return;
       const point = pointRef.current;
-      const map = L.map(container.current, { scrollWheelZoom: false }).setView([point.latitude, point.longitude], 15);
+      const isPicker = Boolean(selectRef.current);
+      const isMobile = window.matchMedia('(max-width: 767px)').matches;
+      const map = L.map(container.current, {
+        scrollWheelZoom: false,
+        dragging: isPicker || !isMobile,
+        touchZoom: isPicker,
+      }).setView([point.latitude, point.longitude], 15);
       mapRef.current = map;
       const tiles = L.tileLayer(tileUrl, { maxZoom: 19, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' });
       unwatch = watchTiles(tiles, (next, progress) => { if (!disposed) { setStatus(next); if (progress.loaded) setHasTiles(true); } });
