@@ -42,10 +42,11 @@ export default function CurvedSidebar({ merchantNavigation }: { merchantNavigati
           <Store className="w-5 h-5" aria-hidden="true" />
         </Link>
 
-        {/* Laporan Tab */}
+        {/* Review Tab */}
         <Link
           href="/kelola-usaha/laporan"
-          aria-label="Laporan Pos Tutup"
+          aria-label="Review Pos Tutup"
+          title="Review Pos Tutup"
           className={`relative w-10 h-10 rounded-2xl flex items-center justify-center transition-colors duration-150 ${
             activeNav === 'reports'
               ? 'bg-terracotta text-white !text-white shadow-md shadow-terracotta/25'

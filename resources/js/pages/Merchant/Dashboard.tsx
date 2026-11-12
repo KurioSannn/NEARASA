@@ -62,7 +62,7 @@ export default function Dashboard({
         style={{ fontFamily: 'var(--font-sans)' }}
       >
         <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 pt-0 pb-6 flex flex-col gap-6">
-          {/* BEGIN: TopNavigationBar */}
+          {/* BEGIN: TopNavigationBar (Clean header without middle nav pills) */}
           <TopNav
             merchantNavigation={merchantNavigation}
             searchQuery={searchQuery}

@@ -16,33 +16,50 @@
   --color-clay-100: #f5ede4;
   --color-clay-200: #ede0d3;
   --color-clay-300: #decbc0;
-  --color-clay-400: #c5ada1;
-  --color-clay-500: #8b726a;
-  --color-clay-600: #57423c;
-  --color-clay-700: #3c2d26;
-  --color-clay-800: #261912;
-  --color-clay-900: #1e130c;
+  --color-clay-400: #a89289;
+  --color-clay-500: #a89289;
+  --color-clay-600: #917970;
+  --color-clay-700: #786057;
+  --color-clay-800: #5f4940;
+  --color-clay-900: #4a3831;
 
   --color-sand-surface: #fff8f6;
   --color-sand-base: #f5ede4;
   --color-sand-dim: #eed5ca;
-  --color-sand-border: #f0e3db;
+  --color-sand-border: rgba(183, 75, 40, 0.18);
 
   --shadow-soft: 0 10px 30px -5px rgba(82, 32, 13, 0.04), 0 4px 12px -2px rgba(82, 32, 13, 0.02);
   --shadow-card-hover: 0 20px 35px -8px rgba(82, 32, 13, 0.08), 0 8px 16px -4px rgba(82, 32, 13, 0.04);
   --shadow-pill: 0 4px 14px 0 rgba(183, 75, 40, 0.22);
 }
 
+/* Universal border styling for soft transparent brown lines */
+*, ::before, ::after {
+  border-color: rgba(183, 75, 40, 0.18);
+}
+
 /* Fallback utility classes */
 .bg-sand-surface { background-color: #fff8f6; }
 .bg-sand-base { background-color: #f5ede4; }
-.border-sand-border { border-color: #f0e3db; }
-.text-clay-900 { color: #1e130c; }
-.text-clay-800 { color: #261912; }
-.text-clay-700 { color: #3c2d26; }
-.text-clay-600 { color: #57423c; }
-.text-clay-500 { color: #8b726a; }
-.text-clay-400 { color: #c5ada1; }
+.border-sand-border,
+[class*="border-sand-border"],
+.border-t.border-sand-border,
+.border-b.border-sand-border,
+.border-l.border-sand-border,
+.border-r.border-sand-border,
+.border.border-sand-border {
+  border-color: rgba(183, 75, 40, 0.18) !important;
+}
+.divide-sand-border > :not([hidden]) ~ :not([hidden]),
+tbody.divide-sand-border > tr + tr {
+  border-color: rgba(183, 75, 40, 0.18) !important;
+}
+.text-clay-900 { color: #4a3831 !important; }
+.text-clay-800 { color: #5f4940 !important; }
+.text-clay-700 { color: #786057 !important; }
+.text-clay-600 { color: #917970 !important; }
+.text-clay-500 { color: #a89289; }
+.text-clay-400 { color: #bcaaa1; }
 .text-clay-300 { color: #decbc0; }
 .bg-clay-50 { background-color: #fbf8f5; }
 .bg-clay-100 { background-color: #f5ede4; }
@@ -137,4 +154,110 @@ body {
 
 .dash-scroll::-webkit-scrollbar-thumb:hover {
   background: #b74b28;
+}
+
+/* Modal Dialog Slim Scrollbar & Tidy Styling */
+dialog.dialog {
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+
+.dialog-content {
+  display: flex !important;
+  flex-direction: column !important;
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+}
+
+.dialog-heading {
+  flex: 0 0 auto !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 16px !important;
+  padding: 20px 26px !important;
+  background: #fffdfa !important;
+  border-bottom: 1px solid rgba(183, 75, 40, 0.18) !important;
+  margin: 0 !important;
+  position: static !important;
+}
+
+.dialog-body {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  padding: 24px 26px 28px !important;
+  scrollbar-width: thin !important;
+  scrollbar-color: #decbc0 transparent !important;
+}
+
+.dialog-body::-webkit-scrollbar {
+  width: 6px !important;
+  height: 6px !important;
+}
+
+.dialog-body::-webkit-scrollbar-track {
+  background: transparent !important;
+}
+
+.dialog-body::-webkit-scrollbar-thumb {
+  background: #decbc0 !important;
+  border-radius: 9999px !important;
+}
+
+.dialog-body::-webkit-scrollbar-thumb:hover {
+  background: #b74b28 !important;
+}
+
+/* Scrollbar Suppression on Dialog Container and Content */
+dialog.dialog::-webkit-scrollbar,
+.dialog::-webkit-scrollbar,
+.dialog-content::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* Unified Modal Footer Background (No Two-Tone Discoloration) */
+.dialog-footer,
+.dialog .profile-save-area,
+.dialog .profile-step-footer,
+.dialog .owner-editor-footer {
+  background: #fffdfa !important;
+  border-top: 1px solid rgba(183, 75, 40, 0.18) !important;
+  padding-top: 18px !important;
+  margin-top: 24px !important;
+  position: static !important;
+}
+
+/* Secondary Button & Control Hovers in Modals (Signature NEARASA Terracotta) */
+.dialog .profile-secondary,
+.dialog .owner-button-secondary {
+  background: #ffffff !important;
+  border: 1px solid rgba(183, 75, 40, 0.22) !important;
+  color: #4a3831 !important;
+  transition: all 0.15s ease !important;
+}
+
+.dialog .profile-secondary:hover,
+.dialog .owner-button-secondary:hover {
+  background: #fdeee9 !important;
+  color: #b74b28 !important;
+  border-color: rgba(183, 75, 40, 0.35) !important;
+}
+
+.dialog .profile-editor-steps > button:hover:not([aria-current]) {
+  background: #fdeee9 !important;
+  color: #b74b28 !important;
+  border-color: rgba(183, 75, 40, 0.35) !important;
+}
+
+.dialog-heading .icon-button:hover,
+.dialog-close-btn:hover {
+  background: #fdeee9 !important;
+  color: #b74b28 !important;
+  border-color: rgba(183, 75, 40, 0.35) !important;
 }

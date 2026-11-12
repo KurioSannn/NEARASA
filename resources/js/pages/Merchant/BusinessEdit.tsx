@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { ArrowLeft, ChevronDown, Eye, Store } from 'lucide-react';
+import { ArrowLeft, Check, ChevronDown, Eye, Store } from 'lucide-react';
 import MerchantLayout from '@/layouts/MerchantLayout';
 import Dialog from '@/components/Dialog';
 import type { MerchantBusiness } from '@/types/business-profile';
@@ -33,6 +33,7 @@ function BusinessWorkspace({ business, operations, merchantNavigation }: Props &
   const [profilePart, setProfilePart] = useState('about');
   const [mediaPart, setMediaPart] = useState('photos');
   const [hoursRequest, setHoursRequest] = useState(0);
+  const [businessDropdownOpen, setBusinessDropdownOpen] = useState(false);
   const [drafts, setDrafts] = useState<Record<string, boolean>>({});
   const [leavingFor, setLeavingFor] = useState<{ url: string; logout: boolean } | null>(null);
   const allowNavigation = useRef(false);
@@ -97,20 +98,51 @@ function BusinessWorkspace({ business, operations, merchantNavigation }: Props &
                 Usaha yang Dikelola
               </label>
               <div className="flex items-center gap-2 mt-1 flex-wrap">
+                {/* Custom Popover Dropdown for Usaha (No OS Blue Hover) */}
                 <div className="relative">
-                  <select
-                    id="owner-business-select"
-                    value={business.slug}
-                    onChange={(event) => router.get(managementUrl(event.target.value), {}, { preserveState: false })}
-                    className="appearance-none bg-clay-50 hover:bg-clay-100/70 text-clay-900 text-sm font-extrabold rounded-xl pl-3 pr-8 py-2 border border-sand-border cursor-pointer transition focus:ring-2 focus:ring-terracotta/20 outline-none"
+                  <button
+                    type="button"
+                    onClick={() => setBusinessDropdownOpen(!businessDropdownOpen)}
+                    className="flex items-center gap-2 bg-clay-50/90 hover:bg-[#fdeee9] text-clay-900 text-sm font-extrabold rounded-xl px-3.5 py-2 border border-sand-border hover:border-terracotta-300 cursor-pointer transition-all focus:ring-2 focus:ring-terracotta/20 outline-none shadow-xs"
+                    aria-expanded={businessDropdownOpen}
                   >
-                    {merchantNavigation.businesses.map((item) => (
-                      <option key={item.id} value={item.slug}>
-                        {item.name}
-                      </option>
-                    ))}
-                  </select>
-                  <ChevronDown className="w-4 h-4 text-clay-500 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <span>{business.name}</span>
+                    <ChevronDown className={`w-4 h-4 text-clay-500 transition-transform duration-200 ${businessDropdownOpen ? 'rotate-180 text-terracotta' : ''}`} />
+                  </button>
+
+                  {businessDropdownOpen && (
+                    <>
+                      <div
+                        className="fixed inset-0 z-40"
+                        onClick={() => setBusinessDropdownOpen(false)}
+                      />
+                      <div className="absolute left-0 top-full mt-1.5 min-w-[220px] bg-white border border-sand-border rounded-2xl shadow-xl p-1.5 z-50 space-y-1">
+                        {merchantNavigation.businesses.map((item) => {
+                          const isSelected = item.slug === business.slug;
+                          return (
+                            <button
+                              key={item.id}
+                              type="button"
+                              onClick={() => {
+                                setBusinessDropdownOpen(false);
+                                if (!isSelected) {
+                                  router.get(managementUrl(item.slug), {}, { preserveState: false });
+                                }
+                              }}
+                              className={`w-full text-left px-3 py-2.5 rounded-xl text-xs transition-colors duration-150 flex items-center justify-between gap-3 cursor-pointer ${
+                                isSelected
+                                  ? 'bg-terracotta-50 text-terracotta font-extrabold border border-terracotta-200'
+                                  : 'text-clay-800 font-semibold hover:bg-[#fdeee9] hover:text-terracotta border border-transparent'
+                              }`}
+                            >
+                              <span>{item.name}</span>
+                              {isSelected && <Check className="w-3.5 h-3.5 text-terracotta shrink-0" />}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </>
+                  )}
                 </div>
                 {business.status === 'published' ? (
                   <span className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full">

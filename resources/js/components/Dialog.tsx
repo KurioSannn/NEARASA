@@ -39,10 +39,12 @@ export default function Dialog({
             {subtitle && <p className="dialog-subtitle">{subtitle}</p>}
           </div>
           <button className="icon-button dialog-close-btn" aria-label="Tutup" type="button" onClick={onClose}>
-            <X size={20} />
+            <X size={18} />
           </button>
         </header>
-        {children}
+        <div className="dialog-body">
+          {children}
+        </div>
       </div>
     </dialog>
   );

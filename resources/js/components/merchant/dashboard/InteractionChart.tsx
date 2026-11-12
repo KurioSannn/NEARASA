@@ -48,7 +48,10 @@ export default function InteractionChart({ statistics }: { statistics: MerchantS
           {gridSteps.map((val, idx) => (
             <div key={idx} className="flex items-center gap-3">
               <span className="w-6 text-right font-mono">{Math.round(val)}</span>
-              <div className={`flex-1 border-b ${idx === gridSteps.length - 1 ? 'border-sand-border' : 'border-dashed border-sand-border'}`} />
+              <div
+                className={`flex-1 border-b ${idx === gridSteps.length - 1 ? 'border-sand-border' : 'border-dashed border-sand-border'}`}
+                style={{ borderColor: 'rgba(183, 75, 40, 0.18)' }}
+              />
             </div>
           ))}
         </div>
@@ -105,7 +108,10 @@ export default function InteractionChart({ statistics }: { statistics: MerchantS
       </div>
 
       {/* Bottom summary pill row */}
-      <div className="flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-sand-border/70 text-xs">
+      <div
+        className="flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-sand-border text-xs"
+        style={{ borderColor: 'rgba(183, 75, 40, 0.18)' }}
+      >
         <span className="text-clay-700 font-medium">
           Total interaksi: <strong className="text-clay-900">{number(totalInteractions)} interaksi</strong>
         </span>
