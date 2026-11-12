@@ -60,8 +60,8 @@
 .profile-errors ul { list-style:disc; padding-left:18px; margin:6px 0 0; }
 .profile-upload-progress { display:flex; flex-direction:column; gap:8px; margin-bottom:16px; color:var(--muted); font-size:var(--text-small); }
 .profile-upload-progress progress { accent-color:var(--accent); height:6px; width:100%; }
-.profile-secondary,.profile-danger { display:inline-flex; align-items:center; justify-content:center; gap:8px; min-height:44px; padding:10px 14px; border-radius:10px; border:1px solid var(--line); background:var(--surface); color:var(--ink); font-size:var(--text-small); font-weight:550; line-height:1.5; }
-.profile-secondary:hover { background:var(--soft); }
+.profile-secondary,.profile-danger { display:inline-flex; align-items:center; justify-content:center; gap:8px; min-height:44px; padding:10px 14px; border-radius:10px; border:1px solid rgba(183, 75, 40, 0.22); background:#ffffff; color:#4a3831; font-size:var(--text-small); font-weight:550; line-height:1.5; transition:all 0.15s ease; }
+.profile-secondary:hover { background:#fdeee9; color:#b74b28; border-color:rgba(183, 75, 40, 0.35); }
 .profile-danger { color:var(--surface); background:var(--accent-dark); border-color:var(--accent-dark); }
 .profile-danger:hover { background:var(--ink); border-color:var(--ink); }
 .profile-icon-danger { display:inline-flex; justify-content:center; align-items:center; width:44px; height:44px; flex:none; border:1px solid var(--line); border-radius:10px; color:var(--accent-dark); background:transparent; }
@@ -174,7 +174,7 @@
 .profile-category-tags button { background:transparent; color:var(--muted); flex:none; display:grid; place-items:center; min-width:44px; min-height:44px; }
 .profile-field>label>small { color:var(--muted); font-weight:400; margin-left:6px; }
 .profile-panels>section:not([hidden]),.profile-editor-fields { animation:content-enter .2s ease-out; }
-.dialog .profile-save-area,.dialog .profile-step-footer { position:sticky; bottom:-28px; z-index:4; margin-top:16px; padding:16px 0 22px; background:var(--paper); border-top:1px solid var(--line); }
+.dialog .profile-save-area,.dialog .profile-step-footer { position:static; z-index:4; margin-top:20px; padding:18px 0 8px; background:#fffdfa; border-top:1px solid rgba(183, 75, 40, 0.18); }
 .dialog .profile-save-bar { gap:10px; }
 .profile-schedule-summary li { align-items:baseline; gap:12px; }
 .profile-schedule-summary strong { text-align:right; font-variant-numeric:tabular-nums; }

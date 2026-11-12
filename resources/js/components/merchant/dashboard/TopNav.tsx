@@ -10,9 +10,6 @@ export default function TopNav({ merchantNavigation, searchQuery = '', onSearchC
   onSearchChange?: (q: string) => void;
 }) {
   const { auth } = usePage<SharedProps>().props;
-  const { url } = usePage();
-  const pageUrl = (url || '').split('?')[0];
-  const activeNav = pageUrl === '/kelola-usaha' ? 'dashboard' : pageUrl.startsWith('/kelola-usaha/laporan') ? 'reports' : 'manage';
   const [profileOpen, setProfileOpen] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
   const pending = merchantNavigation.pending_reports;
@@ -47,55 +44,6 @@ export default function TopNav({ merchantNavigation, searchQuery = '', onSearchC
         </Link>
       </div>
 
-      {/* Navigation Pill Switcher - Compact & Color Transition Only */}
-      <nav aria-label="Main Navigation" className="hidden md:flex items-center bg-white/95 p-1 rounded-full border border-sand-border shadow-sm gap-1">
-        <Link
-          className={`px-3.5 py-1.5 rounded-full text-xs transition-colors duration-150 ${
-            activeNav === 'dashboard'
-              ? 'font-bold bg-terracotta text-white !text-white shadow-pill'
-              : 'font-semibold text-clay-800 hover:text-terracotta hover:bg-[#fdeee9]'
-          }`}
-          href="/kelola-usaha"
-        >
-          Dashboard
-        </Link>
-        <Link
-          className={`px-3.5 py-1.5 rounded-full text-xs transition-colors duration-150 ${
-            activeNav === 'manage'
-              ? 'font-bold bg-terracotta text-white !text-white shadow-pill'
-              : 'font-semibold text-clay-800 hover:text-terracotta hover:bg-[#fdeee9]'
-          }`}
-          href={merchantNavigation.manage_url}
-        >
-          Kelola Usaha
-        </Link>
-        <Link
-          className={`px-3.5 py-1.5 rounded-full text-xs transition-colors duration-150 flex items-center gap-1.5 ${
-            activeNav === 'reports'
-              ? 'font-bold bg-terracotta text-white !text-white shadow-pill'
-              : 'font-semibold text-clay-800 hover:text-terracotta hover:bg-[#fdeee9]'
-          }`}
-          href="/kelola-usaha/laporan"
-        >
-          <span>Laporan</span>
-          {pending > 0 && (
-            <span
-              className={`px-1.5 py-0.5 rounded-full text-[10px] font-bold leading-none ${
-                activeNav === 'reports' ? 'bg-white/20 text-white !text-white' : 'bg-amber-100 text-amber-900'
-              }`}
-            >
-              {pending}
-            </span>
-          )}
-        </Link>
-        <Link
-          className="px-3.5 py-1.5 rounded-full text-xs font-semibold text-clay-800 hover:text-terracotta hover:bg-[#fdeee9] transition-colors duration-150"
-          href="/"
-        >
-          Lihat NEARASA
-        </Link>
-      </nav>
-
       {/* Utility & Profile Area */}
       <div className="flex items-center gap-3">
         {/* Quick Search */}
@@ -114,7 +62,7 @@ export default function TopNav({ merchantNavigation, searchQuery = '', onSearchC
         {/* Notification Bell */}
         <Link
           href="/kelola-usaha/laporan"
-          aria-label={pending > 0 ? `${pending} laporan perlu diperiksa` : 'Notifikasi laporan'}
+          aria-label={pending > 0 ? `${pending} review perlu diperiksa` : 'Notifikasi review'}
           className="relative w-10 h-10 rounded-full bg-white border border-sand-border flex items-center justify-center text-clay-700 hover:text-terracotta hover:bg-[#fdeee9] hover:border-terracotta-200 shadow-sm transition-colors duration-150"
         >
           <Bell className="w-4 h-4" aria-hidden="true" />

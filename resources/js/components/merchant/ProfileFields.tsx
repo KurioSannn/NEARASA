@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type InputHTMLAttributes, type ReactNode, type SelectHTMLAttributes, type TextareaHTMLAttributes } from 'react';
-import { AlertCircle, Check, LoaderCircle, Save } from 'lucide-react';
+import { AlertCircle, Check, ChevronDown, LoaderCircle, Save } from 'lucide-react';
 import Button from '@/components/Button';
 
 type FieldProps = { id: string; label: string; hint?: string; error?: unknown };
@@ -17,8 +17,66 @@ export function TextAreaField({ id, label, hint, error, ...props }: FieldProps &
   return <Field id={id} label={label} hint={hint} error={error}><textarea id={id} className="profile-textarea" aria-invalid={Boolean(error)} aria-describedby={[hint ? `${id}-hint` : '', error ? `${id}-error` : ''].filter(Boolean).join(' ') || undefined} rows={4} {...props} /></Field>;
 }
 
-export function SelectField({ id, label, hint, error, options, ...props }: FieldProps & SelectHTMLAttributes<HTMLSelectElement> & { options: readonly (readonly [string, string])[] }) {
-  return <Field id={id} label={label} hint={hint} error={error}><select id={id} className="text-input" aria-invalid={Boolean(error)} aria-describedby={error ? `${id}-error` : hint ? `${id}-hint` : undefined} {...props}>{options.map(([value, text]) => <option key={value} value={value}>{text}</option>)}</select></Field>;
+export function SelectField({ id, label, hint, error, options, value, onChange, disabled }: FieldProps & {
+  options: readonly (readonly [string, string])[];
+  value?: string | number | readonly string[];
+  onChange?: (event: { target: { value: string } }) => void;
+  disabled?: boolean;
+  required?: boolean;
+}) {
+  const [open, setOpen] = useState(false);
+  const currentVal = String(value ?? '');
+  const selectedOption = options.find(([val]) => val === currentVal);
+  const displayLabel = selectedOption ? selectedOption[1] : options[0] ? options[0][1] : 'Pilih opsi';
+
+  return (
+    <Field id={id} label={label} hint={hint} error={error}>
+      <div className="relative">
+        <button
+          id={id}
+          type="button"
+          disabled={disabled}
+          onClick={() => setOpen(!open)}
+          className={`w-full flex items-center justify-between gap-2.5 bg-clay-50/80 hover:bg-[#fdeee9] border ${error ? 'border-red-400' : 'border-sand-border hover:border-terracotta-300'} text-clay-900 text-xs font-bold rounded-xl px-3.5 py-2.5 transition-all text-left cursor-pointer outline-none focus:ring-2 focus:ring-terracotta/20 ${disabled ? 'opacity-60 cursor-not-allowed' : ''}`}
+          aria-expanded={open}
+          aria-invalid={Boolean(error)}
+          aria-describedby={[hint ? `${id}-hint` : '', error ? `${id}-error` : ''].filter(Boolean).join(' ') || undefined}
+        >
+          <span className="truncate">{displayLabel}</span>
+          <ChevronDown className={`w-4 h-4 text-clay-500 transition-transform duration-200 shrink-0 ${open ? 'rotate-180 text-terracotta' : ''}`} />
+        </button>
+
+        {open && !disabled && (
+          <>
+            <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
+            <div className="absolute left-0 right-0 top-full mt-1.5 bg-white border border-sand-border rounded-2xl shadow-xl p-1.5 z-50 max-h-56 overflow-y-auto space-y-1">
+              {options.map(([optValue, optText]) => {
+                const isSelected = optValue === currentVal;
+                return (
+                  <button
+                    key={optValue}
+                    type="button"
+                    onClick={() => {
+                      setOpen(false);
+                      onChange?.({ target: { value: optValue } });
+                    }}
+                    className={`w-full text-left px-3 py-2 rounded-xl text-xs transition-colors duration-150 flex items-center justify-between gap-2 cursor-pointer ${
+                      isSelected
+                        ? 'bg-terracotta-50 text-terracotta font-extrabold border border-terracotta-200'
+                        : 'text-clay-800 font-semibold hover:bg-[#fdeee9] hover:text-terracotta border border-transparent'
+                    }`}
+                  >
+                    <span className="truncate">{optText}</span>
+                    {isSelected && <Check className="w-3.5 h-3.5 text-terracotta shrink-0" />}
+                  </button>
+                );
+              })}
+            </div>
+          </>
+        )}
+      </div>
+    </Field>
+  );
 }
 
 export function CheckField({ label, hint, ...props }: { label: string; hint?: string } & InputHTMLAttributes<HTMLInputElement>) {

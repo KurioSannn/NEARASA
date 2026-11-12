@@ -1,7 +1,7 @@
 /* Owner workspace: D102–D129. Consumer and legacy pages keep their own scope. */
 html:has(.merchant-redesign), body:has(.merchant-redesign) { background:#fbf6f0; }
 body:has(.merchant-redesign) #nprogress { display:none; }
-.merchant-redesign { --paper:#fbf6f0; --surface:#fff; --ink:#1e130c; --muted:#786b62; --accent:#b74b28; --accent-dark:#963412; --tint:#ffdcd2; --line:#eedfd4; --soft:#fbf1ea; --green:#147760; --owner-mint:#b9dad7; --owner-danger:#b63142; min-height:100dvh; color:var(--ink); font-size:14px; background:#fbf6f0; }
+.merchant-redesign { --paper:#fbf6f0; --surface:#fff; --ink:#362822; --muted:#5e4941; --accent:#b74b28; --accent-dark:#963412; --tint:#ffdcd2; --line:rgba(183, 75, 40, 0.18); --soft:#fbf1ea; --green:#147760; --owner-mint:#b9dad7; --owner-danger:#b63142; min-height:100dvh; color:var(--ink); font-size:14px; background:#fbf6f0; }
 .merchant-redesign [hidden] { display:none!important; }
 .merchant-redesign :is(button,a,input,select,textarea):focus-visible { outline:2px solid var(--accent); outline-offset:3px; }
 .merchant-redesign button:disabled { cursor:not-allowed; }
@@ -41,8 +41,8 @@ body:has(.merchant-redesign) #nprogress { display:none; }
 .owner-page-heading p { margin-top:7px; font-size:15px; line-height:1.6; color:var(--muted); }
 .owner-button { display:inline-flex; flex:none; align-items:center; justify-content:center; gap:8px; min-height:44px; padding:10px 20px; border:1px solid var(--accent); border-radius:12px; background:var(--accent); box-shadow:inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 3px 10px rgba(183, 75, 40, 0.2); color:white; font-size:14px; font-weight:600; line-height:1.4; text-align:center; transition:background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease; }
 .owner-button:hover { background:var(--accent-dark); border-color:var(--accent-dark); box-shadow:0 4px 12px rgba(150, 52, 18, 0.25); }
-.owner-button-secondary { background:var(--surface); color:var(--accent); border-color:var(--line); box-shadow:0 1px 3px rgba(30, 19, 12, 0.04); }
-.owner-button-secondary:hover { background:var(--soft); color:var(--accent-dark); border-color:var(--tint); }
+.owner-button-secondary { background:#ffffff; color:#4a3831; border-color:rgba(183, 75, 40, 0.22); box-shadow:0 1px 3px rgba(30, 19, 12, 0.04); transition:all 0.15s ease; }
+.owner-button-secondary:hover { background:#fdeee9; color:#b74b28; border-color:rgba(183, 75, 40, 0.35); }
 .owner-button-danger { color:var(--owner-danger); border-color:#e6bdc4; background:white; box-shadow:none; }
 .owner-button-danger:hover { background:#fff2f3; border-color:var(--owner-danger); }
 .owner-text-link { display:inline-flex; align-items:center; justify-content:flex-start; gap:8px; min-height:44px; padding:7px 0; border-radius:8px; background:transparent; color:var(--accent); font-size:14px; line-height:1.5; font-weight:600; transition:color 0.15s; }

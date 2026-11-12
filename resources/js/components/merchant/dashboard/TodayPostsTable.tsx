@@ -40,7 +40,10 @@ export default function TodayPostsTable({ businesses, operations, manageUrl }: P
         <div className="overflow-x-auto dash-scroll">
           <table className="w-full text-left border-collapse" id="transactions-table">
             <thead>
-              <tr className="border-b border-sand-border text-[11px] font-bold uppercase tracking-wider text-clay-600">
+              <tr
+                className="border-b border-sand-border text-[11px] font-bold uppercase tracking-wider text-clay-600"
+                style={{ borderColor: 'rgba(183, 75, 40, 0.18)' }}
+              >
                 <th className="pb-3 pl-2">Pos Jualan & Usaha</th>
                 <th className="pb-3">Alamat / Patokan</th>
                 <th className="pb-3">Jam Operasional (WIB)</th>
@@ -56,7 +59,11 @@ export default function TodayPostsTable({ businesses, operations, manageUrl }: P
                 const hasSpecialHours = Boolean(operation.post.today_hours);
 
                 return (
-                  <tr key={operation.post.id} className="hover:bg-clay-50/70 transition-colors group">
+                  <tr
+                    key={operation.post.id}
+                    className="hover:bg-clay-50/70 transition-colors group border-b border-sand-border last:border-b-0"
+                    style={{ borderColor: 'rgba(183, 75, 40, 0.18)' }}
+                  >
                     <td className="py-3.5 pl-2">
                       <div className="flex items-center gap-3">
                         <div className="w-9 h-9 rounded-xl bg-sand-base border border-sand-border overflow-hidden shrink-0 flex items-center justify-center font-bold text-xs text-clay-700">

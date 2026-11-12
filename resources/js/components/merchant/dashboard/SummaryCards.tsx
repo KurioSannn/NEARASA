@@ -25,10 +25,10 @@ export default function SummaryCards({ businessCount, postCount, openCount, pend
         </div>
       </div>
 
-      {/* Metric 2: Pending Reports (Amber Soft Card) */}
+      {/* Metric 2: Pending Reviews (Amber Soft Card) */}
       <div className="bg-white p-4 rounded-3xl border border-sand-border shadow-soft flex items-center justify-between select-none">
         <div>
-          <p className="text-xs text-clay-700 font-semibold">Laporan Tutup</p>
+          <p className="text-xs text-clay-700 font-semibold">Review Tutup</p>
           <h4 className="text-2xl font-extrabold text-clay-900 tracking-tight mt-1">{pending}</h4>
           <span className={`text-[10px] px-2 py-0.5 rounded-full mt-2 inline-block font-bold border ${
             pending > 0

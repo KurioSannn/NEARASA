@@ -262,6 +262,7 @@ function TodayHours({ operation, onDirty, onRoutine }: { operation: DailyOperati
 }
 
 export default function DailyOperations({ operations, selectedPostId, onSelectPost, onRoutine, onDirty }: { operations: DailyOperation[]; selectedPostId: number; onSelectPost: (id: number) => void; onRoutine: () => void; onDirty?: (key: string, dirty: boolean) => void }) {
+  const [postSelectOpen, setPostSelectOpen] = useState(false);
   const [drafts, setDrafts] = useState<Record<number, boolean>>({});
   const reportDirty = useCallback((postId: number, dirty: boolean) => setDrafts(previous => previous[postId] === dirty ? previous : { ...previous, [postId]: dirty }), []);
   const hasDraft = Object.values(drafts).some(Boolean);
@@ -293,16 +294,56 @@ export default function DailyOperations({ operations, selectedPostId, onSelectPo
             Lokasi jualan yang diatur
           </label>
           <div className="flex items-center gap-3 flex-wrap">
+            {/* Custom Popover Dropdown for Pos (No OS Blue Hover) */}
             <div className="relative w-full sm:w-auto">
-              <select
-                id="owner-post-select"
-                className="w-full sm:w-auto appearance-none bg-clay-50 hover:bg-clay-100/70 text-clay-900 text-sm font-extrabold rounded-xl pl-3 pr-8 py-2 border border-sand-border cursor-pointer transition focus:ring-2 focus:ring-terracotta/20 outline-none"
-                value={selected.post.id}
-                onChange={event => onSelectPost(Number(event.target.value))}
+              <button
+                type="button"
+                onClick={() => setPostSelectOpen(!postSelectOpen)}
+                className="w-full sm:w-auto flex items-center justify-between gap-3 bg-clay-50/90 hover:bg-[#fdeee9] text-clay-900 text-sm font-extrabold rounded-xl px-3.5 py-2 border border-sand-border hover:border-terracotta-300 cursor-pointer transition-all focus:ring-2 focus:ring-terracotta/20 outline-none shadow-xs"
+                aria-expanded={postSelectOpen}
               >
-                {operations.map(operation => <option key={operation.post.id} value={operation.post.id}>{operation.post.name}</option>)}
-              </select>
-              <ChevronDown className="w-4 h-4 text-clay-500 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                <span>{selected.post.name}</span>
+                <ChevronDown className={`w-4 h-4 text-clay-500 transition-transform duration-200 ${postSelectOpen ? 'rotate-180 text-terracotta' : ''}`} />
+              </button>
+
+              {postSelectOpen && (
+                <>
+                  <div
+                    className="fixed inset-0 z-40"
+                    onClick={() => setPostSelectOpen(false)}
+                  />
+                  <div className="absolute left-0 top-full mt-1.5 min-w-[240px] bg-white border border-sand-border rounded-2xl shadow-xl p-1.5 z-50 space-y-1">
+                    {operations.map((operation) => {
+                      const isSelected = operation.post.id === selected.post.id;
+                      return (
+                        <button
+                          key={operation.post.id}
+                          type="button"
+                          onClick={() => {
+                            setPostSelectOpen(false);
+                            onSelectPost(operation.post.id);
+                          }}
+                          className={`w-full text-left px-3 py-2.5 rounded-xl text-xs transition-colors duration-150 flex items-center justify-between gap-3 cursor-pointer ${
+                            isSelected
+                              ? 'bg-terracotta-50 text-terracotta font-extrabold border border-terracotta-200'
+                              : 'text-clay-800 font-semibold hover:bg-[#fdeee9] hover:text-terracotta border border-transparent'
+                          }`}
+                        >
+                          <div className="truncate">
+                            <span className="block font-bold truncate">{operation.post.name}</span>
+                            {operation.post.address && (
+                              <span className="block text-[10px] text-clay-600 truncate mt-0.5">
+                                {operation.post.address}
+                              </span>
+                            )}
+                          </div>
+                          {isSelected && <Check className="w-3.5 h-3.5 text-terracotta shrink-0" />}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </>
+              )}
             </div>
             <p className="flex items-center gap-1.5 text-xs text-clay-700 font-medium">
               <MapPin size={14} className="text-terracotta shrink-0" aria-hidden="true" />

@@ -103,7 +103,7 @@ export default function RightWalletSidebar({
           <Link
             href="/kelola-usaha/laporan"
             className="flex flex-col items-center gap-1.5 p-2.5 rounded-2xl bg-clay-100 hover:bg-[#fdeee9] border border-sand-border hover:border-terracotta-200 transition-colors duration-150 group text-center"
-            title="Daftar Laporan"
+            title="Daftar Review"
           >
             <div className="w-8 h-8 rounded-xl bg-terracotta group-hover:bg-terracotta-600 shadow-xs flex items-center justify-center text-white border border-terracotta-600 transition-colors duration-150 relative">
               <ShieldCheck className="w-4 h-4 text-white" />
@@ -111,7 +111,7 @@ export default function RightWalletSidebar({
                 <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-amber-300 ring-1 ring-white" />
               )}
             </div>
-            <span className="text-[11px] font-bold text-clay-900 group-hover:text-terracotta transition-colors duration-150">Laporan</span>
+            <span className="text-[11px] font-bold text-clay-900 group-hover:text-terracotta transition-colors duration-150">Review</span>
           </Link>
 
           <Link
@@ -161,7 +161,7 @@ export default function RightWalletSidebar({
           <Link
             href="/kelola-usaha/laporan"
             className="w-7 h-7 rounded-full bg-clay-100 hover:bg-[#fdeee9] border border-transparent hover:border-terracotta-200 flex items-center justify-center text-clay-600 hover:text-terracotta transition-colors duration-150"
-            aria-label="Lihat semua laporan"
+            aria-label="Lihat semua review"
           >
             <ArrowUpRight className="w-4 h-4" />
           </Link>
@@ -174,7 +174,7 @@ export default function RightWalletSidebar({
                 <AlertTriangle className="w-4 h-4" />
               </div>
               <div className="min-w-0">
-                <h3 className="text-xs font-bold text-clay-900">Laporan Pos Tutup</h3>
+                <h3 className="text-xs font-bold text-clay-900">Review Pos Tutup</h3>
                 <p className="text-[11px] font-semibold text-terracotta-700 truncate">{report.business_name} - {report.post_name}</p>
               </div>
             </div>
@@ -187,7 +187,7 @@ export default function RightWalletSidebar({
                 href={`/kelola-usaha/laporan?status=pending#laporan-${report.id}`}
                 className="text-xs font-bold text-terracotta hover:text-terracotta-700 hover:underline transition-colors"
               >
-                Buka Laporan
+                Buka Review
               </Link>
             </div>
           </article>
@@ -198,7 +198,7 @@ export default function RightWalletSidebar({
             </div>
             <div>
               <h3 className="text-xs font-bold text-clay-900">Semua Pos Aman</h3>
-              <p className="text-[11px] text-clay-500">Tidak ada laporan tutup dari konsumen yang tertunda.</p>
+              <p className="text-[11px] text-clay-500">Tidak ada review pos tutup dari konsumen yang tertunda.</p>
             </div>
           </div>
         )}
