@@ -1,6 +1,7 @@
 @import 'tailwindcss';
 @import './accounts.css';
 @import './post-discovery.css';
+@import './awards.css';
 
 @theme {
     --font-sans: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', system-ui, 'Segoe UI', Arial, sans-serif;

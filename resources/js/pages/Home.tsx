@@ -1,5 +1,5 @@
 import { Head, Link, usePage } from '@inertiajs/react';
-import { ArrowRight, Clock, Compass, Map, MapPin, Navigation, Search, SlidersHorizontal, Store, Utensils } from 'lucide-react';
+import { ArrowRight, Award, Clock, Compass, Map, MapPin, Navigation, Search, SlidersHorizontal, Store, Utensils } from 'lucide-react';
 import { useState } from 'react';
 import CustomerLayout, { useUi } from '@/layouts/CustomerLayout';
 import SearchField from '@/components/SearchField';
@@ -62,6 +62,42 @@ export default function Home({ businesses, filters, options, location, recommend
         <FoodCategory categories={options.categories} filters={filters} />
       </section>
 
+      {/* Editorial Food Feature Banner: NEARASA Awards Tangga Kuliner (Human, Warm, Anti-Slop) */}
+      <section className="home-awards-banner-wrap" aria-label="Tangga Kuliner Terpopuler">
+        <div className="home-awards-banner">
+          <div className="awards-banner-content">
+            <span className="awards-banner-kicker">Tangga Kuliner Pekan Ini</span>
+            <h2 className="awards-banner-title">
+              Roti Pagi & Dapur Griya Paling Diminati Warga
+            </h2>
+            <p className="awards-banner-desc">
+              Cek podium 3 besar dan klasemen mingguan gerai kuliner lokal terpopuler di Sidoarjo & Surabaya.
+            </p>
+            <div>
+              <Link href="/awards" className="awards-banner-cta">
+                <span>Lihat Klasemen Lengkap</span>
+                <ArrowRight size={14} aria-hidden="true" />
+              </Link>
+            </div>
+          </div>
+
+          <div className="awards-banner-photo-wrap" aria-hidden="true">
+            <div className="awards-banner-photo-card">
+              <img
+                src="/images/demo/toast.jpg"
+                alt="Sajian Roti Pagi"
+                className="awards-banner-img"
+                loading="lazy"
+              />
+              <div className="awards-banner-photo-caption">
+                <span className="photo-caption-rank">#1 Teratas</span>
+                <span className="photo-caption-name">Roti Pagi</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {personal.length > 0 && (
         <section className="home-catalog" aria-labelledby="home-personal-title">
           <header className="home-section-heading">
@@ -79,6 +115,7 @@ export default function Home({ businesses, filters, options, location, recommend
         </section>
       )}
 
+      {/* Pilihan untuk dicoba (Restored to exact cards user loved) */}
       <section className="home-catalog home-trending-section" aria-labelledby="home-choices-title">
         <header className="home-section-heading">
           <div>

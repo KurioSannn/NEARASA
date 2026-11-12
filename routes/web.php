@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\AwardsController;
 use App\Http\Controllers\BusinessController;
 use App\Http\Controllers\CommunityController;
 use App\Http\Controllers\ExploreController;
@@ -22,6 +23,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', HomeController::class)->name('home');
 Route::get('/jelajah', ExploreController::class)->name('explore');
 Route::get('/peta', MapExploreController::class)->name('map.explore');
+Route::get('/awards', AwardsController::class)->name('awards');
 Route::get('/usaha/{business:slug}', BusinessController::class)->name('business.show');
 Route::get('/pemilik/{user}', [PublicOwnerController::class, 'show'])->name('owner.show');
 Route::post('/interaksi', [CommunityController::class, 'interaction'])->middleware('throttle:120,1');

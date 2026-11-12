@@ -1,12 +1,14 @@
 import { Link, usePage } from '@inertiajs/react';
-import { Compass, Heart, House, Map, UserRound } from 'lucide-react';
+import { Award, Compass, Heart, House, Map, UserRound } from 'lucide-react';
 import { useUi } from '@/layouts/CustomerLayout';
 
 export default function MobilePillNav() {
   const { url } = usePage();
   const { openAccount } = useUi();
   const path = url.split('?')[0];
-  const active = url.startsWith('/favorit')
+  const active = url.startsWith('/awards')
+    ? 'Awards'
+    : url.startsWith('/favorit')
     ? 'Favorit'
     : url.startsWith('/akun') || url.startsWith('/masuk') || url.startsWith('/riwayat')
     ? 'Akun'
@@ -20,6 +22,7 @@ export default function MobilePillNav() {
     { label: 'Beranda', icon: House, href: '/' },
     { label: 'Jelajah', icon: Compass, href: '/jelajah' },
     { label: 'Peta', icon: Map, href: '/peta' },
+    { label: 'Awards', icon: Award, href: '/awards' },
     { label: 'Favorit', icon: Heart },
     { label: 'Akun', icon: UserRound },
   ];

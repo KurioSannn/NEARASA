@@ -88,6 +88,9 @@ export default function DesktopHeader({ discovery = false }: { discovery?: boole
           <Link href="/peta" aria-current={url.startsWith('/peta') ? 'page' : undefined}>
             Peta
           </Link>
+          <Link href="/awards" aria-current={url.startsWith('/awards') ? 'page' : undefined}>
+            Awards
+          </Link>
         </nav>
 
         <div className="header-actions">
