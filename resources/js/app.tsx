@@ -5,6 +5,7 @@ import '../css/discovery.css';
 import '../css/map-discovery.css';
 import '../css/public-profile.css';
 import '../css/merchant-redesign.css';
+import '../css/merchant-dashboard.css';
 import '../css/consumer-pages.css';
 import { createInertiaApp } from '@inertiajs/react';
 import { createRoot } from 'react-dom/client';

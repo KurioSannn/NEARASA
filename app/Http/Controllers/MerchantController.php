@@ -26,7 +26,7 @@ class MerchantController extends Controller
 
         return Inertia::render('Merchant/Dashboard', [
             'businesses' => $this->businessOptions($businesses),
-            'operations' => $this->operations($businesses), 'statistics' => app(InteractionTracker::class)->statistics($request->user()),
+            'operations' => $this->operations($businesses, includeMenus: false), 'statistics' => app(InteractionTracker::class)->statistics($request->user()),
             'reports' => $this->reports($businesses->pluck('id')), 'publicName' => $request->user()->public_name ?? '',
             'merchantNavigation' => $this->navigation($request, $businesses),
         ]);
@@ -96,20 +96,24 @@ class MerchantController extends Controller
             'pending_reports' => ClosedReport::whereIn('business_id', $businesses->pluck('id'))->whereNull('resolved_at')->count()];
     }
 
-    private function operations(Collection $businesses): array
+    private function operations(Collection $businesses, bool $includeMenus = true): array
     {
         $profile = app(BusinessProfile::class);
         $catalog = app(CatalogService::class);
+        $now = CarbonImmutable::now();
+        $openingHours = app(OpeningHours::class);
 
-        return $businesses->flatMap(fn ($business) => $business->sellingPosts->map(function ($post) use ($business, $profile, $catalog) {
+        return $businesses->flatMap(fn ($business) => $business->sellingPosts->map(function ($post) use ($business, $profile, $catalog, $openingHours, $now, $includeMenus) {
+            $menus = $includeMenus ? $business->menuItems->map(function ($menu) use ($business, $profile, $post) {
+                $item = $profile->menuInformation($menu, $business->sellingPosts);
+                $item['sold_out'] = collect($item['availability'])->firstWhere('post_id', $post->id)['sold_out'] ?? $item['sold_out'];
+
+                return $item;
+            })->values()->all() : [];
+
             return ['business_id' => $business->id, 'business_slug' => $business->slug, 'business_name' => $business->name,
-                'post' => [...$catalog->post($post, null, CarbonImmutable::now()), 'schedule_today' => app(OpeningHours::class)->scheduleToday($post, CarbonImmutable::now())],
-                'menus' => $business->menuItems->map(function ($menu) use ($business, $profile, $post) {
-                    $item = $profile->menuInformation($menu, $business->sellingPosts);
-                    $item['sold_out'] = collect($item['availability'])->firstWhere('post_id', $post->id)['sold_out'] ?? $item['sold_out'];
-
-                    return $item;
-                })->values()->all()];
+                'post' => [...$catalog->post($post, null, $now), 'schedule_today' => $openingHours->scheduleToday($post, $now)],
+                'menus' => $menus];
         }))->values()->all();
     }
 

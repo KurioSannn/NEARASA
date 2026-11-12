@@ -1,59 +1,151 @@
+import { useState } from 'react';
 import { Head, Link, usePage } from '@inertiajs/react';
-import { AlertTriangle, BookOpen, CalendarDays, CheckCircle2, ChevronDown, ChevronRight, Eye, FileText, Info, MapPin, MessageCircle, Store, UserRound } from 'lucide-react';
-import MerchantLayout from '@/layouts/MerchantLayout';
-import { merchantDate, type DailyOperation } from '@/components/merchant/DailyOperations';
-import { businessCover } from '@/types/business-images';
+import { Plus } from 'lucide-react';
+import BusinessWatchlist from '@/components/merchant/dashboard/BusinessWatchlist';
+import CurvedSidebar from '@/components/merchant/dashboard/CurvedSidebar';
+import InteractionChart from '@/components/merchant/dashboard/InteractionChart';
+import RightWalletSidebar from '@/components/merchant/dashboard/RightWalletSidebar';
+import SummaryCards from '@/components/merchant/dashboard/SummaryCards';
+import TodayPostsTable from '@/components/merchant/dashboard/TodayPostsTable';
+import TopNav from '@/components/merchant/dashboard/TopNav';
+import Footer from '@/components/merchant/dashboard/Footer';
+import type { DailyOperation } from '@/components/merchant/DailyOperations';
 import type { SharedProps } from '@/types/catalog';
-import { managementUrl, operationStatus, type ClosureReport, type MerchantNavigation, type MerchantStatistics, type OwnedBusiness } from '@/types/merchant';
+import type { ClosureReport, MerchantNavigation, MerchantStatistics, OwnedBusiness } from '@/types/merchant';
 
-type DashboardProps = { businesses: OwnedBusiness[]; operations: DailyOperation[]; statistics: MerchantStatistics; reports: ClosureReport[]; merchantNavigation: MerchantNavigation };
-const metrics = [
-  { key: 'profile_view', label: 'Profil dilihat', icon: Eye },
-  { key: 'menu_open', label: 'Menu dibuka', icon: BookOpen },
-  { key: 'map_click', label: 'Klik peta', icon: MapPin },
-  { key: 'whatsapp_click', label: 'Klik WhatsApp', icon: MessageCircle },
-] as const;
-const number = (value: number) => value.toLocaleString('id-ID');
+type DashboardProps = {
+  businesses: OwnedBusiness[];
+  operations: DailyOperation[];
+  statistics: MerchantStatistics;
+  reports: ClosureReport[];
+  merchantNavigation: MerchantNavigation;
+};
 
-function Interactions({ statistics }: { statistics: MerchantStatistics }) {
-  const maximum = Math.max(1, ...metrics.map(({ key }) => statistics.totals[key]));
-  const empty = metrics.every(({ key }) => statistics.totals[key] === 0);
-  return <section className="owner-panel owner-interactions" aria-labelledby="owner-interaction-title"><header className="owner-panel-heading"><div><h2 id="owner-interaction-title">Interaksi di NEARASA</h2><p>{statistics.days} hari terakhir · seluruh usaha</p></div></header>
-    <dl className="owner-metric-bars">{metrics.map(({ key, label, icon: Icon }) => <div key={key}><dt><Icon size={19} aria-hidden="true" />{label}</dt><dd><span className="owner-bar" aria-hidden="true"><span style={{ width: `${statistics.totals[key] / maximum * 100}%` }} /></span><strong>{number(statistics.totals[key])}</strong></dd></div>)}</dl>
-    {empty && <p className="owner-inline-hint"><Info size={16} aria-hidden="true" />Belum ada interaksi tercatat dalam periode ini.</p>}
-    <details className="owner-disclosure owner-metric-help"><summary><Info size={16} aria-hidden="true" />Cara menghitung<ChevronDown size={16} aria-hidden="true" /></summary><div><p>Profil dilihat saat detail pos dibuka; menu dibuka saat pelanggan membuka rincian menu. Klik peta dan WhatsApp dicatat saat tombol tersebut ditekan.</p><p>Aktivitas pada usaha sendiri dikecualikan. Pengulangan jenis interaksi di pos yang sama dalam 30 menit dihitung sekali per akun yang masuk, atau per sesi tamu.</p><p>Angka ini adalah interaksi aplikasi, bukan penjualan, kunjungan fisik, atau pelanggan unik.</p></div></details>
-    {statistics.by_post.length > 0 && <details className="owner-disclosure"><summary>Rincian per pos<ChevronDown size={16} aria-hidden="true" /></summary><ul className="owner-stat-posts">{statistics.by_post.map(post => <li key={post.post_id}><strong>{post.business_name}<span>{post.post_name}</span></strong><dl>{metrics.map(({ key, label }) => <div key={key}><dt>{label}</dt><dd>{number(post[key])}</dd></div>)}</dl></li>)}</ul></details>}
-  </section>;
-}
+export default function Dashboard({
+  businesses,
+  operations,
+  statistics,
+  reports,
+  merchantNavigation,
+}: DashboardProps) {
+  const { auth, flash } = usePage<SharedProps>().props;
+  const [searchQuery, setSearchQuery] = useState('');
 
-export default function Dashboard({ businesses, operations, statistics, reports, merchantNavigation }: DashboardProps) {
-  const { auth } = usePage<SharedProps>().props;
   const pending = merchantNavigation.pending_reports;
-  const firstReport = reports.find(report => !report.resolved_at);
-  const openCount = operations.filter(operation => operation.post.is_open && operation.post.operating_status !== 'permanently_closed').length;
-  const summaries = [
-    { label: 'Usaha terkelola', value: businesses.length, icon: Store, href: merchantNavigation.manage_url, className: 'owner-summary-primary' },
-    { label: 'Pos jualan', value: operations.length, icon: MapPin, href: `${merchantNavigation.manage_url}?tab=posts`, className: '' },
-    { label: 'Buka saat ini', value: openCount, suffix: `dari ${operations.length} pos`, icon: CalendarDays, href: '#pos-hari-ini', className: '' },
-    { label: 'Laporan perlu diperiksa', value: pending, icon: AlertTriangle, href: '/kelola-usaha/laporan?status=pending', className: 'owner-summary-warning' },
-  ];
-  return <><Head title="Dashboard pemilik" /><div className="owner-dashboard">
-    <header className="owner-page-heading"><div><h1>Dashboard</h1><p>Ringkasan seluruh usahamu.</p></div>{businesses.length > 0 && <Link className="owner-button" href={merchantNavigation.manage_url}><Store size={18} aria-hidden="true" />Kelola usaha</Link>}</header>
-    <div className="owner-summaries">{summaries.map(({ label, value, suffix, icon: Icon, href, className }) => <Link href={href} className={`owner-summary ${className}`} key={label}><div><Icon size={22} aria-hidden="true" /><span>{label}</span></div><strong>{number(value)}{suffix && <small>{suffix}</small>}</strong><ChevronRight className="owner-summary-arrow" size={19} aria-hidden="true" /></Link>)}</div>
-    <div className="owner-dashboard-grid"><Interactions statistics={statistics} /><section className="owner-panel owner-attention" aria-labelledby="owner-attention-title"><header className="owner-panel-heading"><h2 id="owner-attention-title">Perlu diperiksa</h2>{pending > 0 && <span className="owner-count amber">{pending}</span>}</header>
-      {firstReport ? <article className="owner-report-highlight"><AlertTriangle size={22} aria-hidden="true" /><div><h3>Laporan pos tutup</h3><strong>{firstReport.business_name}</strong><span>{firstReport.post_name}</span><p>{firstReport.note || 'Konsumen menemukan pos tutup. Periksa kondisi dan informasi pos ini.'}</p><small>{merchantDate(firstReport.created_at)}</small></div><Link href={`/kelola-usaha/laporan?status=pending#laporan-${firstReport.id}`} className="owner-button"><FileText size={17} aria-hidden="true" />Buka laporan</Link></article>
-        : <div className="owner-calm-state"><CheckCircle2 size={30} aria-hidden="true" /><h3>Belum ada yang perlu diperiksa</h3><p>Laporan pelanggan untuk seluruh pos akan muncul di sini.</p><Link className="owner-text-link" href="/kelola-usaha/laporan">Lihat laporan</Link></div>}
-      <p className="owner-inline-hint"><Info size={16} aria-hidden="true" />Laporan tidak otomatis mengubah jam atau menutup pos.</p>
-    </section></div>
-    <section className="owner-panel owner-today" id="pos-hari-ini" aria-labelledby="owner-today-title"><header className="owner-panel-heading"><div><h2 id="owner-today-title">Ringkasan pos hari ini</h2><p>Status mengikuti jadwal dan jam khusus pemilik · WIB</p></div></header>
-      {operations.length ? <div className="owner-post-table"><div className="owner-post-table-head" aria-hidden="true"><span>Usaha</span><span>Pos jualan</span><span>Jam hari ini (WIB)</span><span>Status</span><span /></div><ul>{operations.map(operation => {
-        const business = businesses.find(item => item.id === operation.business_id);
-        const status = operationStatus(operation.post);
-        const hours = operation.post.today_hours;
-        return <li key={operation.post.id}><div className="owner-table-business">{business && <img src={businessCover(business)} alt="" width={44} height={44} loading="lazy" />}<strong>{operation.business_name}</strong></div><span className="owner-table-post">{operation.post.name}</span><div className="owner-table-hours"><span className="profile-sr-only">Jam hari ini: </span>{hours ? `${hours.opens_at.slice(0, 5)}–${hours.closes_at.slice(0, 5)}${hours.closes_tomorrow ? ' besok' : ''}` : operation.post.schedule_today?.label ?? 'Belum diatur'}{hours && <small>Jam khusus</small>}</div><span className={`owner-status${status.open ? ' is-open' : ''}`}><span aria-hidden="true" />{status.label}</span><Link href={managementUrl(operation.business_slug, operation.post.id)} className="owner-button owner-button-secondary owner-table-action" aria-label={`Kelola ${operation.business_name}, ${operation.post.name}`}>Kelola<ChevronRight size={15} aria-hidden="true" /></Link></li>;
-      })}</ul></div> : <div className="owner-empty"><Store size={30} aria-hidden="true" /><h3>{businesses.length ? 'Belum ada pos jualan' : 'Belum ada usaha terhubung'}</h3><p>{businesses.length ? 'Tambahkan pos melalui tab Pos & jadwal di Kelola usaha.' : 'Akun UMKM uji menyediakan usaha contoh untuk dicoba. Pendaftaran usaha baru belum tersedia.'}</p><Link href={businesses.length ? merchantNavigation.manage_url : '/akun'} className="owner-button owner-button-secondary">{businesses.length ? 'Kelola usaha' : 'Buka akun'}</Link></div>}
-    </section>
-    {auth.user && <Link href="/akun" className="owner-account-note"><UserRound size={19} aria-hidden="true" /><span>Nama publik & akun<small>Atur nama yang terlihat oleh konsumen.</small></span><ChevronRight size={18} aria-hidden="true" /></Link>}
-  </div></>;
+  const openCount = operations.filter(
+    (op) => op.post.is_open && op.post.operating_status !== 'permanently_closed'
+  ).length;
+
+  const userName = auth.user?.public_name || auth.user?.name || 'Pemilik';
+  const firstName = userName.trim().split(' ')[0];
+  const firstReport = reports.find((r) => !r.resolved_at);
+
+  const q = searchQuery.toLowerCase().trim();
+  const filteredBusinesses = q
+    ? businesses.filter((b) => b.name.toLowerCase().includes(q) || b.kind.toLowerCase().includes(q))
+    : businesses;
+
+  const filteredOperations = q
+    ? operations.filter(
+        (op) =>
+          op.post.name.toLowerCase().includes(q) ||
+          op.business_name.toLowerCase().includes(q) ||
+          op.post.address.toLowerCase().includes(q)
+      )
+    : operations;
+
+  return (
+    <>
+      <Head title="Dashboard Pemilik · NEARASA" />
+      <div
+        className="min-h-screen bg-sand-surface text-clay-900 antialiased"
+        style={{ fontFamily: 'var(--font-sans)' }}
+      >
+        <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 pt-0 pb-6 flex flex-col gap-6">
+          {/* BEGIN: TopNavigationBar */}
+          <TopNav
+            merchantNavigation={merchantNavigation}
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+          />
+
+          {/* Flash Notice */}
+          {flash?.success && (
+            <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs rounded-2xl flex items-center justify-between font-medium">
+              <span>{flash.success}</span>
+            </div>
+          )}
+
+          {/* BEGIN: MainContentGrid */}
+          <div className="flex flex-col lg:flex-row gap-6 items-start">
+            {/* Compact Curved Sidebar */}
+            <CurvedSidebar merchantNavigation={merchantNavigation} />
+
+            {/* Center Main Column */}
+            <main className="flex-1 min-w-0 flex flex-col gap-6 overflow-hidden">
+              {/* BEGIN: Greeting & Controls - Perfectly aligned with content below */}
+              <section className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4" data-purpose="hero-controls">
+                <div>
+                  <h1 className="text-2xl lg:text-3xl font-extrabold tracking-tight text-clay-900 flex items-center gap-2">
+                    Halo, {firstName} <span className="animate-pulse">👋</span>
+                  </h1>
+                  <p className="text-xs text-clay-700 font-medium mt-1">
+                    Selamat datang kembali! Ini ringkasan operasional dan interaksi seluruh usahamu hari ini.
+                  </p>
+                </div>
+
+                {/* Action Tools */}
+                {businesses.length > 0 && (
+                  <Link
+                    href={merchantNavigation.manage_url}
+                    className="flex items-center gap-1.5 bg-terracotta hover:bg-terracotta-600 text-white !text-white px-4 py-2 rounded-full text-xs font-bold shadow-pill transition-colors duration-150"
+                  >
+                    <Plus className="w-4 h-4 text-white !text-white" />
+                    <span className="text-white !text-white">Kelola usaha</span>
+                  </Link>
+                )}
+              </section>
+
+              {/* Row 1: Watchlist & Engagement Chart */}
+              <section className="grid grid-cols-1 xl:grid-cols-12 gap-6" data-purpose="charts-and-watchlist">
+                <BusinessWatchlist businesses={filteredBusinesses} totalPosts={operations.length} />
+                <InteractionChart statistics={statistics} />
+              </section>
+
+              {/* Row 2: Status Badges / Operational Metrics */}
+              <SummaryCards
+                businessCount={businesses.length}
+                postCount={operations.length}
+                openCount={openCount}
+                pending={pending}
+                manageUrl={merchantNavigation.manage_url}
+              />
+
+              {/* Row 3: Transaction / Posts History Table */}
+              <TodayPostsTable
+                businesses={businesses}
+                operations={filteredOperations}
+                manageUrl={merchantNavigation.manage_url}
+              />
+            </main>
+
+            {/* Right Sidebar Widgets */}
+            <RightWalletSidebar
+              ownerName={userName}
+              ownerId={auth.user?.id}
+              businesses={businesses}
+              postCount={operations.length}
+              openCount={openCount}
+              pending={pending}
+              report={firstReport}
+              manageUrl={merchantNavigation.manage_url}
+            />
+          </div>
+
+          {/* Site Footer - Seamless bottom alignment */}
+          <Footer />
+        </div>
+      </div>
+    </>
+  );
 }
-Dashboard.layout = (page: React.ReactNode) => <MerchantLayout>{page}</MerchantLayout>;

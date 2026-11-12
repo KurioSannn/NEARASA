@@ -1,0 +1,140 @@
+/* NEARASA Owner Dashboard - Terracotta & Warm Clay Theme */
+@theme {
+  --color-terracotta: #b74b28;
+  --color-terracotta-50: #fff5f1;
+  --color-terracotta-100: #ffece5;
+  --color-terracotta-200: #ffd7ca;
+  --color-terracotta-300: #ffb59f;
+  --color-terracotta-400: #f57f58;
+  --color-terracotta-500: #b74b28;
+  --color-terracotta-600: #963412;
+  --color-terracotta-700: #832604;
+  --color-terracotta-800: #52200d;
+  --color-terracotta-900: #3a1306;
+
+  --color-clay-50: #fbf8f5;
+  --color-clay-100: #f5ede4;
+  --color-clay-200: #ede0d3;
+  --color-clay-300: #decbc0;
+  --color-clay-400: #c5ada1;
+  --color-clay-500: #8b726a;
+  --color-clay-600: #57423c;
+  --color-clay-700: #3c2d26;
+  --color-clay-800: #261912;
+  --color-clay-900: #1e130c;
+
+  --color-sand-surface: #fff8f6;
+  --color-sand-base: #f5ede4;
+  --color-sand-dim: #eed5ca;
+  --color-sand-border: #f0e3db;
+
+  --shadow-soft: 0 10px 30px -5px rgba(82, 32, 13, 0.04), 0 4px 12px -2px rgba(82, 32, 13, 0.02);
+  --shadow-card-hover: 0 20px 35px -8px rgba(82, 32, 13, 0.08), 0 8px 16px -4px rgba(82, 32, 13, 0.04);
+  --shadow-pill: 0 4px 14px 0 rgba(183, 75, 40, 0.22);
+}
+
+/* Fallback utility classes */
+.bg-sand-surface { background-color: #fff8f6; }
+.bg-sand-base { background-color: #f5ede4; }
+.border-sand-border { border-color: #f0e3db; }
+.text-clay-900 { color: #1e130c; }
+.text-clay-800 { color: #261912; }
+.text-clay-700 { color: #3c2d26; }
+.text-clay-600 { color: #57423c; }
+.text-clay-500 { color: #8b726a; }
+.text-clay-400 { color: #c5ada1; }
+.text-clay-300 { color: #decbc0; }
+.bg-clay-50 { background-color: #fbf8f5; }
+.bg-clay-100 { background-color: #f5ede4; }
+.bg-clay-200 { background-color: #ede0d3; }
+.bg-clay-700 { background-color: #3c2d26; }
+.bg-clay-800 { background-color: #261912; }
+.bg-clay-900 { background-color: #1e130c; }
+.text-terracotta { color: #b74b28; }
+.text-terracotta-200 { color: #ffd7ca; }
+.text-terracotta-300 { color: #ffb59f; }
+.text-terracotta-600 { color: #963412; }
+.text-terracotta-700 { color: #832604; }
+.bg-terracotta { background-color: #b74b28; }
+.bg-terracotta-50 { background-color: #fff5f1; }
+.bg-terracotta-100 { background-color: #ffece5; }
+.bg-terracotta-200 { background-color: #ffd7ca; }
+.bg-terracotta-300 { background-color: #ffb59f; }
+.bg-terracotta-400 { background-color: #f57f58; }
+.bg-terracotta-600 { background-color: #963412; }
+.border-terracotta { border-color: #b74b28; }
+.border-terracotta-200 { border-color: #ffd7ca; }
+.border-terracotta-300 { border-color: #ffb59f; }
+.ring-terracotta-100 { --tw-ring-color: #ffece5; }
+.shadow-soft { box-shadow: 0 10px 30px -5px rgba(82, 32, 13, 0.04), 0 4px 12px -2px rgba(82, 32, 13, 0.02); }
+.shadow-card-hover { box-shadow: 0 20px 35px -8px rgba(82, 32, 13, 0.08), 0 8px 16px -4px rgba(82, 32, 13, 0.04); }
+.shadow-pill { box-shadow: 0 4px 14px 0 rgba(183, 75, 40, 0.22); }
+
+.dash-summary-primary,
+.bg-gradient-to-br.from-terracotta {
+  background: linear-gradient(135deg, #b74b28 0%, #963412 100%) !important;
+  color: #ffffff !important;
+}
+
+/* Card Gradients from Reference */
+.fintech-card-gradient {
+  background: linear-gradient(135deg, #ffdcd2 0%, #f7c9b8 45%, #efad95 100%);
+}
+.card-stack-back {
+  background: linear-gradient(135deg, #b74b28 0%, #70260e 100%);
+  transform: translateY(-8px) scale(0.94);
+}
+.card-stack-mid {
+  background: linear-gradient(135deg, #e07a5f 0%, #d48b52 100%);
+  transform: translateY(-4px) scale(0.97);
+}
+
+/* Custom scrollbar - NEARASA Warm Terracotta & Sand Theme */
+html,
+body {
+  scrollbar-width: thin;
+  scrollbar-color: #d8c4b8 #fff8f6;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #fff8f6;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d8c4b8;
+  border-radius: 9999px;
+  border: 2px solid #fff8f6;
+  transition: background-color 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #b74b28;
+}
+
+.dash-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #d8c4b8 #fff8f6;
+}
+
+.dash-scroll::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.dash-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.dash-scroll::-webkit-scrollbar-thumb {
+  background: #decbc0;
+  border-radius: 9999px;
+}
+
+.dash-scroll::-webkit-scrollbar-thumb:hover {
+  background: #b74b28;
+}

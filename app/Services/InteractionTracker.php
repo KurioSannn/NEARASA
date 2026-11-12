@@ -35,6 +35,9 @@ class InteractionTracker
     public function statistics(User $owner): array
     {
         $ids = $owner->businesses()->pluck('id');
+        if ($ids->isEmpty()) {
+            return ['days' => 7, 'totals' => array_fill_keys(self::TYPES, 0), 'by_post' => []];
+        }
         $rows = InteractionEvent::whereIn('business_id', $ids)->where('created_at', '>=', CarbonImmutable::now('Asia/Jakarta')->subDays(6)->startOfDay())
             ->selectRaw('selling_post_id, type, COUNT(*) as total')->groupBy('selling_post_id', 'type')->get();
         $totals = array_fill_keys(self::TYPES, 0);

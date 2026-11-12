@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { router, useForm } from '@inertiajs/react';
-import { Check, Clock3, Info, MapPin, RotateCcw, Utensils } from 'lucide-react';
+import { Check, ChevronDown, Clock3, Info, MapPin, RotateCcw, Utensils } from 'lucide-react';
 import { rupiah } from '@/types/catalog';
 import { operationStatus } from '@/types/merchant';
 
@@ -43,25 +43,66 @@ function AvailabilityRow({ operation, menu }: { operation: DailyOperation; menu:
   const [message, setMessage] = useState('');
   const soldOut = menuSoldOut(menu, operation.post.id);
   const rowId = `availability-${operation.post.id}-${menu.id}`;
+
   function toggleAvailability() {
-    setError(''); setMessage('');
+    setError('');
+    setMessage('');
     router.patch(`/kelola-usaha/${operation.business_slug}/pos/${operation.post.id}/menu/${menu.id}/ketersediaan`, { sold_out: !soldOut }, {
-      preserveScroll: true, preserveState: true, errorBag: rowId,
+      preserveScroll: true,
+      preserveState: true,
+      errorBag: rowId,
       onStart: () => setProcessing(true),
       onSuccess: () => setMessage(`${menu.name} ditandai ${soldOut ? 'tersedia' : 'habis'} di ${operation.post.name}.`),
-      onError: errors => setError(firstError(errors)), onFinish: () => setProcessing(false),
+      onError: errors => setError(firstError(errors)),
+      onFinish: () => setProcessing(false),
     });
   }
-  return <li className={`daily-menu-row${soldOut ? ' is-sold-out' : ''}`}>
-    <span className="owner-stock-photo">{menu.photo ? <img src={menu.photo} alt="" width={52} height={52} loading="lazy" /> : <Utensils size={23} aria-hidden="true" />}</span><div className="daily-menu-info"><strong>{menu.name}</strong><span>{rupiah(menu.price)}</span></div>
-    <button type="button" role="switch" aria-checked={!soldOut} className="daily-stock-switch" disabled={processing}
-      aria-label={`${menu.name} di ${operation.post.name}: ${soldOut ? 'habis, tandai tersedia' : 'tersedia, tandai habis'}`}
-      aria-describedby={error ? `${rowId}-error` : undefined} onClick={toggleAvailability}>
-      <span className="owner-switch-track" aria-hidden="true"><span /></span><span>{processing ? 'Menyimpan…' : soldOut ? 'Habis' : 'Tersedia'}</span>
-    </button>
-    {error && <p className="daily-field-error daily-menu-feedback" id={`${rowId}-error`} role="alert">{error}</p>}
-    <span className="daily-sr-only" role="status">{message}</span>
-  </li>;
+
+  return (
+    <li className="flex items-center justify-between gap-3 py-3.5 border-b border-sand-border last:border-b-0">
+      <div className="flex items-center gap-3.5 min-w-0">
+        <span className="w-12 h-12 rounded-2xl overflow-hidden bg-sand-surface border border-sand-border flex items-center justify-center shrink-0">
+          {menu.photo ? (
+            <img src={menu.photo} alt="" width={48} height={48} className="w-full h-full object-cover" loading="lazy" />
+          ) : (
+            <Utensils size={20} className="text-clay-400" aria-hidden="true" />
+          )}
+        </span>
+        <div className="min-w-0">
+          <strong className="block text-sm font-bold text-clay-900 truncate">{menu.name}</strong>
+          <span className="text-xs font-semibold text-clay-600 mt-0.5 block">{rupiah(menu.price)}</span>
+        </div>
+      </div>
+      <button
+        type="button"
+        role="switch"
+        aria-checked={!soldOut}
+        className="flex items-center gap-2 cursor-pointer shrink-0"
+        disabled={processing}
+        aria-label={`${menu.name} di ${operation.post.name}: ${soldOut ? 'habis, tandai tersedia' : 'tersedia, tandai habis'}`}
+        aria-describedby={error ? `${rowId}-error` : undefined}
+        onClick={toggleAvailability}
+      >
+        <span
+          className={`relative inline-flex w-11 h-6 rounded-full transition-colors border ${
+            soldOut ? 'bg-clay-200 border-clay-300' : 'bg-terracotta border-terracotta'
+          } p-0.5`}
+          aria-hidden="true"
+        >
+          <span
+            className={`block w-5 h-5 rounded-full bg-white shadow-sm transition-transform ${
+              soldOut ? 'translate-x-0' : 'translate-x-5'
+            }`}
+          />
+        </span>
+        <span className={`text-xs font-bold min-w-[54px] text-left ${soldOut ? 'text-clay-700' : 'text-terracotta'}`}>
+          {processing ? 'Menyimpan…' : soldOut ? 'Habis' : 'Tersedia'}
+        </span>
+      </button>
+      {error && <p className="daily-field-error w-full text-xs text-rose-600 mt-1" id={`${rowId}-error`} role="alert">{error}</p>}
+      <span className="profile-sr-only" role="status">{message}</span>
+    </li>
+  );
 }
 
 function TodayHours({ operation, onDirty, onRoutine }: { operation: DailyOperation; onDirty: (postId: number, dirty: boolean) => void; onRoutine: () => void }) {
@@ -79,72 +120,242 @@ function TodayHours({ operation, onDirty, onRoutine }: { operation: DailyOperati
   const startedYesterday = Boolean(overnight && post.today_hours && !post.today_hours.closes_tomorrow && post.today_hours.closes_at < post.today_hours.opens_at);
   const closingDay = overnight ? startedYesterday ? 'hari ini' : 'besok' : '';
   const updated = post.hours_updated_at ? merchantDate(post.hours_updated_at) : '';
+
   useEffect(() => { onDirty(post.id, editing && form.isDirty); }, [editing, form.isDirty, post.id, onDirty]);
   useEffect(() => () => onDirty(post.id, false), [post.id, onDirty]);
   useEffect(() => { if (editing) opensInput.current?.focus({ preventScroll: true }); }, [editing]);
+
   function startEditing() {
     const values = { opens_at: post.today_hours?.opens_at.slice(0, 5) ?? currentTime(), closes_at: post.today_hours?.closes_at.slice(0, 5) ?? '' };
-    form.setDefaults(values); form.setData(values); form.clearErrors();
-    setMessage(''); setRestoreError(''); setEditing(true);
+    form.setDefaults(values);
+    form.setData(values);
+    form.clearErrors();
+    setMessage('');
+    setRestoreError('');
+    setEditing(true);
   }
+
   function restoreRoutine() {
-    setMessage(''); setRestoreError('');
+    setMessage('');
+    setRestoreError('');
     router.delete(endpoint, {
-      preserveScroll: true, preserveState: true, errorBag: `restoreHours-${post.id}`,
+      preserveScroll: true,
+      preserveState: true,
+      errorBag: `restoreHours-${post.id}`,
       onStart: () => setRestoring(true),
       onSuccess: () => setMessage('Jam khusus dihapus. Pos kembali mengikuti jadwal rutin.'),
-      onError: errors => setRestoreError(firstError(errors)), onFinish: () => setRestoring(false),
+      onError: errors => setRestoreError(firstError(errors)),
+      onFinish: () => setRestoring(false),
     });
   }
-  return <section className="daily-hours" aria-labelledby={`hours-title-${post.id}`}>
-    <h2 id={`hours-title-${post.id}`}>Jam hari ini</h2>
-    {post.today_hours ? <p className="daily-hours-current"><strong>{post.today_hours.opens_at.slice(0, 5)}–{post.today_hours.closes_at.slice(0, 5)}{post.today_hours.closes_tomorrow ? ' besok' : ''} WIB</strong><span>Jam khusus · jadwal rutin tetap tersimpan</span></p>
-      : <p className="daily-hours-current"><strong>{isPermanent ? 'Pos tutup permanen' : post.operating_status === 'temporarily_closed' ? 'Pos tutup sementara' : post.schedule_today?.label ?? 'Mengikuti jadwal rutin'}{!isPermanent && post.operating_status !== 'temporarily_closed' && /\d/.test(post.schedule_today?.label ?? '') ? ' WIB' : ''}</strong><span>{post.operating_status === 'temporarily_closed' ? 'Isi jam khusus untuk membuka pos hari ini.' : isPermanent ? 'Ubah kondisi operasional untuk membuka kembali.' : post.schedule_today?.source ?? 'Jadwal rutin'}</span></p>}
-    {updated && <p className="daily-hours-updated">Jam hari ini diperbarui {updated}.</p>}
-    {isPermanent && <p className="daily-hint"><Info size={15} aria-hidden="true" />Pos tutup permanen. Ubah kondisi operasional di Jadwal & hari libur sebelum membukanya.</p>}
-    <div className="daily-hours-actions" hidden={editing}>
-      <button ref={editButton} type="button" className="daily-action" onClick={startEditing} disabled={isPermanent || restoring} aria-controls={`hours-form-${post.id}`} aria-expanded={editing}><Clock3 size={16} aria-hidden="true" />{post.today_hours || post.is_open ? 'Ubah jam hari ini' : 'Buka sekarang'}</button>
-      {post.today_hours && <button className="daily-text-action" type="button" onClick={restoreRoutine} disabled={restoring}><RotateCcw size={14} aria-hidden="true" />{restoring ? 'Memulihkan…' : 'Kembali ke jadwal rutin'}</button>}
-      <button className="daily-text-action" type="button" onClick={onRoutine}>Atur jadwal rutin</button>
-    </div><form hidden={!editing} className="daily-hours-form" id={`hours-form-${post.id}`} onSubmit={event => {
-      event.preventDefault();
-      form.post(endpoint, { preserveScroll: true, preserveState: true, errorBag: `todayHours-${post.id}`,
-        onSuccess: () => { form.setDefaults(); setEditing(false); setMessage('Jam khusus tersimpan untuk pos ini.'); requestAnimationFrame(() => editButton.current?.focus({ preventScroll: true })); },
-      });
-    }}>
-      <p className="daily-hint">Isi jamnya, lalu simpan agar perubahan berlaku pada pos ini.</p>
-      {form.hasErrors && <p className="daily-field-error" role="alert">{Object.values(form.errors).join(' ')}</p>}
-      <fieldset disabled={form.processing}>
-        <div className="daily-time-fields">
-          <div><label htmlFor={`opens-${post.id}`}>Buka{startedYesterday ? ' kemarin' : ''} (WIB)</label><input ref={opensInput} id={`opens-${post.id}`} type="time" required className="text-input" value={form.data.opens_at} aria-invalid={Boolean(form.errors.opens_at)} aria-describedby={form.errors.opens_at ? `opens-error-${post.id}` : undefined} onChange={event => form.setData('opens_at', event.target.value)} />{form.errors.opens_at && <p id={`opens-error-${post.id}`} className="daily-field-error">{form.errors.opens_at}</p>}</div>
-          <div><label htmlFor={`closes-${post.id}`}>Tutup{closingDay ? ` ${closingDay}` : ''} (WIB)</label><input id={`closes-${post.id}`} type="time" required className="text-input" value={form.data.closes_at} aria-invalid={Boolean(form.errors.closes_at)} aria-describedby={`hours-effect-${post.id}${form.errors.closes_at ? ` closes-error-${post.id}` : ''}`} onChange={event => form.setData('closes_at', event.target.value)} />{form.errors.closes_at && <p id={`closes-error-${post.id}`} className="daily-field-error">{form.errors.closes_at}</p>}</div>
+
+  return (
+    <section className="bg-white p-6 rounded-3xl border border-sand-border shadow-soft flex flex-col gap-4" aria-labelledby={`hours-title-${post.id}`}>
+      <div className="flex items-center justify-between pb-3 border-b border-sand-border">
+        <h2 id={`hours-title-${post.id}`} className="text-lg font-extrabold text-clay-900 tracking-tight">Jam Hari Ini</h2>
+        <span className="w-8 h-8 rounded-xl bg-terracotta-50 text-terracotta flex items-center justify-center">
+          <Clock3 size={16} />
+        </span>
+      </div>
+
+      {post.today_hours ? (
+        <div className="py-2">
+          <strong className="text-2xl sm:text-3xl font-extrabold text-clay-900 tracking-tight block">
+            {post.today_hours.opens_at.slice(0, 5)}–{post.today_hours.closes_at.slice(0, 5)}{post.today_hours.closes_tomorrow ? ' besok' : ''} WIB
+          </strong>
+          <span className="text-xs font-semibold text-terracotta-600 mt-1 block">Jam khusus · jadwal rutin tetap tersimpan</span>
         </div>
-        <p className={`daily-hint${overnight ? ' daily-overnight' : ''}`} id={`hours-effect-${post.id}`} aria-live="polite">{overnight ? `${startedYesterday ? 'Sesi yang dimulai kemarin' : 'Sesi'} berakhir pukul ${form.data.closes_at} ${closingDay}. Setelah itu, jadwal rutin berlaku kembali.` : 'Jam khusus berlaku hari ini. Jadwal rutin tetap tersimpan.'}</p>
-        <div className="daily-form-actions"><button className="daily-text-action" type="button" onClick={() => { form.resetAndClearErrors(); setEditing(false); requestAnimationFrame(() => editButton.current?.focus({ preventScroll: true })); }}>Batal</button><button type="submit" className="daily-action">{form.processing ? 'Menyimpan…' : 'Simpan jam hari ini'}</button></div>
-      </fieldset>
-    </form>
-    <p className="owner-inline-hint"><Info size={16} aria-hidden="true" />Jam khusus berlaku untuk sesi hari ini. Jadwal rutin tetap tersimpan.</p>{restoreError && <p className="daily-field-error" role="alert">{restoreError}</p>}
-    {message && <p className="daily-success" role="status"><Check size={15} aria-hidden="true" />{message}</p>}
-  </section>;
+      ) : (
+        <div className="py-2">
+          <strong className="text-2xl sm:text-3xl font-extrabold text-clay-900 tracking-tight block">
+            {isPermanent ? 'Pos tutup permanen' : post.operating_status === 'temporarily_closed' ? 'Pos tutup sementara' : post.schedule_today?.label ?? 'Mengikuti jadwal rutin'}{!isPermanent && post.operating_status !== 'temporarily_closed' && /\d/.test(post.schedule_today?.label ?? '') ? ' WIB' : ''}
+          </strong>
+          <span className="text-xs font-semibold text-clay-700 mt-1 block">
+            {post.operating_status === 'temporarily_closed' ? 'Isi jam khusus untuk membuka pos hari ini.' : isPermanent ? 'Ubah kondisi operasional untuk membuka kembali.' : post.schedule_today?.source ?? 'Jadwal rutin'}
+          </span>
+        </div>
+      )}
+
+      {updated && <p className="text-xs text-clay-600 font-medium">Jam hari ini diperbarui {updated}.</p>}
+      {isPermanent && <p className="text-xs text-amber-800 bg-amber-50 p-2.5 rounded-xl"><Info size={14} className="inline mr-1" />Pos tutup permanen.</p>}
+
+      <div className="flex flex-col gap-2 mt-1" hidden={editing}>
+        <button
+          ref={editButton}
+          type="button"
+          className="w-full py-3 px-4 rounded-2xl bg-terracotta hover:bg-terracotta-600 text-white !text-white font-bold text-xs shadow-md shadow-terracotta/20 flex items-center justify-center gap-2 transition cursor-pointer"
+          onClick={startEditing}
+          disabled={isPermanent || restoring}
+          aria-controls={`hours-form-${post.id}`}
+          aria-expanded={editing}
+        >
+          <Clock3 size={15} aria-hidden="true" />
+          <span className="text-white !text-white">{post.today_hours || post.is_open ? 'Ubah jam hari ini' : 'Buka sekarang'}</span>
+        </button>
+
+        {post.today_hours && (
+          <button
+            className="w-full py-2 px-3 rounded-xl text-xs font-bold text-terracotta bg-terracotta-50/70 hover:bg-[#fdeee9] border border-terracotta-200/60 hover:border-terracotta-200 flex items-center justify-center gap-1.5 transition-colors duration-150 cursor-pointer"
+            type="button"
+            onClick={restoreRoutine}
+            disabled={restoring}
+          >
+            <RotateCcw size={13} aria-hidden="true" />
+            <span>{restoring ? 'Memulihkan…' : 'Kembali ke jadwal rutin'}</span>
+          </button>
+        )}
+
+        <button
+          className="w-full py-2 px-3 rounded-xl text-xs font-semibold text-clay-700 hover:text-terracotta hover:bg-[#fdeee9] border border-transparent hover:border-terracotta-200 transition-colors duration-150 cursor-pointer"
+          type="button"
+          onClick={onRoutine}
+        >
+          Atur jadwal rutin di Pos & Jadwal →
+        </button>
+      </div>
+
+      <form hidden={!editing} className="flex flex-col gap-3 mt-1" id={`hours-form-${post.id}`} onSubmit={event => {
+        event.preventDefault();
+        form.post(endpoint, { preserveScroll: true, preserveState: true, errorBag: `todayHours-${post.id}`,
+          onSuccess: () => { form.setDefaults(); setEditing(false); setMessage('Jam khusus tersimpan untuk pos ini.'); requestAnimationFrame(() => editButton.current?.focus({ preventScroll: true })); },
+        });
+      }}>
+        <p className="text-xs text-clay-500">Isi jam buka & tutup pos untuk hari ini.</p>
+        {form.hasErrors && <p className="text-xs text-rose-600" role="alert">{Object.values(form.errors).join(' ')}</p>}
+        <fieldset disabled={form.processing} className="flex flex-col gap-3">
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label htmlFor={`opens-${post.id}`} className="block text-[11px] font-bold text-clay-400 uppercase mb-1">
+                Buka{startedYesterday ? ' kemarin' : ''} (WIB)
+              </label>
+              <input ref={opensInput} id={`opens-${post.id}`} type="time" required className="w-full bg-clay-50 text-clay-900 text-sm font-bold rounded-xl px-3 py-2 border border-sand-border focus:ring-2 focus:ring-terracotta/20 outline-none" value={form.data.opens_at} onChange={event => form.setData('opens_at', event.target.value)} />
+            </div>
+            <div>
+              <label htmlFor={`closes-${post.id}`} className="block text-[11px] font-bold text-clay-400 uppercase mb-1">
+                Tutup{closingDay ? ` ${closingDay}` : ''} (WIB)
+              </label>
+              <input id={`closes-${post.id}`} type="time" required className="w-full bg-clay-50 text-clay-900 text-sm font-bold rounded-xl px-3 py-2 border border-sand-border focus:ring-2 focus:ring-terracotta/20 outline-none" value={form.data.closes_at} onChange={event => form.setData('closes_at', event.target.value)} />
+            </div>
+          </div>
+          <div className="flex items-center gap-2 mt-1">
+            <button
+              className="flex-1 py-2 px-3 rounded-xl border border-sand-border text-xs font-semibold text-clay-600 hover:bg-clay-100/80 hover:text-clay-900 transition-colors duration-150 cursor-pointer"
+              type="button"
+              onClick={() => { form.resetAndClearErrors(); setEditing(false); requestAnimationFrame(() => editButton.current?.focus({ preventScroll: true })); }}
+            >
+              Batal
+            </button>
+            <button
+              type="submit"
+              className="flex-1 py-2 px-3 rounded-xl bg-terracotta hover:bg-terracotta-600 text-white font-bold text-xs shadow-md shadow-terracotta/20 transition-colors duration-150 cursor-pointer"
+            >
+              {form.processing ? 'Menyimpan…' : 'Simpan Jam'}
+            </button>
+          </div>
+        </fieldset>
+      </form>
+
+      {restoreError && <p className="text-xs text-rose-600" role="alert">{restoreError}</p>}
+      {message && <p className="text-xs text-emerald-700 bg-emerald-50 p-2.5 rounded-xl font-semibold flex items-center gap-1.5" role="status"><Check size={14} />{message}</p>}
+    </section>
+  );
 }
 
 export default function DailyOperations({ operations, selectedPostId, onSelectPost, onRoutine, onDirty }: { operations: DailyOperation[]; selectedPostId: number; onSelectPost: (id: number) => void; onRoutine: () => void; onDirty?: (key: string, dirty: boolean) => void }) {
   const [drafts, setDrafts] = useState<Record<number, boolean>>({});
   const reportDirty = useCallback((postId: number, dirty: boolean) => setDrafts(previous => previous[postId] === dirty ? previous : { ...previous, [postId]: dirty }), []);
   const hasDraft = Object.values(drafts).some(Boolean);
+
   useEffect(() => { onDirty?.('daily', hasDraft); }, [hasDraft, onDirty]);
   useEffect(() => () => onDirty?.('daily', false), [onDirty]);
-  if (!operations.length) return <div className="daily-empty"><MapPin size={24} aria-hidden="true" /><div><h3>Belum ada pos untuk dikelola</h3><p>Tambahkan pos dari profil usaha agar jam dan ketersediaan menunya dapat diatur di sini.</p></div></div>;
+
+  if (!operations.length) {
+    return (
+      <div className="bg-white p-8 rounded-3xl border border-sand-border shadow-soft flex items-center gap-4 text-clay-500">
+        <MapPin size={24} className="text-terracotta shrink-0" aria-hidden="true" />
+        <div>
+          <h3 className="font-extrabold text-clay-900 text-base">Belum ada pos untuk dikelola</h3>
+          <p className="text-xs text-clay-500 mt-1">Tambahkan pos dari tab Pos & Jadwal agar jam dan ketersediaan menunya dapat diatur di sini.</p>
+        </div>
+      </div>
+    );
+  }
+
   const selected = operations.find(operation => operation.post.id === selectedPostId) ?? operations[0];
   const status = operationStatus(selected.post);
-  return <div className="owner-operations"><section className="owner-panel owner-post-selector" aria-labelledby="owner-post-label"><div><label id="owner-post-label" htmlFor="owner-post-select">Lokasi jualan yang diatur</label><select id="owner-post-select" className="text-input" value={selected.post.id} onChange={event => onSelectPost(Number(event.target.value))}>{operations.map(operation => <option key={operation.post.id} value={operation.post.id}>{operation.post.name}</option>)}</select><p><MapPin size={16} aria-hidden="true" />{selected.post.address}</p></div><span className={`owner-status${status.open ? ' is-open' : ''}`}><span aria-hidden="true" />{status.label}</span></section>
-    {operations.map(operation => {
-      const available = operation.menus.filter(menu => !menuSoldOut(menu, operation.post.id)).length;
-      return <div className="owner-operation-columns" key={operation.post.id} hidden={operation.post.id !== selected.post.id}><section className="owner-panel owner-stock" aria-labelledby={`stock-title-${operation.post.id}`}><header className="owner-panel-heading"><h2 id={`stock-title-${operation.post.id}`}>Ketersediaan menu</h2><span className="owner-caption">{available} tersedia</span></header>
-        {operation.menus.length ? <ul className="daily-menu-list">{operation.menus.map(menu => <AvailabilityRow key={menu.id} operation={operation} menu={menu} />)}</ul> : <p className="owner-inline-hint">Belum ada menu. Tambahkan dari tab Menu & harga.</p>}
-        <p className="owner-inline-hint"><Info size={16} aria-hidden="true" />Status habis tersimpan di pos ini sampai kamu mengubahnya.</p>{operation.menus.length > 0 && available === 0 && <p className="daily-hint daily-all-sold-out">Semua menu habis. Status buka pos tetap mengikuti jadwalnya.</p>}
-      </section><TodayHours operation={operation} onDirty={reportDirty} onRoutine={onRoutine} /></div>;
-    })}
-  </div>;
-}
 
+  return (
+    <div className="flex flex-col gap-6">
+      {/* Pos Selector Card */}
+      <section className="bg-white p-5 rounded-3xl border border-sand-border shadow-soft flex flex-col sm:flex-row sm:items-center justify-between gap-4" aria-labelledby="owner-post-label">
+        <div className="flex-1 min-w-0">
+          <label id="owner-post-label" htmlFor="owner-post-select" className="block text-[11px] font-bold text-clay-700 uppercase tracking-wider mb-1.5">
+            Lokasi jualan yang diatur
+          </label>
+          <div className="flex items-center gap-3 flex-wrap">
+            <div className="relative w-full sm:w-auto">
+              <select
+                id="owner-post-select"
+                className="w-full sm:w-auto appearance-none bg-clay-50 hover:bg-clay-100/70 text-clay-900 text-sm font-extrabold rounded-xl pl-3 pr-8 py-2 border border-sand-border cursor-pointer transition focus:ring-2 focus:ring-terracotta/20 outline-none"
+                value={selected.post.id}
+                onChange={event => onSelectPost(Number(event.target.value))}
+              >
+                {operations.map(operation => <option key={operation.post.id} value={operation.post.id}>{operation.post.name}</option>)}
+              </select>
+              <ChevronDown className="w-4 h-4 text-clay-500 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            </div>
+            <p className="flex items-center gap-1.5 text-xs text-clay-700 font-medium">
+              <MapPin size={14} className="text-terracotta shrink-0" aria-hidden="true" />
+              <span className="truncate">{selected.post.address}</span>
+            </p>
+          </div>
+        </div>
+        <span className={`inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full shrink-0 w-fit ${
+          status.open
+            ? 'text-emerald-700 bg-emerald-50 border border-emerald-200'
+            : 'text-amber-700 bg-amber-50 border border-amber-200'
+        }`}>
+          <span className={`w-1.5 h-1.5 rounded-full ${status.open ? 'bg-emerald-500' : 'bg-amber-500'}`} aria-hidden="true" />
+          {status.label}
+        </span>
+      </section>
+
+      {/* Columns: Menu Availability & Today Hours */}
+      {operations.map(operation => {
+        const available = operation.menus.filter(menu => !menuSoldOut(menu, operation.post.id)).length;
+        return (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start" key={operation.post.id} hidden={operation.post.id !== selected.post.id}>
+            {/* Left Column: Ketersediaan Menu (7 cols) */}
+            <section className="lg:col-span-7 bg-white p-6 rounded-3xl border border-sand-border shadow-soft" aria-labelledby={`stock-title-${operation.post.id}`}>
+              <header className="flex items-center justify-between gap-4 mb-4 pb-3 border-b border-sand-border">
+                <h2 id={`stock-title-${operation.post.id}`} className="text-lg font-extrabold text-clay-900 tracking-tight">Ketersediaan Menu</h2>
+                <span className="text-xs font-bold text-terracotta bg-terracotta-50 border border-terracotta-200 px-2.5 py-0.5 rounded-full">{available} tersedia</span>
+              </header>
+              {operation.menus.length ? (
+                <ul className="divide-y divide-sand-border">
+                  {operation.menus.map(menu => <AvailabilityRow key={menu.id} operation={operation} menu={menu} />)}
+                </ul>
+              ) : (
+                <p className="text-xs text-clay-500 py-4">Belum ada menu. Tambahkan dari tab Menu & harga.</p>
+              )}
+              <p className="flex items-center gap-2 text-xs text-clay-400 mt-4 pt-3 border-t border-sand-border">
+                <Info size={14} className="text-clay-400 shrink-0" aria-hidden="true" />
+                Status habis tersimpan di pos ini sampai kamu mengubahnya.
+              </p>
+              {operation.menus.length > 0 && available === 0 && (
+                <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 p-2.5 rounded-xl mt-3 font-medium">
+                  Semua menu habis. Status buka pos tetap mengikuti jadwalnya.
+                </p>
+              )}
+            </section>
+
+            {/* Right Column: Jam Hari Ini (5 cols) */}
+            <div className="lg:col-span-5">
+              <TodayHours operation={operation} onDirty={reportDirty} onRoutine={onRoutine} />
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
