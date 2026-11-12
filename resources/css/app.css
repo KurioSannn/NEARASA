@@ -3,6 +3,7 @@
 @import './post-discovery.css';
 @import './merchant-dashboard.css';
 @import './awards.css';
+@import './chatbot.css';
 
 @theme {
     --font-sans: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', system-ui, 'Segoe UI', Arial, sans-serif;
@@ -48,7 +49,7 @@ button:disabled, input:disabled, select:disabled { cursor:not-allowed; opacity:.
 button,input,a { touch-action:manipulation; }
 button,a { transition:background-color .2s, color .2s, transform .2s; }
 button:active,.button:active { transform:scale(.98); }
-:focus-visible { outline:2px solid var(--accent); outline-offset:4px; }
+:focus-visible:not(.chatbot-input-textarea) { outline:2px solid var(--accent); outline-offset:4px; }
 input:focus-visible { outline-offset:1px; }
 img { display:block; max-width:100%; object-fit:cover; }
 svg { flex-shrink:0; }

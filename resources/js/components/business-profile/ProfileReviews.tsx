@@ -36,24 +36,136 @@ export default function ProfileReviews({ business, post, reviews, owner }: { bus
   const isOwner = Boolean(auth.user && owner?.id === auth.user.id);
   const items = reviews?.items ?? [];
   const rating = reviews?.rating;
+  const hasReviews = Boolean(items.length > 0 && rating?.count && rating.average !== null);
   const loginUrl = profileLoginUrl(business.slug, post.id, url);
-  return <div className="profile-reviews">
-    <header className="profile-reviews-heading"><div><h2>Ulasan</h2><p className="profile-section-intro">{post.name}</p></div>
-      {!isOwner && !writing && (auth.user ? <Button type="button" onClick={() => { setWriting(true); setSaved(false); }}>{reviews?.own ? 'Perbarui ulasanmu' : 'Tulis ulasan'}</Button> : <Link href={loginUrl} className="button button-outline">Masuk untuk menulis</Link>)}
-    </header>
-    <div className="profile-review-score"><Star size={28} aria-hidden="true" />{rating?.count && rating.average !== null ? <><strong>{rating.average.toLocaleString('id-ID', { maximumFractionDigits: 1 })}</strong><span>dari 5 · {rating.count} ulasan pos ini</span></> : <span>Belum ada ulasan pos ini</span>}</div>
-    {saved && <p className="consumer-success" role="status">Ulasanmu untuk {post.name} sudah tersimpan.</p>}
-    {writing && auth.user && !isOwner && <ReviewForm key={post.id} business={business} post={post} reviews={reviews} onCancel={() => setWriting(false)} onSaved={() => { setWriting(false); setSaved(true); }} />}
-    {items.length > 0 ? <div className="review-list">{items.map(review => {
-      const date = new Date(review.created_at);
-      const createdLabel = Number.isNaN(date.getTime()) ? null : new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Jakarta' }).format(date);
-      return <article className="review-item" key={review.id}>
-        <header className="review-author"><span className="profile-review-avatar" aria-hidden="true">{review.author.charAt(0).toLocaleUpperCase('id-ID')}</span><div><strong>{review.author}</strong>{createdLabel && <time dateTime={review.created_at}>{createdLabel}</time>}</div></header>
-        <span className="review-stars" aria-label={review.rating + ' dari 5 bintang'}>{[1, 2, 3, 4, 5].map(star => <Star size={16} key={star} className={review.rating >= star ? 'is-filled' : ''} aria-hidden="true" />)}</span>
-        {review.comment && <p className="profile-preserve-lines">{review.comment}</p>}
-        {review.photo && <ProfilePhoto src={review.photo} alt={'Foto ulasan ' + review.author} className="review-photo" />}
-      </article>;
-    })}</div> : <div className="reviews-empty"><Star size={27} aria-hidden="true" /><h3>Belum ada penilaian di pos ini</h3><p>Punya cerita tentang {post.name}? Kamu bisa menjadi yang pertama memberi ulasan.</p></div>}
-    {isOwner && <p className="profile-section-intro">Kamu mengelola usaha ini. Penilaian berasal dari akun konsumen lain.</p>}
-  </div>;
+
+  return (
+    <div className="profile-reviews">
+      <header className="profile-reviews-heading">
+        <div>
+          <h2>Ulasan Pengunjung</h2>
+          <p className="profile-section-intro">Pengalaman bersantap langsung di {post.name}</p>
+        </div>
+        {!isOwner && !writing && (
+          auth.user ? (
+            <Button
+              type="button"
+              onClick={() => { setWriting(true); setSaved(false); }}
+            >
+              {reviews?.own ? 'Perbarui Ulasan' : 'Tulis Ulasan'}
+            </Button>
+          ) : (
+            <Link href={loginUrl} className="button button-outline">
+              Masuk untuk Menulis
+            </Link>
+          )
+        )}
+      </header>
+
+      {/* Review Score Summary (Only displayed when actual reviews exist) */}
+      {hasReviews && (
+        <div className="profile-review-summary">
+          <div className="review-score-big">
+            {rating?.average?.toLocaleString('id-ID', { maximumFractionDigits: 1 })}
+          </div>
+          <div className="review-score-info">
+            <div className="review-stars-row" aria-label={`Nilai ${rating?.average} dari 5 bintang`}>
+              {[1, 2, 3, 4, 5].map(star => (
+                <Star
+                  size={15}
+                  key={star}
+                  className={rating?.average && Math.round(rating.average) >= star ? 'is-filled' : ''}
+                  aria-hidden="true"
+                />
+              ))}
+            </div>
+            <span className="review-count-text">Berdasarkan {rating?.count} ulasan terverifikasi</span>
+          </div>
+        </div>
+      )}
+
+      {saved && (
+        <p className="consumer-success" role="status">
+          Ulasanmu untuk {post.name} sudah tersimpan.
+        </p>
+      )}
+
+      {writing && auth.user && !isOwner && (
+        <ReviewForm
+          key={post.id}
+          business={business}
+          post={post}
+          reviews={reviews}
+          onCancel={() => setWriting(false)}
+          onSaved={() => { setWriting(false); setSaved(true); }}
+        />
+      )}
+
+      {items.length > 0 ? (
+        <div className="review-list">
+          {items.map(review => {
+            const date = new Date(review.created_at);
+            const createdLabel = Number.isNaN(date.getTime())
+              ? null
+              : new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Jakarta' }).format(date);
+            return (
+              <article className="review-item" key={review.id}>
+                <header className="review-author">
+                  <span className="profile-review-avatar" aria-hidden="true">
+                    {review.author.charAt(0).toLocaleUpperCase('id-ID')}
+                  </span>
+                  <div>
+                    <strong>{review.author}</strong>
+                    {createdLabel && <time dateTime={review.created_at}>{createdLabel}</time>}
+                  </div>
+                </header>
+                <div className="review-stars-row" aria-label={review.rating + ' dari 5 bintang'}>
+                  {[1, 2, 3, 4, 5].map(star => (
+                    <Star
+                      size={14}
+                      key={star}
+                      className={review.rating >= star ? 'is-filled' : ''}
+                      aria-hidden="true"
+                    />
+                  ))}
+                </div>
+                {review.comment && <p className="profile-preserve-lines review-comment-text">{review.comment}</p>}
+                {review.photo && <ProfilePhoto src={review.photo} alt={'Foto ulasan ' + review.author} className="review-photo" />}
+              </article>
+            );
+          })}
+        </div>
+      ) : (
+        !writing && (
+          <div className="profile-reviews-empty">
+            <h3>Belum Ada Ulasan di Pos Ini</h3>
+            <p>
+              Punya cerita tentang cita rasa atau pelayanan di {post.name}? Jadilah yang pertama memberikan ulasan untuk membantu penikmat kuliner lain.
+            </p>
+            {!isOwner && (
+              auth.user ? (
+                <button
+                  type="button"
+                  className="button button-write-first"
+                  onClick={() => { setWriting(true); setSaved(false); }}
+                >
+                  Tulis Ulasan Pertama
+                </button>
+              ) : (
+                <Link href={loginUrl} className="button button-write-first">
+                  Masuk untuk Menulis Ulasan
+                </Link>
+              )
+            )}
+          </div>
+        )
+      )}
+
+      {isOwner && (
+        <p className="profile-section-intro profile-owner-notice">
+          Kamu mengelola usaha ini. Ulasan berasal dari akun konsumen lain.
+        </p>
+      )}
+    </div>
+  );
 }

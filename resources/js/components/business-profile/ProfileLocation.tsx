@@ -24,15 +24,76 @@ function PostHours({ post }: { post: SellingPost }) {
   }
   specialHours.sort((a, b) => a.date.localeCompare(b.date));
   const today = new Intl.DateTimeFormat('id-ID', { weekday: 'long', timeZone: 'Asia/Jakarta' }).format(new Date());
-  return <div className="profile-hours">
-    <section aria-labelledby="profile-regular-hours-title"><h3 id="profile-regular-hours-title"><Clock3 size={20} aria-hidden="true" />Jadwal rutin</h3><p className="profile-section-intro">Semua jam dalam WIB.</p>
-      {post.schedules.length ? <dl className="schedule-list">{days.slice(1).map((day, index) => {
-        const sessions = post.schedules.filter(hours => hours.weekday === index + 1).sort((a, b) => a.opens_at.localeCompare(b.opens_at));
-        return <div className={day.toLocaleLowerCase('id-ID') === today.toLocaleLowerCase('id-ID') ? 'schedule-today' : ''} key={day}><dt>{day}{day.toLocaleLowerCase('id-ID') === today.toLocaleLowerCase('id-ID') && <small>Hari ini</small>}</dt><dd>{sessions.length ? sessions.map((hours, sessionIndex) => <span key={hours.opens_at + '-' + sessionIndex}>{hoursLabel(hours).replaceAll(':', '.')}</span>) : <span>Tidak dijadwalkan</span>}</dd></div>;
-      })}</dl> : <p className="profile-section-intro">Jadwal rutin belum diisi.</p>}
-    </section>
-    {specialHours.length > 0 && <details className="profile-special-hours"><summary>Jadwal khusus & libur<ChevronDown size={18} aria-hidden="true" /></summary><p className="profile-section-intro">Menggantikan jam rutin pada tanggal yang tercantum.</p><dl className="schedule-list">{specialHours.map(hours => <div key={hours.date}><dt><time dateTime={hours.date}>{dateLabel(hours.date)}</time></dt><dd>{hoursLabel(hours).replaceAll(':', '.')}</dd></div>)}</dl></details>}
-  </div>;
+  const isOpen = postIsOpen(post);
+
+  return (
+    <div className="profile-hours">
+      <section aria-labelledby="profile-regular-hours-title">
+        <div className="profile-hours-header">
+          <div>
+            <h3 id="profile-regular-hours-title">Jam Buka</h3>
+            <span className="profile-hours-tz">WIB · Waktu Indonesia Barat</span>
+          </div>
+          <span className={`profile-live-pill ${isOpen ? 'is-open' : 'is-closed'}`}>
+            <span className="live-dot" aria-hidden="true" />
+            {isOpen ? 'Buka Sekarang' : 'Tutup'}
+          </span>
+        </div>
+
+        {post.schedules.length ? (
+          <dl className="schedule-list">
+            {days.slice(1).map((day, index) => {
+              const isToday = day.toLocaleLowerCase('id-ID') === today.toLocaleLowerCase('id-ID');
+              const sessions = post.schedules
+                .filter(hours => hours.weekday === index + 1)
+                .sort((a, b) => a.opens_at.localeCompare(b.opens_at));
+              return (
+                <div className={`schedule-row ${isToday ? 'is-today' : ''}`} key={day}>
+                  <dt>
+                    <span className="day-name">{day}</span>
+                    {isToday && <span className="today-badge">Hari ini</span>}
+                  </dt>
+                  <dd>
+                    {sessions.length ? (
+                      sessions.map((hours, sessionIndex) => (
+                        <span key={hours.opens_at + '-' + sessionIndex}>
+                          {hoursLabel(hours).replaceAll(':', '.')}
+                        </span>
+                      ))
+                    ) : (
+                      <span className="is-off">Libur</span>
+                    )}
+                  </dd>
+                </div>
+              );
+            })}
+          </dl>
+        ) : (
+          <p className="profile-section-intro">Jadwal operasional belum diisi.</p>
+        )}
+      </section>
+
+      {specialHours.length > 0 && (
+        <details className="profile-special-hours">
+          <summary>
+            <span>Jadwal Khusus & Libur</span>
+            <ChevronDown size={15} aria-hidden="true" />
+          </summary>
+          <p className="profile-section-intro">Menggantikan jam operasional rutin pada tanggal tertentu.</p>
+          <dl className="schedule-list">
+            {specialHours.map(hours => (
+              <div className="schedule-row" key={hours.date}>
+                <dt>
+                  <time dateTime={hours.date}>{dateLabel(hours.date)}</time>
+                </dt>
+                <dd>{hoursLabel(hours).replaceAll(':', '.')}</dd>
+              </div>
+            ))}
+          </dl>
+        </details>
+      )}
+    </div>
+  );
 }
 export default function ProfileLocation({ business, posts, post, onSelect, mapTiles, ownerId }: { business: Business; posts: SellingPost[]; post?: SellingPost; onSelect: (id: number) => void; mapTiles: string; ownerId?: number }) {
   if (!post) return <div className="profile-empty-state"><MapPin size={30} aria-hidden="true" /><h2>Lokasi belum tersedia</h2><p>Pemilik belum menambahkan pos jualan.</p></div>;

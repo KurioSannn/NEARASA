@@ -4,6 +4,7 @@ import { MapPin } from 'lucide-react';
 import DesktopHeader from '@/components/DesktopHeader';
 import MobilePillNav from '@/components/MobilePillNav';
 import LocationPicker from '@/components/LocationPicker';
+import FloatingChatbot from '@/components/FloatingChatbot';
 import { type SharedProps } from '@/types/catalog';
 
 const UiContext = createContext({ openLocation: () => {}, openAccount: (_purpose?: string) => {}, toggleFavorite: (_slug: string, _id: number) => {}, isNavigating: false });
@@ -47,6 +48,7 @@ export default function CustomerLayout({ children }: { children: ReactNode }) {
         <span>Panduan kuliner UMKM · Sidoarjo & Surabaya</span>
       </footer>
       <MobilePillNav />
+      <FloatingChatbot />
       {locationOpen && <LocationPicker location={props.location} areas={props.options.areas} tileUrl={props.mapTiles} onClose={() => setLocationOpen(false)} />}
     </div>
   </UiContext.Provider>;
