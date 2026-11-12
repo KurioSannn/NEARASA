@@ -1,11 +1,8 @@
 @import 'tailwindcss';
 @import './accounts.css';
 @import './post-discovery.css';
-<<<<<<< HEAD
-@import './awards.css';
-=======
 @import './merchant-dashboard.css';
->>>>>>> 8c248ccb92451b111e90647fd3ff74677dfbadd9
+@import './awards.css';
 
 @theme {
     --font-sans: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', system-ui, 'Segoe UI', Arial, sans-serif;
