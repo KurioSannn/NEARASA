@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, type FormEvent } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Link } from '@inertiajs/react';
 import {
   ArrowRight,
@@ -6,141 +6,37 @@ import {
   Bot,
   Globe,
   MessageCircle,
-  Mic,
+  TrendingUp,
   Plus,
   RotateCcw,
   X,
 } from 'lucide-react';
+import { businessCover } from '@/types/business-images';
+import { jsonRequestHeaders } from '@/types/request-headers';
+
+type Place = {
+  slug: string;
+  name: string;
+  photo: string;
+  is_demo: boolean;
+  post_id: number;
+  post_name: string;
+  distance: number | null;
+  menu: string;
+  price: number;
+};
 
 interface ChatMessage {
-  id: string;
+  id: number;
   sender: 'user' | 'assistant';
   text: string;
   time: string;
-  places?: Array<{
-    slug: string;
-    name: string;
-    sub: string;
-    photo: string;
-    price: string;
-  }>;
+  places?: Place[];
+  showExploreLink?: boolean;
 }
 
-const PRESET_RESPONSES: Record<
-  string,
-  {
-    reply: string;
-    places?: Array<{
-      slug: string;
-      name: string;
-      sub: string;
-      photo: string;
-      price: string;
-    }>;
-  }
-> = {
-  terdekat: {
-    reply:
-      'Berikut 3 rekomendasi gerai favorit terdekat yang sedang buka hari ini di Sidoarjo & Surabaya:',
-    places: [
-      {
-        slug: 'dapur-griya',
-        name: 'Dapur Griya',
-        sub: 'Warung · Gedangan, Sidoarjo',
-        photo: '/images/demo/places/dapur-griya.png',
-        price: 'Mulai Rp 12.000',
-      },
-      {
-        slug: 'roti-pagi',
-        name: 'Roti Pagi',
-        sub: 'Warung · Krian, Sidoarjo',
-        photo: '/images/demo/toast.jpg',
-        price: 'Mulai Rp 15.000',
-      },
-      {
-        slug: 'burger-pos',
-        name: 'Burger Pos',
-        sub: 'Food Truck · Pos Gedangan',
-        photo: '/images/demo/places/burger-pos.png',
-        price: 'Mulai Rp 23.000',
-      },
-    ],
-  },
-  malam: {
-    reply:
-      'Untuk santap malam ini, gerai-gerai ini siap melayani hingga larut malam:',
-    places: [
-      {
-        slug: 'dapur-bara',
-        name: 'Dapur Bara',
-        sub: 'Rombong · Krian (Buka s/d 23:00)',
-        photo: '/images/demo/grill.jpg',
-        price: 'Mulai Rp 22.000',
-      },
-      {
-        slug: 'burger-pos',
-        name: 'Burger Pos',
-        sub: 'Pos Gedangan (Buka s/d 22:00)',
-        photo: '/images/demo/places/burger-pos.png',
-        price: 'Mulai Rp 23.000',
-      },
-      {
-        slug: 'dapur-griya',
-        name: 'Dapur Griya',
-        sub: 'Gedangan (Buka s/d 22:00)',
-        photo: '/images/demo/places/dapur-griya.png',
-        price: 'Mulai Rp 12.000',
-      },
-    ],
-  },
-  pedas: {
-    reply:
-      'Pecinta rasa pedas gurih khas Jawa Timur wajib coba rekomendasi ini:',
-    places: [
-      {
-        slug: 'dapur-bara',
-        name: 'Dapur Bara',
-        sub: 'Ayam Bakar Sambal Korek Mantap',
-        photo: '/images/demo/grill.jpg',
-        price: 'Mulai Rp 22.000',
-      },
-      {
-        slug: 'dapur-griya',
-        name: 'Dapur Griya',
-        sub: 'Nasi Telur Balado Pedas Rempah',
-        photo: '/images/demo/places/dapur-griya.png',
-        price: 'Mulai Rp 12.000',
-      },
-    ],
-  },
-  hemat: {
-    reply:
-      'Pilihan menu lezat dan bersahabat di kantong (di bawah Rp 20.000):',
-    places: [
-      {
-        slug: 'dapur-griya',
-        name: 'Dapur Griya',
-        sub: 'Nasi Telur Komplit',
-        photo: '/images/demo/places/dapur-griya.png',
-        price: 'Rp 12.000',
-      },
-      {
-        slug: 'roti-pagi',
-        name: 'Roti Pagi',
-        sub: 'Roti Bakar Cokelat Keju',
-        photo: '/images/demo/toast.jpg',
-        price: 'Rp 15.000',
-      },
-      {
-        slug: 'kopi-sudut',
-        name: 'Kopi Sudut',
-        sub: 'Americano & Kopi Susu Aren',
-        photo: '/images/demo/coffee.jpg',
-        price: 'Rp 12.000',
-      },
-    ],
-  },
-};
+const priceFormat = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 });
+const distanceFormat = new Intl.NumberFormat('id-ID', { maximumFractionDigits: 1 });
 
 function formatCurrentTime(): string {
   const d = new Date();
@@ -153,6 +49,13 @@ export default function FloatingChatbot() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputVal, setInputVal] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const activeRequest = useRef<AbortController | null>(null);
+  const messageId = useRef(0);
+
+  useEffect(() => () => {
+    activeRequest.current?.abort();
+    activeRequest.current = null;
+  }, []);
 
   // Positions: Both use top-left viewport coordinates in pixels
   const [launcherPos, setLauncherPos] = useState<{ x: number; y: number }>({ x: 20, y: 600 });
@@ -464,13 +367,17 @@ export default function FloatingChatbot() {
     }
   };
 
-  const handleSendPrompt = (promptText: string, presetKey?: string) => {
-    if (!promptText.trim()) return;
+  const handleSendPrompt = async (promptText: string) => {
+    const prompt = promptText.trim();
+    if (!prompt || activeRequest.current) return;
 
+    const request = new AbortController();
+    activeRequest.current = request;
+    const timeout = window.setTimeout(() => request.abort(), 8000);
     const userMsg: ChatMessage = {
-      id: Date.now().toString(),
+      id: ++messageId.current,
       sender: 'user',
-      text: promptText,
+      text: prompt,
       time: formatCurrentTime(),
     };
 
@@ -478,36 +385,49 @@ export default function FloatingChatbot() {
     setInputVal('');
     setIsTyping(true);
 
-    setTimeout(() => {
-      let replyData = presetKey ? PRESET_RESPONSES[presetKey] : undefined;
-
-      if (!replyData) {
-        const lower = promptText.toLowerCase();
-        if (lower.includes('malam') || lower.includes('larut') || lower.includes('buka')) {
-          replyData = PRESET_RESPONSES.malam;
-        } else if (lower.includes('pedas') || lower.includes('sambal') || lower.includes('ayam')) {
-          replyData = PRESET_RESPONSES.pedas;
-        } else if (lower.includes('hemat') || lower.includes('murah') || lower.includes('harga')) {
-          replyData = PRESET_RESPONSES.hemat;
-        } else {
-          replyData = PRESET_RESPONSES.terdekat;
-        }
+    try {
+      const response = await fetch('/asisten/rekomendasi', {
+        method: 'POST',
+        headers: jsonRequestHeaders(),
+        body: JSON.stringify({ prompt }),
+        signal: request.signal,
+      });
+      if (!response.ok) throw new Error('Pencarian asisten gagal');
+      const result: { reply: string; places: Place[] } = await response.json();
+      if (activeRequest.current === request) {
+        const reply: ChatMessage = {
+          id: ++messageId.current,
+          sender: 'assistant',
+          text: result.reply,
+          time: formatCurrentTime(),
+          places: result.places,
+          showExploreLink: result.places.length === 0,
+        };
+        setMessages(prev => [...prev, reply]);
       }
-
-      const assistantMsg: ChatMessage = {
-        id: (Date.now() + 1).toString(),
-        sender: 'assistant',
-        text: replyData.reply,
-        time: formatCurrentTime(),
-        places: replyData.places,
-      };
-
-      setIsTyping(false);
-      setMessages(prev => [...prev, assistantMsg]);
-    }, 550);
+    } catch {
+      if (activeRequest.current === request) {
+        const reply: ChatMessage = {
+          id: ++messageId.current,
+          sender: 'assistant',
+          text: 'Pencarian asisten sedang bermasalah. Coba kirim lagi atau buka Jelajah.',
+          time: formatCurrentTime(),
+          showExploreLink: true,
+        };
+        setMessages(prev => [...prev, reply]);
+      }
+    } finally {
+      window.clearTimeout(timeout);
+      if (activeRequest.current === request) {
+        activeRequest.current = null;
+        setIsTyping(false);
+      }
+    }
   };
 
   const handleReset = () => {
+    activeRequest.current?.abort();
+    activeRequest.current = null;
     setMessages([]);
     setIsTyping(false);
   };
@@ -611,7 +531,7 @@ export default function FloatingChatbot() {
                     type="button"
                     className="chatbot-chip-btn"
                     onClick={() =>
-                      handleSendPrompt('Cari rekomendasi kuliner terdekat yang sedang buka', 'terdekat')
+                      handleSendPrompt('Cari rekomendasi kuliner terdekat yang sedang buka')
                     }
                   >
                     📍 Terdekat
@@ -620,7 +540,7 @@ export default function FloatingChatbot() {
                     type="button"
                     className="chatbot-chip-btn"
                     onClick={() =>
-                      handleSendPrompt('Warung atau rombong yang buka malam ini', 'malam')
+                      handleSendPrompt('Warung atau rombong yang buka malam ini')
                     }
                   >
                     🌙 Buka Malam
@@ -629,7 +549,7 @@ export default function FloatingChatbot() {
                     type="button"
                     className="chatbot-chip-btn"
                     onClick={() =>
-                      handleSendPrompt('Rekomendasi kuliner pedas mantap', 'pedas')
+                      handleSendPrompt('Rekomendasi kuliner pedas mantap')
                     }
                   >
                     🔥 Kuliner Pedas
@@ -638,7 +558,7 @@ export default function FloatingChatbot() {
                     type="button"
                     className="chatbot-chip-btn"
                     onClick={() =>
-                      handleSendPrompt('Pilihan menu hemat bersahabat kantong', 'hemat')
+                      handleSendPrompt('Pilihan menu hemat bersahabat kantong')
                     }
                   >
                     💰 Pilihan Hemat
@@ -656,24 +576,27 @@ export default function FloatingChatbot() {
                     <p style={{ margin: 0 }}>{msg.text}</p>
 
                     {/* Interactive Place Cards */}
-                    {msg.places && (
+                    {Boolean(msg.places?.length) && (
                       <div className="chatbot-place-cards">
-                        {msg.places.map(place => (
+                        {msg.places?.map(place => (
                           <Link
                             key={place.slug}
-                            href={`/usaha/${place.slug}`}
+                            href={`/usaha/${place.slug}?post=${place.post_id}`}
                             className="chatbot-place-card"
                             onClick={closeChat}
                           >
                             <img
-                              src={place.photo}
+                              src={businessCover(place)}
                               alt={place.name}
                               className="chatbot-place-thumb"
                             />
                             <div className="chatbot-place-meta">
                               <div className="chatbot-place-name">{place.name}</div>
                               <div className="chatbot-place-sub">
-                                {place.sub} · <strong>{place.price}</strong>
+                                {place.post_name}{place.distance !== null ? ` · ${distanceFormat.format(place.distance)} km` : ''}
+                              </div>
+                              <div className="chatbot-place-sub">
+                                {place.menu} · <strong>{priceFormat.format(place.price)}</strong>
                               </div>
                             </div>
                             <span className="chatbot-place-action">
@@ -684,6 +607,7 @@ export default function FloatingChatbot() {
                       </div>
                     )}
 
+                    {msg.showExploreLink && <Link href="/jelajah" className="text-link" onClick={closeChat}>Buka Jelajah</Link>}
                     <div className="chatbot-bubble-time">{msg.time}</div>
                   </div>
                 ))}
@@ -707,10 +631,11 @@ export default function FloatingChatbot() {
                 className="chatbot-input-textarea border-0 outline-none ring-0 focus:border-0 focus:outline-none focus:ring-0 shadow-none focus:shadow-none"
                 placeholder="Tanya rekomendasi kuliner terdekat..."
                 rows={1}
+                maxLength={200}
                 value={inputVal}
                 onChange={e => setInputVal(e.target.value)}
                 onKeyDown={e => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
+                  if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) {
                     e.preventDefault();
                     handleSendPrompt(inputVal);
                   }
@@ -741,10 +666,11 @@ export default function FloatingChatbot() {
                   <button
                     type="button"
                     className="toolbar-btn-icon"
-                    title="Suara"
-                    onClick={() => handleSendPrompt('Rekomendasi terpopuler hari ini')}
+                    title="Cari kuliner populer"
+                    aria-label="Cari kuliner populer"
+                    onClick={() => handleSendPrompt('Rekomendasi kuliner terpopuler')}
                   >
-                    <Mic size={15} />
+                    <TrendingUp size={15} />
                   </button>
                   <button
                     type="button"

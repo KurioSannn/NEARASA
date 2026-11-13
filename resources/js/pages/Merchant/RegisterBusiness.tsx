@@ -51,7 +51,6 @@ export default function RegisterBusiness({ options, kindOptions }: Props) {
 
   const form = useForm({
     // Step 1: Informasi Pemilik
-    owner_nik: '3515082409950001',
     first_name: defaultFirstName,
     last_name: defaultLastName,
     owner_address: '',
@@ -146,7 +145,7 @@ export default function RegisterBusiness({ options, kindOptions }: Props) {
   };
 
   const stepsConfig = [
-    { num: 1, title: 'Informasi Pribadi & Pemilik', desc: 'NIK, nama & kontak pemilik' },
+    { num: 1, title: 'Informasi Pribadi & Pemilik', desc: 'Nama & kontak pemilik' },
     { num: 2, title: 'Detail Usaha & Gerai', desc: 'Warung, menu & kategori' },
     { num: 3, title: 'Jadwal & Operasional', desc: 'Hari & jam buka' },
     { num: 4, title: 'Ringkasan & Konfirmasi', desc: 'Verifikasi tim Nearasa' },
@@ -287,35 +286,6 @@ export default function RegisterBusiness({ options, kindOptions }: Props) {
                         </div>
 
                         <div className="space-y-4">
-                          {/* NIK Field with Outlined Highlight styling */}
-                          <div>
-                            <div className="relative rounded-2xl border-2 border-[#B74B28] bg-white px-4 pt-2.5 pb-2 transition-all">
-                              <label
-                                htmlFor="owner-nik"
-                                className="absolute -top-2.5 left-3 bg-white px-2 text-[11px] font-bold uppercase tracking-wider text-[#B74B28] rounded"
-                              >
-                                Nomor Identitas KTP (NIK)
-                              </label>
-                              <div className="flex items-center justify-between">
-                                <input
-                                  id="owner-nik"
-                                  type="text"
-                                  maxLength={16}
-                                  placeholder="Masukkan 16 digit NIK"
-                                  value={form.data.owner_nik}
-                                  onChange={(e) => form.setData('owner_nik', e.target.value)}
-                                  className="w-full border-0 p-0 text-sm font-bold text-clay-900 placeholder-clay-400 focus:ring-0 tracking-wide outline-none bg-transparent"
-                                />
-                                <span className="text-[10px] font-bold text-clay-600 whitespace-nowrap bg-clay-50 border border-sand-border px-2.5 py-0.5 rounded-full">
-                                  16 Digit KTP
-                                </span>
-                              </div>
-                            </div>
-                            <p className="text-[11px] text-clay-600 mt-1.5 ml-1">
-                              Pastikan NIK masih berlaku dan terdaftar resmi di Dukcapil.
-                            </p>
-                          </div>
-
                           {/* Name Grid: First and Last Name */}
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
@@ -847,7 +817,7 @@ export default function RegisterBusiness({ options, kindOptions }: Props) {
                           {/* Card 3: Data Pemilik */}
                           <div className="p-4 bg-white border border-sand-border rounded-2xl text-xs space-y-1">
                             <span className="text-[11px] font-bold text-clay-500 uppercase tracking-wider block">Pemilik Terdaftar:</span>
-                            <p className="font-bold text-clay-900">{form.data.first_name} {form.data.last_name} ({form.data.owner_nik})</p>
+                            <p className="font-bold text-clay-900">{form.data.first_name} {form.data.last_name}</p>
                             <p className="text-clay-600 text-[11px]">{form.data.owner_email} · +62 {form.data.owner_phone}</p>
                           </div>
 

@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 
 class RankingCalculator
 {
-    public const FORMULA_VERSION = 'hybrid-demo-v1';
+    public const FORMULA_VERSION = 'hybrid-demo-v2';
 
     /**
      * Calculate rankings for a given period, start date, and region.
@@ -37,9 +37,11 @@ class RankingCalculator
         $tz = 'Asia/Jakarta';
         $startWib = CarbonImmutable::parse($startDateWib, $tz)->startOfDay();
 
+        $annual = in_array($period, ['yearly', 'annual'], true);
+
         [$endWib, $params] = match ($period) {
             'monthly' => [
-                $startWib->addMonth()->startOfDay(),
+                $startWib->addMonthNoOverflow()->startOfDay(),
                 [
                     'volume_weight' => 0.6,
                     'rate_weight' => 0.4,
@@ -79,7 +81,7 @@ class RankingCalculator
 
         // 1. Fetch businesses in the requested region
         $businesses = Business::query()
-            ->with(['sellingPosts'])
+            ->where('status', 'published')
             ->whereHas('sellingPosts', function ($q) use ($region) {
                 $q->where('address', 'like', "%{$region}%");
             })
@@ -95,17 +97,7 @@ class RankingCalculator
                 ->where('occurred_at', '<', $endUtc)
                 ->get();
 
-            // Unique visitors who viewed profile: V
-            $viewers = $events->where('type', 'profile_view')->pluck('visitor_key')->unique();
-            $v = $viewers->count();
-
-            // Unique interested visitors who also viewed profile: I
-            $interested = $events
-                ->whereIn('type', ['map_click', 'whatsapp_click'])
-                ->pluck('visitor_key')
-                ->unique()
-                ->intersect($viewers);
-            $i = $interested->count();
+            [$i, $v] = $this->visitorCounts($events);
 
             // Raw favorites if present in events (for inspection/compatibility)
             $favorites = $events->where('type', 'favorite')->pluck('visitor_key')->unique()->count();
@@ -113,12 +105,17 @@ class RankingCalculator
             // Mathematical calculation of hybrid score
             $scoreParts = $this->calculateScore($i, $v, $params);
 
+            if ($annual) {
+                $scoreParts = $this->annualScoreParts($events, $scoreParts, $params, $tz);
+            }
+
             $entries[] = [
                 'business_id' => $business->id,
                 'slug' => $business->slug,
                 'name' => $business->name,
                 'kind' => $business->kind,
-                'cover_photo' => $business->cover_path,
+                'cover_photo' => $business->photo,
+                'is_demo' => $business->is_demo,
                 'metrics' => [
                     'views' => $v,
                     'intent' => $i,
@@ -176,7 +173,7 @@ class RankingCalculator
             'schema_version' => '1.0',
             'formula_version' => self::FORMULA_VERSION,
             'data_status' => 'simulated',
-            'result_status' => 'finalized',
+            'result_status' => $endWib->isFuture() ? 'provisional' : 'finalized',
             'region' => $region,
             'category' => 'most_interested',
             'period' => $period,
@@ -184,7 +181,7 @@ class RankingCalculator
             'end' => $endWib->toIso8601String(),
             'timezone' => $tz,
             'params' => $params,
-            'eligible_business_count' => count($entries),
+            'eligible_business_count' => count(array_filter($entries, fn (array $entry) => $entry['score'] > 0)),
             'minimum_participants' => 3,
             'entries' => $entries,
             'notes' => [
@@ -192,6 +189,37 @@ class RankingCalculator
                 'Bukan sertifikasi cita rasa kuliner atau transaksi moneter.',
             ],
         ];
+    }
+
+    private function visitorCounts(Collection $events): array
+    {
+        $viewers = $events->where('type', 'profile_view')->pluck('visitor_key')->unique();
+        $interested = $events
+            ->whereIn('type', ['map_click', 'whatsapp_click'])
+            ->pluck('visitor_key')
+            ->unique()
+            ->intersect($viewers);
+
+        return [$interested->count(), $viewers->count()];
+    }
+
+    private function annualScoreParts(Collection $events, array $parts, array $params, string $timezone): array
+    {
+        $scores = $events
+            ->groupBy(fn ($event) => CarbonImmutable::parse($event->occurred_at, 'UTC')->setTimezone($timezone)->format('Y-m'))
+            ->map(function (Collection $month) use ($params) {
+                [$intent, $views] = $this->visitorCounts($month);
+
+                return $this->calculateScore($intent, $views, $params)['total'];
+            });
+        $mean = $scores->avg() ?? 0.0;
+        $median = $scores->median() ?? 0.0;
+        $parts['monthly_mean'] = round($mean, 2);
+        $parts['monthly_median'] = round($median, 2);
+        $parts['months_with_data'] = $scores->count();
+        $parts['total'] = round($params['annual_mean_weight'] * $mean + $params['annual_median_weight'] * $median, 2);
+
+        return $parts;
     }
 
     /**

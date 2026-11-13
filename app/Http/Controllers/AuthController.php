@@ -20,7 +20,9 @@ class AuthController extends Controller
             return redirect()->intended('/akun');
         }
 
-        return Inertia::render('Auth/Login');
+        return Inertia::render('Auth/Login', [
+            'demoEnabled' => app()->environment('local') && config('nearasa.demo_auth'),
+        ]);
     }
 
     public function store(Request $request)

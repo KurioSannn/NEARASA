@@ -11,13 +11,13 @@ import TopNav from '@/components/merchant/dashboard/TopNav';
 import Footer from '@/components/merchant/dashboard/Footer';
 import type { DailyOperation } from '@/components/merchant/DailyOperations';
 import type { SharedProps } from '@/types/catalog';
-import type { ClosureReport, MerchantNavigation, MerchantStatistics, OwnedBusiness } from '@/types/merchant';
+import type { MerchantNavigation, MerchantStatistics, OwnedBusiness } from '@/types/merchant';
 
 type DashboardProps = {
   businesses: OwnedBusiness[];
   operations: DailyOperation[];
   statistics: MerchantStatistics;
-  reports: ClosureReport[];
+  reviewCount: number;
   merchantNavigation: MerchantNavigation;
 };
 
@@ -25,20 +25,18 @@ export default function Dashboard({
   businesses,
   operations,
   statistics,
-  reports,
+  reviewCount,
   merchantNavigation,
 }: DashboardProps) {
   const { auth, flash } = usePage<SharedProps>().props;
   const [searchQuery, setSearchQuery] = useState('');
 
-  const pending = merchantNavigation.pending_reports;
   const openCount = operations.filter(
     (op) => op.post.is_open && op.post.operating_status !== 'permanently_closed'
   ).length;
 
   const userName = auth.user?.public_name || auth.user?.name || 'Pemilik';
   const firstName = userName.trim().split(' ')[0];
-  const firstReport = reports.find((r) => !r.resolved_at);
 
   const q = searchQuery.toLowerCase().trim();
   const filteredBusinesses = q
@@ -101,14 +99,14 @@ export default function Dashboard({
                     className="flex items-center gap-1.5 bg-white hover:bg-[#fdeee9] border border-sand-border hover:border-terracotta-300 text-clay-800 hover:text-terracotta px-3.5 py-2 rounded-full text-xs font-bold transition-colors duration-150 shadow-xs cursor-pointer"
                   >
                     <Plus className="w-4 h-4 text-terracotta" />
-                    <span>+ Tambah Usaha</span>
+                    <span>Tambah Usaha</span>
                   </Link>
                   {businesses.length > 0 && (
                     <Link
                       href={merchantNavigation.manage_url}
                       className="flex items-center gap-1.5 bg-terracotta hover:bg-terracotta-600 text-white !text-white px-4 py-2 rounded-full text-xs font-bold shadow-pill transition-colors duration-150 cursor-pointer"
                     >
-                      <Plus className="w-4 h-4 text-white !text-white" />
+                      <Store className="w-4 h-4 text-white !text-white" aria-hidden="true" />
                       <span className="text-white !text-white">Kelola usaha</span>
                     </Link>
                   )}
@@ -149,7 +147,7 @@ export default function Dashboard({
                 businessCount={businesses.length}
                 postCount={operations.length}
                 openCount={openCount}
-                pending={pending}
+                reviewCount={reviewCount}
                 manageUrl={merchantNavigation.manage_url}
               />
 
@@ -168,8 +166,6 @@ export default function Dashboard({
               businesses={businesses}
               postCount={operations.length}
               openCount={openCount}
-              pending={pending}
-              report={firstReport}
               manageUrl={merchantNavigation.manage_url}
             />
           </div>

@@ -8,23 +8,21 @@ export default function CurvedSidebar({ merchantNavigation }: { merchantNavigati
   const activeNav =
     pageUrl === '/kelola-usaha'
       ? 'dashboard'
-      : pageUrl.startsWith('/kelola-usaha/laporan')
+      : pageUrl.startsWith('/kelola-usaha/ulasan')
       ? 'reports'
       : pageUrl.startsWith('/kelola-usaha/setelan')
       ? 'settings'
       : 'manage';
-  const pending = merchantNavigation.pending_reports;
 
   const mobileItems = [
     { key: 'dashboard', label: 'Dashboard', href: '/kelola-usaha', icon: LayoutGrid, active: activeNav === 'dashboard' },
     { key: 'manage', label: 'Kelola', href: merchantNavigation.manage_url, icon: Store, active: activeNav === 'manage' },
     {
       key: 'reports',
-      label: 'Review',
-      href: '/kelola-usaha/laporan',
+      label: 'Ulasan',
+      href: '/kelola-usaha/ulasan',
       icon: ShieldCheck,
       active: activeNav === 'reports',
-      hasBadge: pending > 0,
     },
     { key: 'settings', label: 'Setelan', href: '/kelola-usaha/setelan', icon: Settings, active: activeNav === 'settings' },
     { key: 'public', label: 'Publik', href: '/', icon: Home, active: false },
@@ -67,9 +65,9 @@ export default function CurvedSidebar({ merchantNavigation }: { merchantNavigati
 
           {/* Review Tab */}
           <Link
-            href="/kelola-usaha/laporan"
-            aria-label="Review Pos Tutup"
-            title="Review Pos Tutup"
+            href="/kelola-usaha/ulasan"
+            aria-label="Ulasan pelanggan"
+            title="Ulasan pelanggan"
             className={`relative w-10 h-10 rounded-2xl flex items-center justify-center transition-colors duration-150 ${
               activeNav === 'reports'
                 ? 'bg-terracotta text-white !text-white shadow-md shadow-terracotta/25'
@@ -77,13 +75,6 @@ export default function CurvedSidebar({ merchantNavigation }: { merchantNavigati
             }`}
           >
             <ShieldCheck className="w-5 h-5" aria-hidden="true" />
-            {pending > 0 && (
-              <span
-                className={`absolute top-1.5 right-1.5 w-2 h-2 rounded-full ring-2 ring-white ${
-                  activeNav === 'reports' ? 'bg-white' : 'bg-terracotta'
-                }`}
-              />
-            )}
           </Link>
         </div>
 
@@ -119,7 +110,7 @@ export default function CurvedSidebar({ merchantNavigation }: { merchantNavigati
         style={{ fontFamily: 'var(--font-sans)' }}
       >
         <div className="pointer-events-auto inline-flex items-center justify-center gap-1.5 max-[370px]:gap-1 p-1.5 max-[370px]:p-1 rounded-full bg-[#fffdfa]/96 backdrop-blur-md border border-sand-border shadow-[0_8px_30px_rgba(59,43,38,0.14)]">
-          {mobileItems.map(({ key, label, href, icon: Icon, active, hasBadge }) => (
+          {mobileItems.map(({ key, label, href, icon: Icon, active }) => (
             <Link
               key={key}
               href={href}
@@ -139,17 +130,11 @@ export default function CurvedSidebar({ merchantNavigation }: { merchantNavigati
                   <span className="text-[13px] max-[370px]:text-[12px] font-bold text-white !text-white leading-none whitespace-nowrap tracking-[-0.2px]">
                     {label}
                   </span>
-                  {hasBadge && (
-                    <span className="absolute top-1.5 left-6 w-2 h-2 rounded-full bg-terracotta ring-2 ring-white" />
-                  )}
                 </>
               ) : (
                 <>
                   <Icon className="w-[20px] h-[20px] stroke-[1.9]" aria-hidden="true" />
                   <span className="sr-only">{label}</span>
-                  {hasBadge && (
-                    <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-terracotta ring-2 ring-[#fffdfa]" />
-                  )}
                 </>
               )}
             </Link>

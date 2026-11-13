@@ -12,8 +12,13 @@ import EmptyCatalog from '@/components/EmptyCatalog';
 import HomeMapPreview from '@/components/HomeMapPreview';
 import { cardKey, catalogUrl, type CatalogProps, type SharedProps } from '@/types/catalog';
 import { groupBusinessLocations } from '@/types/consumer-pages';
+import { businessCover } from '@/types/business-images';
 
-export default function Home({ businesses, filters, options, location, recommendations = [] }: CatalogProps) {
+type HomeProps = CatalogProps & {
+  awardHighlight: { name: string; slug: string; photo: string | null; is_demo: boolean } | null;
+};
+
+export default function Home({ businesses, filters, options, location, recommendations = [], awardHighlight }: HomeProps) {
   const [filterOpen, setFilterOpen] = useState(false);
   const { openLocation } = useUi();
   const { mapTiles } = usePage<SharedProps>().props;
@@ -62,39 +67,42 @@ export default function Home({ businesses, filters, options, location, recommend
         <FoodCategory categories={options.categories} filters={filters} />
       </section>
 
-      {/* Editorial Food Feature Banner: NEARASA Awards Tangga Kuliner (Human, Warm, Anti-Slop) */}
-      <section className="home-awards-banner-wrap" aria-label="Tangga Kuliner Terpopuler">
+      <section className="home-awards-banner-wrap" aria-label="Simulasi NEARASA Awards">
         <div className="home-awards-banner">
           <div className="awards-banner-content">
-            <span className="awards-banner-kicker">Tangga Kuliner Pekan Ini</span>
+            <span className="awards-banner-kicker">NEARASA Awards · Simulasi</span>
             <h2 className="awards-banner-title">
-              Roti Pagi & Dapur Griya Paling Diminati Warga
+              {awardHighlight ? `${awardHighlight.name} memimpin di Sidoarjo` : 'Tangga kuliner Sidoarjo dan Surabaya'}
             </h2>
             <p className="awards-banner-desc">
-              Cek podium 3 besar dan klasemen mingguan gerai kuliner lokal terpopuler di Sidoarjo & Surabaya.
+              {awardHighlight
+                ? 'Peringkat pekan ini berdasarkan interaksi yang disimulasikan.'
+                : 'Jelajahi peringkat usaha berdasarkan interaksi yang disimulasikan.'}
             </p>
             <div>
-              <Link href="/awards" className="awards-banner-cta">
+              <Link href="/awards?period=weekly&region=Sidoarjo" className="awards-banner-cta">
                 <span>Lihat Klasemen Lengkap</span>
                 <ArrowRight size={14} aria-hidden="true" />
               </Link>
             </div>
           </div>
 
-          <div className="awards-banner-photo-wrap" aria-hidden="true">
-            <div className="awards-banner-photo-card">
-              <img
-                src="/images/demo/toast.jpg"
-                alt="Sajian Roti Pagi"
-                className="awards-banner-img"
-                loading="lazy"
-              />
-              <div className="awards-banner-photo-caption">
-                <span className="photo-caption-rank">#1 Teratas</span>
-                <span className="photo-caption-name">Roti Pagi</span>
+          {awardHighlight && (
+            <div className="awards-banner-photo-wrap" aria-hidden="true">
+              <div className="awards-banner-photo-card">
+                <img
+                  src={businessCover({ ...awardHighlight, photo: awardHighlight.photo ?? '' })}
+                  alt=""
+                  className="awards-banner-img"
+                  loading="lazy"
+                />
+                <div className="awards-banner-photo-caption">
+                  <span className="photo-caption-rank">Peringkat 1</span>
+                  <span className="photo-caption-name">{awardHighlight.name}</span>
+                </div>
               </div>
             </div>
-          </div>
+          )}
         </div>
       </section>
 
@@ -120,7 +128,7 @@ export default function Home({ businesses, filters, options, location, recommend
         <header className="home-section-heading">
           <div>
             <h2 id="home-choices-title">{location ? 'Pilihan di sekitarmu' : 'Pilihan untuk dicoba'}</h2>
-            <p>Rekomendasi gerai & warung kuliner teratas siap santap hari ini.</p>
+            <p>Lihat menu, harga, dan lokasi tiap pos jualan.</p>
           </div>
           <Link href={catalogUrl(filters)} className="home-section-link">
             Lihat semua <ArrowRight size={15} aria-hidden="true" />
@@ -133,7 +141,6 @@ export default function Home({ businesses, filters, options, location, recommend
                 key={cardKey(business)}
                 business={business}
                 isHighlighted={index % 3 === 1}
-                rank={index + 1}
               />
             ))}
           </div>
@@ -147,7 +154,7 @@ export default function Home({ businesses, filters, options, location, recommend
           <span className="home-map-callout-kicker">Peta Kuliner Interaktif</span>
           <h2 id="home-map-callout-title">Cari tempat makan terdekat langsung di peta</h2>
           <p className="home-map-callout-desc">
-            Lihat sebaran warung dan rombong yang sedang buka hari ini di sekitarmu, lengkap dengan jarak tempuh, rute presisi, dan ketersediaan menu.
+            Lihat lokasi pos jualan, jarak garis lurus dari titik pilihanmu, dan jam buka menurut jadwal.
           </p>
 
           <div className="home-map-callout-points">
@@ -157,11 +164,11 @@ export default function Home({ businesses, filters, options, location, recommend
             </span>
             <span className="map-point-chip">
               <Clock size={14} aria-hidden="true" />
-              Jadwal buka aktual
+              Jam buka terjadwal
             </span>
             <span className="map-point-chip">
               <Navigation size={14} aria-hidden="true" />
-              Rute langsung
+              Lokasi pos jualan
             </span>
           </div>
 

@@ -1,7 +1,6 @@
 import { Link } from '@inertiajs/react';
-import { AlertTriangle, ArrowUpRight, CheckCircle2, Clock, FileText, Info, Plus, ShieldCheck, Store, TrendingUp, UserRound } from 'lucide-react';
-import { merchantDate } from '@/components/merchant/DailyOperations';
-import type { ClosureReport, OwnedBusiness } from '@/types/merchant';
+import { ArrowUpRight, Clock, FileText, Info, Plus, ShieldCheck, Store, TrendingUp, UserRound } from 'lucide-react';
+import type { OwnedBusiness } from '@/types/merchant';
 
 type Props = {
   ownerName: string;
@@ -9,8 +8,6 @@ type Props = {
   businesses: OwnedBusiness[];
   postCount: number;
   openCount: number;
-  pending: number;
-  report?: ClosureReport;
   manageUrl: string;
 };
 
@@ -20,8 +17,6 @@ export default function RightWalletSidebar({
   businesses,
   postCount,
   openCount,
-  pending,
-  report,
   manageUrl,
 }: Props) {
   const readinessPercent = postCount > 0 ? Math.round((openCount / postCount) * 100) : 0;
@@ -101,17 +96,15 @@ export default function RightWalletSidebar({
           </Link>
 
           <Link
-            href="/kelola-usaha/laporan"
+            href="/kelola-usaha/ulasan"
             className="flex flex-col items-center gap-1.5 p-2.5 rounded-2xl bg-clay-100 hover:bg-[#fdeee9] border border-sand-border hover:border-terracotta-200 transition-colors duration-150 group text-center"
             title="Daftar Review"
           >
             <div className="w-8 h-8 rounded-xl bg-terracotta group-hover:bg-terracotta-600 shadow-xs flex items-center justify-center text-white border border-terracotta-600 transition-colors duration-150 relative">
               <ShieldCheck className="w-4 h-4 text-white" />
-              {pending > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-amber-300 ring-1 ring-white" />
-              )}
+
             </div>
-            <span className="text-[11px] font-bold text-clay-900 group-hover:text-terracotta transition-colors duration-150">Review</span>
+            <span className="text-[11px] font-bold text-clay-900 group-hover:text-terracotta transition-colors duration-150">Ulasan</span>
           </Link>
 
           <Link
@@ -145,63 +138,6 @@ export default function RightWalletSidebar({
             </span>
           </div>
         </div>
-      </section>
-
-      {/* Perhatian & Laporan Tutup Pelanggan */}
-      <section className="bg-white p-5 rounded-3xl border border-sand-border shadow-soft flex flex-col gap-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <h2 className="text-base font-bold text-clay-900 leading-tight">Perhatian Pos</h2>
-            {pending > 0 && (
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">
-                {pending}
-              </span>
-            )}
-          </div>
-          <Link
-            href="/kelola-usaha/laporan"
-            className="w-7 h-7 rounded-full bg-clay-100 hover:bg-[#fdeee9] border border-transparent hover:border-terracotta-200 flex items-center justify-center text-clay-600 hover:text-terracotta transition-colors duration-150"
-            aria-label="Lihat semua review"
-          >
-            <ArrowUpRight className="w-4 h-4" />
-          </Link>
-        </div>
-
-        {report ? (
-          <article className="p-3.5 bg-amber-50/70 border border-amber-200/80 rounded-2xl flex flex-col gap-2.5">
-            <div className="flex items-start gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0 mt-0.5">
-                <AlertTriangle className="w-4 h-4" />
-              </div>
-              <div className="min-w-0">
-                <h3 className="text-xs font-bold text-clay-900">Review Pos Tutup</h3>
-                <p className="text-[11px] font-semibold text-terracotta-700 truncate">{report.business_name} - {report.post_name}</p>
-              </div>
-            </div>
-            <p className="text-xs text-clay-600 line-clamp-2 leading-relaxed">
-              "{report.note || 'Konsumen menemukan pos tutup. Periksa kondisi pos ini.'}"
-            </p>
-            <div className="flex items-center justify-between pt-1 text-[10px] text-clay-400">
-              <span>{merchantDate(report.created_at)}</span>
-              <Link
-                href={`/kelola-usaha/laporan?status=pending#laporan-${report.id}`}
-                className="text-xs font-bold text-terracotta hover:text-terracotta-700 hover:underline transition-colors"
-              >
-                Buka Review
-              </Link>
-            </div>
-          </article>
-        ) : (
-          <div className="p-4 bg-emerald-50/50 border border-emerald-100 rounded-2xl flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
-              <CheckCircle2 className="w-5 h-5" />
-            </div>
-            <div>
-              <h3 className="text-xs font-bold text-clay-900">Semua Pos Aman</h3>
-              <p className="text-[11px] text-clay-500">Tidak ada review pos tutup dari konsumen yang tertunda.</p>
-            </div>
-          </div>
-        )}
       </section>
 
       {/* Operasional & Bantuan Widget */}

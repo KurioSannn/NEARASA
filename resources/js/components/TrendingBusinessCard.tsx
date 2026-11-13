@@ -6,13 +6,11 @@ import { businessCover } from '@/types/business-images';
 interface TrendingCardProps {
   business: BusinessCardData;
   isHighlighted?: boolean;
-  rank?: number;
 }
 
 export default function TrendingBusinessCard({
   business,
   isHighlighted = false,
-  rank = 1,
 }: TrendingCardProps) {
   const { url } = usePage<SharedProps>();
   const detailUrl = `/usaha/${business.slug}?${new URLSearchParams({
@@ -23,13 +21,6 @@ export default function TrendingBusinessCard({
   const menu = matchedMenu(business);
   const price = menu ? menu.price : business.min_price;
 
-  // Clean label without icons
-  const kickerText = isHighlighted
-    ? 'Paling Diminati'
-    : rank === 1
-    ? 'Pilihan Minggu Ini'
-    : 'Favorit Warga';
-
   return (
     <article
       className={`trending-order-card ${isHighlighted ? 'is-highlighted' : ''}`}
@@ -37,10 +28,7 @@ export default function TrendingBusinessCard({
     >
       {/* Left Column: Information */}
       <div className="trending-card-info">
-        {/* Top Kicker Label (One unified color, pure text without icons) */}
-        <div className="trending-card-kicker">
-          <span>{kickerText}</span>
-        </div>
+        {business.business_category && <div className="trending-card-kicker">{business.business_category}</div>}
 
         {/* Title */}
         <h3 className="trending-card-title">
@@ -96,7 +84,7 @@ export default function TrendingBusinessCard({
             className="trending-photo-img"
           />
           <span className={`trending-photo-status ${business.is_open ? 'is-open' : 'is-closed'}`}>
-            {business.is_open ? 'Buka' : 'Tutup'}
+            {business.is_open ? 'Buka terjadwal' : 'Di luar jadwal'}
           </span>
         </Link>
       </div>

@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { EventEmitter } from 'node:events';
 import { watchTiles } from '../../resources/js/components/maps/tile-status.ts';
+import { addBusinessMarkers } from '../../resources/js/components/maps/marker-layers.ts';
 import { businessCover } from '../../resources/js/types/business-images.ts';
 
 test('an unavailable map can recover after retry without losing tile progress', () => {
@@ -56,4 +57,51 @@ test('demo storefront assets never replace an owner upload or a real business co
   assert.equal(businessCover({ ...demo, photo: '/media/owner-cover.jpg' }), '/media/owner-cover.jpg');
   assert.equal(businessCover({ ...demo, is_demo: false }), demo.photo);
   assert.equal(businessCover({ ...demo, slug: 'other-business' }), demo.photo);
+});
+
+test('nearby business pins keep their coordinates and render tooltip labels as text', t => {
+  const originalDocument = globalThis.document;
+  t.after(() => { globalThis.document = originalDocument; });
+  globalThis.document = {
+    createElement(tagName) {
+      return {
+        tagName, textContent: '', children: [],
+        append(child) { this.children.push(child); },
+        set innerHTML(_) { assert.fail('Business names must not be inserted as HTML'); },
+      };
+    },
+  };
+  const markers = [];
+  const leaflet = {
+    divIcon: options => options,
+    marker(coordinates) {
+      return {
+        addTo() { return this; },
+        on() {},
+        getElement() { return null; },
+        bindTooltip(tooltip) { markers.push({ coordinates, tooltip }); },
+      };
+    },
+  };
+  const first = {
+    name: '<b>Warung uji</b>',
+    min_price: 15000,
+    is_open: true,
+    menus: [],
+    matched_menu: { name: '<em>Nasi</em>', price: 15000 },
+    post: { id: 1, name: 'Pos A', latitude: -7.38, longitude: 112.73 },
+  };
+  const second = {
+    ...first, name: 'Pos kedua', matched_menu: null,
+    post: { ...first.post, id: 2, latitude: -7.381, longitude: 112.731 },
+  };
+
+  addBusinessMarkers(leaflet, {}, [first, second], 1, () => {});
+
+  assert.deepEqual(markers.map(marker => marker.coordinates), [[-7.38, 112.73], [-7.381, 112.731]]);
+  assert.deepEqual(markers[0].tooltip.children.map(child => [child.tagName, child.textContent]), [
+    ['strong', '<b>Warung uji</b>'],
+    ['small', ' · <em>Nasi</em> (15rb)'],
+  ]);
+  assert.equal(markers[1].tooltip.children.length, 1);
 });

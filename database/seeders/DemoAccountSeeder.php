@@ -9,6 +9,8 @@ use Illuminate\Support\Str;
 
 class DemoAccountSeeder extends Seeder
 {
+    public const BUSINESS_SLUGS = ['dapur-griya', 'pizza-sore'];
+
     public function run(): void
     {
         if (! app()->environment('local')) {
@@ -21,6 +23,6 @@ class DemoAccountSeeder extends Seeder
         if (! $owner->exists) {
             $owner->forceFill(['name' => 'Raka Pradana', 'password' => Str::random(48), 'is_demo' => true])->save();
         }
-        Business::whereIn('slug', ['dapur-griya', 'pizza-sore'])->where('is_demo', true)->whereNull('owner_id')->update(['owner_id' => $owner->id]);
+        Business::whereIn('slug', self::BUSINESS_SLUGS)->where('is_demo', true)->whereNull('owner_id')->update(['owner_id' => $owner->id]);
     }
 }

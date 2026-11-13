@@ -12,7 +12,6 @@ export default function TopNav({ merchantNavigation, searchQuery = '', onSearchC
   const { auth } = usePage<SharedProps>().props;
   const [profileOpen, setProfileOpen] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
-  const pending = merchantNavigation.pending_reports;
   const user = auth.user;
   const name = user?.public_name || user?.name || 'Pemilik';
   const initial = name.charAt(0).toUpperCase();
@@ -62,14 +61,11 @@ export default function TopNav({ merchantNavigation, searchQuery = '', onSearchC
 
           {/* Notification Bell */}
           <Link
-            href="/kelola-usaha/laporan"
-            aria-label={pending > 0 ? `${pending} review perlu diperiksa` : 'Notifikasi review'}
+            href="/kelola-usaha/ulasan"
+            aria-label="Ulasan pelanggan"
             className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white border border-sand-border flex items-center justify-center text-clay-700 hover:text-terracotta hover:bg-[#fdeee9] hover:border-terracotta-200 shadow-sm transition-colors duration-150"
           >
             <Bell className="w-4 h-4" aria-hidden="true" />
-            {pending > 0 && (
-              <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-terracotta ring-2 ring-white" />
-            )}
           </Link>
 
           {/* User Profile Pill */}

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\AssistantController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AwardsController;
 use App\Http\Controllers\BusinessController;
@@ -23,6 +24,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', HomeController::class)->name('home');
 Route::get('/jelajah', ExploreController::class)->name('explore');
+Route::post('/asisten/rekomendasi', AssistantController::class)->middleware('throttle:30,1');
 Route::get('/peta', MapExploreController::class)->name('map.explore');
 Route::get('/awards', AwardsController::class)->name('awards');
 Route::get('/usaha/{business:slug}', BusinessController::class)->name('business.show');
@@ -55,6 +57,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/favorit/{business:slug}', [FavoriteController::class, 'destroy']);
     Route::get('/kelola-usaha', [MerchantController::class, 'index'])->name('merchant.index');
     Route::get('/kelola-usaha/pengaturan', [MerchantController::class, 'manage'])->name('merchant.manage');
+    Route::get('/kelola-usaha/ulasan', [MerchantController::class, 'reviewIndex'])->name('merchant.reviews');
     Route::get('/kelola-usaha/laporan', [MerchantController::class, 'reportIndex'])->name('merchant.reports');
     Route::get('/kelola-usaha/setelan', [MerchantController::class, 'settings'])->name('merchant.settings');
     Route::get('/kelola-usaha/daftar', [MerchantRegisterController::class, 'create'])->name('merchant.register');

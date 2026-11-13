@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\MerchantProfileRequest;
 use App\Models\Business;
 use App\Models\ClosedReport;
+use App\Models\PostReview;
 use App\Services\BusinessProfile;
 use App\Services\CatalogOptions;
 use App\Services\CatalogService;
@@ -27,6 +28,7 @@ class MerchantController extends Controller
         return Inertia::render('Merchant/Dashboard', [
             'businesses' => $this->businessOptions($businesses),
             'operations' => $this->operations($businesses, includeMenus: false), 'statistics' => app(InteractionTracker::class)->statistics($request->user()),
+            'reviewCount' => PostReview::whereIn('business_id', $businesses->pluck('id'))->count(),
             'reports' => $this->reports($businesses->pluck('id')), 'publicName' => $request->user()->public_name ?? '',
             'merchantNavigation' => $this->navigation($request, $businesses),
         ]);
@@ -54,6 +56,38 @@ class MerchantController extends Controller
         return Inertia::render('Merchant/BusinessEdit', ['options' => CatalogOptions::all(), 'merchantNavigation' => $this->navigation($request), 'operations' => $this->operations(collect([$business])), 'business' => [...$business->only(['id', 'slug', 'name', 'description', 'kind', 'photo', 'status', 'is_demo']), ...$profile->information($business),
             'menus' => $business->menuItems->map(fn ($menu) => $profile->menuInformation($menu, $business->sellingPosts))->values(),
             'posts' => $business->sellingPosts->sortBy('id')->map(fn ($post) => [...$post->only(['id', 'name', 'address', 'landmark', 'latitude', 'longitude']), ...$profile->postInformation($post), 'schedules' => $post->weeklySchedules->map->only(['weekday', 'opens_at', 'closes_at', 'all_day'])->values(), 'closed_dates' => $post->scheduleExceptions->where('is_closed', true)->map(fn ($date) => $date->date->format('Y-m-d'))->sort()->values()])->values()]]);
+    }
+
+    public function reviewIndex(Request $request)
+    {
+        $businesses = $request->user()->businesses()->orderBy('name')->get();
+        $businessId = $request->integer('business') ?: null;
+        abort_if($businessId && ! $businesses->contains('id', $businessId), 404);
+
+        $reviews = PostReview::query()
+            ->whereIn('post_reviews.business_id', $businessId ? [$businessId] : $businesses->modelKeys())
+            ->join('businesses', 'businesses.id', '=', 'post_reviews.business_id')
+            ->join('selling_posts', 'selling_posts.id', '=', 'post_reviews.selling_post_id')
+            ->with('author:id,public_name')
+            ->orderByDesc('post_reviews.updated_at')
+            ->orderByDesc('post_reviews.id')
+            ->paginate(15, [
+                'post_reviews.id', 'post_reviews.user_id', 'post_reviews.rating', 'post_reviews.comment',
+                'post_reviews.photo', 'post_reviews.created_at', 'businesses.name as business_name',
+                'selling_posts.name as post_name',
+            ])
+            ->withQueryString()
+            ->through(fn (PostReview $review) => [
+                ...$review->only(['id', 'rating', 'comment', 'photo', 'business_name', 'post_name']),
+                'author' => $review->author?->public_name ?: 'Pengguna NEARASA',
+                'created_at' => $review->created_at->toIso8601String(),
+            ]);
+
+        return Inertia::render('Merchant/Reviews', [
+            'merchantNavigation' => $this->navigation($request, $businesses),
+            'businessId' => $businessId,
+            'reviews' => $reviews,
+        ]);
     }
 
     public function reportIndex(Request $request)

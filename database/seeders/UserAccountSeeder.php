@@ -15,8 +15,12 @@ class UserAccountSeeder extends Seeder
      */
     public function run(): void
     {
+        if (! app()->environment('local')) {
+            return;
+        }
+
         // 1. Regular Consumer Account (non-merchant, 0 businesses owned)
-        User::updateOrCreate(
+        User::firstOrCreate(
             ['email' => 'user@nearasa.test'],
             [
                 'name' => 'Pengguna Biasa',
@@ -28,7 +32,7 @@ class UserAccountSeeder extends Seeder
 
         // 2. Merchant Owner Account (owns Dapur Griya & Pizza Sore)
         // Ensure standard known password ('password') for manual email/password login
-        $owner = User::where('email', 'pemilik@nearasa.test')->first();
+        $owner = User::where('email', 'pemilik@nearasa.test')->where('is_demo', true)->first();
         if ($owner) {
             $owner->update(['password' => Hash::make('password')]);
         }

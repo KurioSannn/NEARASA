@@ -1,14 +1,15 @@
-import { AlertTriangle, CheckCircle2, MapPin, Store } from 'lucide-react';
+import { Link } from '@inertiajs/react';
+import { CheckCircle2, MapPin, Star, Store } from 'lucide-react';
 
 type Props = {
   businessCount: number;
   postCount: number;
   openCount: number;
-  pending: number;
+  reviewCount: number;
   manageUrl?: string;
 };
 
-export default function SummaryCards({ businessCount, postCount, openCount, pending }: Props) {
+export default function SummaryCards({ businessCount, postCount, openCount, reviewCount }: Props) {
   return (
     <section className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4" data-purpose="metrics-summary-bar">
       {/* Metric 1: Total Businesses (Terracotta Highlight Card) */}
@@ -25,29 +26,13 @@ export default function SummaryCards({ businessCount, postCount, openCount, pend
         </div>
       </div>
 
-      {/* Metric 2: Pending Reviews (Amber Soft Card) */}
-      <div className="bg-white p-4 rounded-3xl border border-sand-border shadow-soft flex items-center justify-between select-none">
+      <Link href="/kelola-usaha/ulasan" className="bg-white p-4 rounded-3xl border border-sand-border shadow-soft flex items-center justify-between">
         <div>
-          <p className="text-xs text-clay-700 font-semibold">Review Tutup</p>
-          <h4 className="text-2xl font-extrabold text-clay-900 tracking-tight mt-1">{pending}</h4>
-          <span className={`text-[10px] px-2 py-0.5 rounded-full mt-2 inline-block font-bold border ${
-            pending > 0
-              ? 'text-amber-700 bg-amber-50 border-amber-200'
-              : 'text-emerald-700 bg-emerald-50 border-emerald-200'
-          }`}>
-            {pending > 0 ? `${pending} Perlu dicek` : 'Semua aman'}
-          </span>
+          <p className="text-xs text-clay-700 font-semibold">Ulasan Pelanggan</p>
+          <p className="text-2xl font-extrabold text-clay-900 tracking-tight mt-1">{reviewCount}</p>
         </div>
-        <div className={`w-10 h-10 rounded-2xl flex items-center justify-center ${
-          pending > 0 ? 'bg-amber-50 text-amber-600' : 'bg-emerald-50 text-emerald-600'
-        }`}>
-          {pending > 0 ? (
-            <AlertTriangle className="w-5 h-5" aria-hidden="true" />
-          ) : (
-            <CheckCircle2 className="w-5 h-5" aria-hidden="true" />
-          )}
-        </div>
-      </div>
+        <Star className="w-5 h-5 text-terracotta" aria-hidden="true" />
+      </Link>
 
       {/* Metric 3: Total Posts (Warm Sand/Terracotta Card) */}
       <div className="bg-white p-4 rounded-3xl border border-sand-border shadow-soft flex items-center justify-between select-none">

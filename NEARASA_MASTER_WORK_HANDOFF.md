@@ -1,5 +1,7 @@
 # NEARASA — MASTER WORK HANDOFF
 
+**Pembaruan 12 November 2026.** Bagian di bawah merekam rancangan awal Awards. Implementasi demo sekarang tersedia pada `/awards` di Laravel dan memakai event sintetis dari `AwardsDemoSeeder`. README mencatat cara menyiapkan dan mencoba versi yang tersedia. [README NEARASA](README.md) · [Kode penghitungan](app/Services/Awards/RankingCalculator.php)
+
 > **Dokumen sumber konteks untuk room Work | Versi rancangan 1.0 | 12 November 2026 | Bahasa Indonesia**
 >
 > **Status:** Audit konsep selesai; **bukan** laporan bahwa fitur Awards sudah selesai diimplementasikan. Dokumen ini menjadi sumber spesifikasi dan keputusan yang telah dibahas di room Strategy/Research. Work harus memverifikasi kondisi repository terbaru sebelum mengubah kode.

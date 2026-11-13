@@ -282,12 +282,10 @@ export default function BusinessDetail({
             {activeTab === 'menu' && <ProfileMenu business={business} post={post} />}
             {activeTab === 'location' && (
               <ProfileLocation
-                business={business}
                 posts={business.posts}
                 post={post}
                 onSelect={selectPost}
                 mapTiles={mapTiles}
-                ownerId={owner?.id}
               />
             )}
             <div hidden={activeTab !== 'reviews'}>
@@ -301,9 +299,7 @@ export default function BusinessDetail({
           {contextual && (
             <ProfileVisitCard
               key={'visit-' + business.id + '-' + post?.id}
-              business={business}
               post={post}
-              ownerId={owner?.id}
               mapTiles={mapTiles}
               onLocation={() => showTab('location', true)}
             />

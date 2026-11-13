@@ -20,23 +20,6 @@ interface AwardsPodiumProps {
   showHeader?: boolean;
 }
 
-const defaultPhotos: Record<string, string> = {
-  'roti-pagi': '/images/demo/toast.jpg',
-  'dapur-griya': '/images/demo/places/dapur-griya.png',
-  'pizza-sore': '/images/demo/places/pizza-sore.png',
-  'burger-pos': '/images/demo/places/burger-pos.png',
-  'dapur-bara': '/images/demo/grill.jpg',
-  'kopi-sudut': '/images/demo/coffee.jpg',
-  'rasa-segar': '/images/demo/salad.jpg',
-  'mie-malam': '/images/demo/noodles.jpg',
-};
-
-function resolvePhoto(slug: string, photo?: string): string {
-  if (defaultPhotos[slug]) return defaultPhotos[slug];
-  if (photo) return photo;
-  return '/images/brand/nearasa-food-hero-v1.png';
-}
-
 export default function AwardsPodium({
   items,
   title = 'Podium Kuliner Paling Diminati',
@@ -122,7 +105,7 @@ export default function AwardsPodium({
                   tabIndex={-1}
                 >
                   <img
-                    src={resolvePhoto(item.slug, item.photo)}
+                    src={item.photo ?? '/images/brand/nearasa-food-hero-v1.png'}
                     alt={`Foto ${item.name}`}
                     className="podium-avatar-img"
                     width="84"

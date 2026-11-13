@@ -103,7 +103,7 @@ export default function DiscoveryMap({ pins, location, radius, tileUrl, selected
     const draw = () => {
       const focused = document.activeElement?.id;
       group.clearLayers();
-      addBusinessMarkers(L, instance, group, pins, selectedId, id => selection.current.onSelect(id));
+      addBusinessMarkers(L, group, pins, selectedId, id => selection.current.onSelect(id));
       if (location) {
         const origin = L.marker([location.latitude, location.longitude], {
           icon: L.divIcon({ className: 'discovery-origin-icon', html: '<span><i class="origin-pulse"></i></span>', iconSize: [24, 24], iconAnchor: [12, 12] }),

@@ -1,10 +1,11 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, router } from '@inertiajs/react';
 import type { Map as LeafletMap } from 'leaflet';
-import { ArrowUpRight, Compass, MapPin } from 'lucide-react';
+import { ArrowUpRight, MapPin } from 'lucide-react';
 import Skeleton from '@/components/Skeleton';
 import { type BusinessCardData, type Location } from '@/types/catalog';
 import { addBusinessMarkers } from '@/components/maps/marker-layers';
+import { watchTiles, type TileStatus } from '@/components/maps/tile-status';
 import 'leaflet/dist/leaflet.css';
 
 interface HomeMapPreviewProps {
@@ -15,23 +16,23 @@ interface HomeMapPreviewProps {
 
 export default function HomeMapPreview({ businesses, location, tileUrl }: HomeMapPreviewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<LeafletMap | null>(null);
-  const [loaded, setLoaded] = useState(false);
-  const [loadError, setLoadError] = useState(false);
+  const [tileStatus, setTileStatus] = useState<TileStatus>('loading');
 
-  const validPins = businesses.filter(
-    b => b.post && typeof b.post.latitude === 'number' && typeof b.post.longitude === 'number'
-  );
+  const validPins = useMemo(() => businesses.filter(
+    b => Number.isFinite(b.post?.latitude) && Number.isFinite(b.post?.longitude)
+  ), [businesses]);
 
   useEffect(() => {
     let disposed = false;
     let mapInstance: LeafletMap | null = null;
+    let stopWatching: (() => void) | undefined;
+    let frame = 0;
+    setTileStatus('loading');
 
     import('leaflet')
       .then(L => {
         if (disposed || !containerRef.current) return;
 
-        // Determine initial center
         const defaultLat = location?.latitude ?? (validPins[0]?.post.latitude ?? -7.4478);
         const defaultLng = location?.longitude ?? (validPins[0]?.post.longitude ?? 112.7183);
 
@@ -42,37 +43,23 @@ export default function HomeMapPreview({ businesses, location, tileUrl }: HomeMa
           scrollWheelZoom: false,
           doubleClickZoom: false,
           touchZoom: false,
-          dragging: !matchMedia('(max-width: 767px)').matches, // allow light panning on desktop
+          dragging: !matchMedia('(max-width: 767px)').matches,
           attributionControl: false,
         });
-        mapRef.current = mapInstance;
-
-        // Add tile layer
-        const tiles = L.tileLayer(tileUrl, {
-          maxZoom: 19,
-        }).addTo(mapInstance);
-
-        tiles.on('load', () => {
-          if (!disposed) setLoaded(true);
+        const tiles = L.tileLayer(tileUrl, { maxZoom: 19 });
+        stopWatching = watchTiles(tiles, status => {
+          if (!disposed) setTileStatus(status);
         });
+        tiles.addTo(mapInstance);
 
-        tiles.on('tileerror', () => {
-          if (!disposed && !loaded) {
-            // Still mark as loaded so partial tiles show
-            setLoaded(true);
-          }
-        });
-
-        // Add markers layer
         const markerLayer = L.layerGroup().addTo(mapInstance);
         const previewPins = validPins.slice(0, 8);
 
         if (previewPins.length > 0) {
-          addBusinessMarkers(L, mapInstance, markerLayer, previewPins, null, () => {
+          addBusinessMarkers(L, markerLayer, previewPins, null, () => {
             router.visit('/peta');
           });
 
-          // Fit bounds to embrace all pins with comfortable padding
           const bounds = L.latLngBounds(
             previewPins.map(p => [p.post.latitude, p.post.longitude] as [number, number])
           );
@@ -87,12 +74,11 @@ export default function HomeMapPreview({ businesses, location, tileUrl }: HomeMa
           });
         }
 
-        // Add user location beacon if available
         if (location) {
           const userIcon = L.divIcon({
             className: 'home-map-user-beacon-wrapper',
             html: `
-              <div class="home-map-user-beacon" title="Titik Lokasimu: ${location.label}">
+              <div class="home-map-user-beacon">
                 <div class="user-beacon-dot"></div>
                 <div class="user-beacon-pulse"></div>
               </div>
@@ -108,68 +94,55 @@ export default function HomeMapPreview({ businesses, location, tileUrl }: HomeMa
           }).addTo(markerLayer);
         }
 
-        // Invalidate size once DOM settles
-        requestAnimationFrame(() => {
-          if (!disposed && mapInstance) {
-            mapInstance.invalidateSize();
-            setLoaded(true);
-          }
+        frame = requestAnimationFrame(() => {
+          if (!disposed) mapInstance?.invalidateSize();
         });
       })
       .catch(() => {
-        if (!disposed) setLoadError(true);
+        if (!disposed) setTileStatus('error');
       });
 
     return () => {
       disposed = true;
-      if (mapInstance) {
-        mapInstance.remove();
-        mapRef.current = null;
-      }
+      cancelAnimationFrame(frame);
+      stopWatching?.();
+      mapInstance?.remove();
     };
-  }, [tileUrl, location?.latitude, location?.longitude, businesses.length]);
+  }, [tileUrl, location, validPins]);
 
   return (
-    <div className="home-map-preview-wrap">
-      {/* Real Interactive Leaflet Canvas */}
+    <div className="home-map-preview-wrap" data-map-status={tileStatus} aria-busy={tileStatus === 'loading'}>
       <div
         ref={containerRef}
         className="home-map-preview-canvas"
         role="region"
         aria-label="Peta interaktif kuliner terdekat"
-        onClick={() => router.visit('/peta')}
+        inert={tileStatus !== 'ready'}
       />
 
-      {/* Loading Skeleton */}
-      {!loaded && !loadError && (
+      {tileStatus === 'loading' && (
         <div className="home-map-preview-loading" aria-hidden="true">
           <Skeleton />
-          <div className="home-map-preview-loading-copy">
-            <Compass className="animate-spin" size={20} />
-            <span>Memuat peta kuliner riil...</span>
-          </div>
         </div>
       )}
 
-      {/* Fallback if map tiles fails to load */}
-      {loadError && (
-        <div className="home-map-preview-fallback">
-          <MapPin size={28} />
-          <p>Peta interaktif siap dijelajahi.</p>
-          <Link href="/peta" className="button button-outline">
-            Buka di Peta Penuh
-          </Link>
+      {tileStatus === 'error' && (
+        <div className="home-map-preview-fallback" role="status">
+          <MapPin size={28} aria-hidden="true" />
+          <p>Peta belum bisa dimuat.</p>
+          <Link href="/jelajah" className="button button-outline">Lihat daftar kuliner</Link>
         </div>
       )}
 
-      {/* Floating Header Tag: Real Location & Count */}
       <div className="home-map-preview-tag" aria-hidden="true">
         <span className="preview-tag-indicator" />
         <strong>{location ? location.label : 'Area Sidoarjo & Sekitarnya'}</strong>
-        <span className="preview-tag-count">&middot; {validPins.length} kuliner aktif</span>
+        <span className="preview-tag-count">&middot; {Math.min(validPins.length, 8)} pos di peta</span>
       </div>
 
-      {/* Floating Bottom Action CTA */}
+      <a className="home-map-preview-attribution" href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">
+        © OpenStreetMap contributors
+      </a>
       <Link href="/peta" className="home-map-preview-cta" aria-label="Buka peta kuliner interaktif penuh">
         <span>Buka Peta Penuh</span>
         <ArrowUpRight size={14} aria-hidden="true" />

@@ -1,9 +1,8 @@
 import { ChevronDown, Clock3, MapPin } from 'lucide-react';
 import LocationMap from '@/components/LocationMap';
 import { days, facilityChoices, paymentChoices, serviceChoices } from '@/types/business-profile';
-import type { Business, SellingPost } from '@/types/catalog';
+import type { SellingPost } from '@/types/catalog';
 import { dateLabel, hoursLabel, postIsOpen, postStatus } from './profile-utils';
-import ProfileClosedReport from './ProfileClosedReport';
 
 function PostAmenities({ post }: { post: SellingPost }) {
   const groups = [
@@ -95,7 +94,7 @@ function PostHours({ post }: { post: SellingPost }) {
     </div>
   );
 }
-export default function ProfileLocation({ business, posts, post, onSelect, mapTiles, ownerId }: { business: Business; posts: SellingPost[]; post?: SellingPost; onSelect: (id: number) => void; mapTiles: string; ownerId?: number }) {
+export default function ProfileLocation({ posts, post, onSelect, mapTiles }: { posts: SellingPost[]; post?: SellingPost; onSelect: (id: number) => void; mapTiles: string }) {
   if (!post) return <div className="profile-empty-state"><MapPin size={30} aria-hidden="true" /><h2>Lokasi belum tersedia</h2><p>Pemilik belum menambahkan pos jualan.</p></div>;
   const others = posts.filter(item => item.id !== post.id);
   return <div className="profile-location-layout">
@@ -104,7 +103,6 @@ export default function ProfileLocation({ business, posts, post, onSelect, mapTi
       {post.landmark && <p className="profile-landmark"><strong>Patokan</strong><span className="profile-preserve-lines">{post.landmark}</span></p>}
       <LocationMap key={post.id} latitude={post.latitude} longitude={post.longitude} tileUrl={mapTiles} />
       <PostAmenities post={post} />
-      <ProfileClosedReport business={business} post={post} ownerId={ownerId} />
     </section></div>
     <div className="profile-location-sidebar"><section className="profile-hours-card"><PostHours post={post} /></section>
       {others.length > 0 && <section className="profile-other-posts"><h3>Pos lain usaha ini</h3>{others.map(item => <article key={item.id}><h4>{item.name}</h4><p>{item.address}</p><p className={'profile-open-status' + (postIsOpen(item) ? ' is-open' : '')}><span aria-hidden="true" />{postStatus(item)}</p><button type="button" className="button button-outline" onClick={() => onSelect(item.id)} aria-label={'Pilih pos ' + item.name}>Pilih pos</button></article>)}</section>}

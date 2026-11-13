@@ -2,12 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Services\CatalogOptions;
 use App\Services\MerchantPhotos;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 use Inertia\Inertia;
+use RuntimeException;
+use Throwable;
 
 class AccountController extends Controller
 {
@@ -53,26 +57,37 @@ class AccountController extends Controller
             'avatar.max' => 'Ukuran foto maksimal 2MB.',
         ]);
 
-        $user = $request->user();
-        if ($user->avatar) {
-            $photos->delete($user->avatar);
-        }
-
         $url = $photos->store($request->file('avatar'));
-        $user->forceFill(['avatar' => $url])->save();
+        try {
+            $previous = $this->replaceAvatar($request->user(), $url);
+        } catch (Throwable $exception) {
+            $photos->delete($url);
+
+            throw $exception;
+        }
+        $photos->delete($previous);
 
         return back(303)->with('success', 'Foto profil berhasil diperbarui.');
     }
 
     public function destroyAvatar(Request $request, MerchantPhotos $photos)
     {
-        $user = $request->user();
-        if ($user->avatar) {
-            $photos->delete($user->avatar);
-            $user->forceFill(['avatar' => null])->save();
-        }
+        $photos->delete($this->replaceAvatar($request->user(), null));
 
         return back(303)->with('success', 'Foto profil berhasil dihapus.');
+    }
+
+    private function replaceAvatar(User $user, ?string $url): ?string
+    {
+        return DB::transaction(function () use ($user, $url) {
+            $account = User::query()->lockForUpdate()->findOrFail($user->getKey());
+            $previous = $account->avatar;
+            if (! $account->forceFill(['avatar' => $url])->save()) {
+                throw new RuntimeException('Perubahan foto profil belum dapat disimpan.');
+            }
+
+            return $previous;
+        });
     }
 
     public function updatePassword(Request $request)

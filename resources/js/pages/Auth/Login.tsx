@@ -2,11 +2,12 @@ import { useEffect, useRef, useState } from 'react';
 import { Head, Link, router, useForm } from '@inertiajs/react';
 import { ArrowLeft, BookmarkCheck, Clock, Eye, EyeOff, Store, Utensils } from 'lucide-react';
 
-export default function Login() {
+export default function Login({ demoEnabled }: { demoEnabled: boolean }) {
   const form = useForm({ email: '', password: '' });
   const [showPassword, setShowPassword] = useState(false);
   const error = form.errors.email || form.errors.password;
-  const busy = form.processing;
+  const [demoPending, setDemoPending] = useState(false);
+  const busy = form.processing || demoPending;
   const summary = useRef<HTMLParagraphElement>(null);
 
   useEffect(() => {
@@ -41,7 +42,7 @@ export default function Login() {
               Satu akun.<br />Banyak cerita rasa.
             </h2>
             <p>
-              Simpan warung favoritmu, pantau menu & jam buka aktual WIB, atau kelola pos usaha kuliner lokalmu.
+              Simpan warung favoritmu, cek menu dan jadwal jualan, atau kelola pos usaha kulinermu.
             </p>
 
             <div className="consumer-auth-perks-row">
@@ -154,6 +155,37 @@ export default function Login() {
                 </button>
               </fieldset>
             </form>
+
+            {demoEnabled && (
+              <div className="consumer-demo-card">
+                <div className="demo-card-head">
+                  <div className="demo-card-icon" aria-hidden="true">
+                    <Store size={20} />
+                  </div>
+                  <div className="demo-card-copy">
+                    <h2>Ingin mencoba sebagai pemilik?</h2>
+                    <p>Akses dasbor contoh untuk mengelola 2 usaha kuliner, menu, dan jam buka.</p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  className="demo-card-button"
+                  disabled={busy}
+                  onClick={() =>
+                    router.post(
+                      '/masuk/demo',
+                      {},
+                      {
+                        onStart: () => setDemoPending(true),
+                        onFinish: () => setDemoPending(false),
+                      }
+                    )
+                  }
+                >
+                  {demoPending ? 'Sedang masuk…' : 'Coba akun UMKM'}
+                </button>
+              </div>
+            )}
 
             <p className="consumer-auth-footnote">
               Gunakan akun yang sudah tersedia. Masuk dengan Google belum tersedia pada versi ini.

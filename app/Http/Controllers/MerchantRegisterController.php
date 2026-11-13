@@ -42,7 +42,6 @@ class MerchantRegisterController extends Controller
     {
         $data = $request->validate([
             // Informasi Pribadi & Pemilik
-            'owner_nik' => ['nullable', 'string', 'max:20'],
             'first_name' => ['nullable', 'string', 'max:60'],
             'last_name' => ['nullable', 'string', 'max:60'],
             'owner_address' => ['nullable', 'string', 'max:255'],

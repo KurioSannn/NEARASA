@@ -1,5 +1,5 @@
-import type { LayerGroup, Map as LeafletMap, Marker } from 'leaflet';
-import { allMenusSoldOut, type BusinessCardData } from '@/types/catalog';
+import type { LayerGroup, Marker } from 'leaflet';
+import { allMenusSoldOut, type BusinessCardData } from '../../types/catalog.ts';
 
 type Leaflet = typeof import('leaflet');
 
@@ -39,39 +39,12 @@ function activation(marker: Marker, label: string, action: () => void) {
 
 export function addBusinessMarkers(
   L: Leaflet,
-  _map: LeafletMap,
   layer: LayerGroup,
   pins: BusinessCardData[],
   selectedId: number | null,
   onSelect: (id: number) => void
 ) {
-  // Proximity-based offset to prevent pins within ~400m from colliding
-  const placedPins: { lat: number; lng: number }[] = [];
-
   pins.forEach(pin => {
-    let lat = pin.post.latitude;
-    let lng = pin.post.longitude;
-
-    // Detect nearby pins placed previously
-    let nearbyCount = 0;
-    for (const placed of placedPins) {
-      const dLat = Math.abs(lat - placed.lat);
-      const dLng = Math.abs(lng - placed.lng);
-      if (dLat < 0.0035 && dLng < 0.005) {
-        nearbyCount++;
-      }
-    }
-
-    if (nearbyCount > 0) {
-      // Alternate offsets so nearby pins form a clean, legible cluster
-      const angle = nearbyCount * (Math.PI * 0.65);
-      const distance = 0.0016 * Math.ceil(nearbyCount / 2);
-      lat += Math.sin(angle) * distance;
-      lng += Math.cos(angle) * distance * 1.3;
-    }
-
-    placedPins.push({ lat, lng });
-
     const selected = pin.post.id === selectedId;
     const soldOut = allMenusSoldOut(pin);
     const shortPrice = formatShortPrice(pin);
@@ -87,7 +60,7 @@ export function addBusinessMarkers(
     `.trim();
 
     const label = `${pin.name}, ${pin.post.name} · ${pin.is_open ? 'Buka' : 'Tutup'}${shortPrice ? ` · Mulai Rp ${shortPrice}` : ''}${soldOut ? ', semua menu habis' : ''}`;
-    const marker = L.marker([lat, lng], {
+    const marker = L.marker([pin.post.latitude, pin.post.longitude], {
       icon: L.divIcon({
         className: 'culinary-pin-wrapper',
         html: pinHtml,
@@ -106,7 +79,14 @@ export function addBusinessMarkers(
     element?.setAttribute('aria-pressed', String(selected));
 
     const tooltip = document.createElement('span');
-    tooltip.innerHTML = `<strong>${pin.name}</strong>${pin.matched_menu ? `<small> · ${pin.matched_menu.name}${shortPrice ? ` (${shortPrice})` : ''}</small>` : ''}`;
+    const name = document.createElement('strong');
+    name.textContent = pin.name;
+    tooltip.append(name);
+    if (pin.matched_menu) {
+      const menu = document.createElement('small');
+      menu.textContent = ` · ${pin.matched_menu.name}${shortPrice ? ` (${shortPrice})` : ''}`;
+      tooltip.append(menu);
+    }
     marker.bindTooltip(tooltip, { direction: 'top', offset: [0, -42], className: 'culinary-tooltip' });
   });
 }

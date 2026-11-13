@@ -2,8 +2,14 @@
 
 namespace Tests\Feature;
 
+use App\Models\Business;
 use App\Models\User;
+use App\Services\MerchantPhotos;
+use Database\Seeders\CatalogSeeder;
+use Database\Seeders\UserAccountSeeder;
+use Illuminate\Http\UploadedFile;
 use Inertia\Testing\AssertableInertia as Assert;
+use RuntimeException;
 use Tests\CatalogTestCase;
 
 class AccountMerchantTest extends CatalogTestCase
@@ -31,6 +37,18 @@ class AccountMerchantTest extends CatalogTestCase
         $this->get('/akun')->assertRedirect('/masuk');
     }
 
+    public function test_example_account_seeder_does_not_create_or_overwrite_accounts_in_production(): void
+    {
+        $this->app->detectEnvironment(fn () => 'production');
+        $owner = User::factory()->create(['email' => 'pemilik@nearasa.test', 'is_demo' => true]);
+        $originalPasswordHash = $owner->password;
+
+        (new UserAccountSeeder)->run();
+
+        $this->assertDatabaseMissing('users', ['email' => 'user@nearasa.test']);
+        $this->assertSame($originalPasswordHash, $owner->fresh()->password);
+    }
+
     public function test_demo_login_is_unavailable_outside_local_even_if_flag_is_on(): void
     {
         config(['nearasa.demo_auth' => true]);
@@ -47,6 +65,63 @@ class AccountMerchantTest extends CatalogTestCase
         $user->forceFill(['is_demo' => true])->save();
         $this->withSession(['_token' => 'demo-test-token'])->post('/masuk/demo', ['_token' => 'demo-test-token'])->assertRedirect('/akun');
         $this->assertAuthenticatedAs($user);
+    }
+
+    public function test_provisioned_demo_owner_uses_regular_login_and_owns_only_demo_businesses(): void
+    {
+        $this->seed(CatalogSeeder::class);
+        app()->detectEnvironment(fn () => 'production');
+        $other = User::factory()->create();
+        $real = $this->business('Usaha sungguhan');
+        $real->update(['owner_id' => $other->id]);
+
+        $this->artisan('nearasa:provision-demo-owner', ['email' => 'Juri@nearasa.test'])
+            ->expectsQuestion('Kata sandi akun demo (min. 12 karakter)', 'sandi-demo-untuk-uji')
+            ->assertSuccessful();
+
+        $owner = User::where('email', 'juri@nearasa.test')->firstOrFail();
+        $this->assertTrue($owner->is_demo);
+        $this->assertEqualsCanonicalizing(['dapur-griya', 'pizza-sore'], $owner->businesses()->pluck('slug')->all());
+        $this->assertSame($other->id, $real->refresh()->owner_id);
+        $token = 'csrf-demo-juri';
+        $this->withSession(['_token' => $token])->post('/masuk/demo', ['_token' => $token])->assertNotFound();
+        $this->withSession(['_token' => $token])->post('/masuk', [
+            '_token' => $token, 'email' => $owner->email, 'password' => 'sandi-demo-untuk-uji',
+        ])->assertRedirect('/akun');
+        $this->assertAuthenticatedAs($owner);
+    }
+
+    public function test_provisioning_preserves_existing_accounts_and_demo_ownership(): void
+    {
+        $this->seed(CatalogSeeder::class);
+        $owner = User::factory()->create();
+        $business = Business::where('slug', 'pizza-sore')->firstOrFail();
+        $business->update(['owner_id' => $owner->id]);
+        $password = $owner->password;
+
+        foreach ([$owner->email, 'pengganti@nearasa.test'] as $email) {
+            $this->artisan('nearasa:provision-demo-owner', ['email' => $email])
+                ->expectsQuestion('Kata sandi akun demo (min. 12 karakter)', 'sandi-demo-untuk-uji')
+                ->assertFailed();
+        }
+
+        $this->assertDatabaseCount('users', 1);
+        $this->assertSame($password, $owner->refresh()->password);
+        $this->assertSame($owner->id, $business->refresh()->owner_id);
+    }
+
+    public function test_failed_avatar_upload_keeps_the_previous_photo(): void
+    {
+        $previous = '/media/'.str_repeat('a', 40).'.jpg';
+        $user = User::factory()->create(['avatar' => $previous]);
+        $photos = $this->mock(MerchantPhotos::class);
+        $photos->shouldReceive('store')->once()->andThrow(new RuntimeException('Penyimpanan gagal.'));
+        $photos->shouldNotReceive('delete');
+
+        $this->actingAs($user)->post('/akun/foto', ['avatar' => UploadedFile::fake()->image('baru.jpg')])
+            ->assertServerError();
+
+        $this->assertSame($previous, $user->refresh()->avatar);
     }
 
     public function test_owner_can_only_see_and_update_owned_businesses(): void

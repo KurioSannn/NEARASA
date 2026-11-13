@@ -30,6 +30,32 @@ class CommunityFlowTest extends CatalogTestCase
         $this->post('/usaha/ulasan/pos/'.$second->id.'/ulasan', ['rating' => 5])->assertForbidden();
     }
 
+    public function test_customer_review_appears_in_the_owning_merchant_workspace(): void
+    {
+        $owner = User::factory()->create();
+        $customer = User::factory()->create(['public_name' => 'Pelanggan Uji']);
+        $business = $this->business('Warung Uji');
+        $business->update(['owner_id' => $owner->id]);
+        $post = $business->sellingPosts()->first();
+
+        $this->actingAs($customer)->post("/usaha/{$business->slug}/pos/{$post->id}/ulasan", [
+            'rating' => 5,
+            'comment' => 'Sambalnya enak.',
+        ])->assertRedirect();
+
+        $this->get('/kelola-usaha/ulasan')->assertInertia(fn (Assert $page) => $page->has('reviews.data', 0));
+        $this->actingAs($owner)->get('/kelola-usaha/ulasan?business='.$business->id)->assertInertia(fn (Assert $page) => $page
+            ->component('Merchant/Reviews')
+            ->has('reviews.data', 1)
+            ->where('reviews.data.0.rating', 5)
+            ->where('reviews.data.0.comment', 'Sambalnya enak.')
+            ->where('reviews.data.0.post_name', $post->name)
+            ->where('reviews.data.0.author', 'Pelanggan Uji')
+            ->missing('reviews.data.0.user_id')
+            ->missing('reviews.data.0.email'));
+        $this->get('/kelola-usaha')->assertInertia(fn (Assert $page) => $page->where('reviewCount', 1));
+    }
+
     public function test_interactions_are_scoped_deduplicated_and_do_not_count_owner_activity(): void
     {
         $owner = User::factory()->create();

@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import LocationMap from '@/components/LocationMap';
 import { mapPostUrl, type Business, type SellingPost } from '@/types/catalog';
 import { trackInteraction, whatsappUrl } from './profile-utils';
-import ProfileClosedReport from './ProfileClosedReport';
 
 export function ProfileVisitActions({ business, post }: { business: Business; post?: SellingPost }) {
   const whatsapp = whatsappUrl(business.whatsapp);
@@ -53,15 +52,11 @@ function useWideContext() {
 }
 
 export default function ProfileVisitCard({
-  business,
   post,
-  ownerId,
   mapTiles,
   onLocation,
 }: {
-  business: Business;
   post?: SellingPost;
-  ownerId?: number;
   mapTiles: string;
   onLocation: () => void;
 }) {
@@ -93,7 +88,6 @@ export default function ProfileVisitCard({
         <span>Lihat lokasi & jadwal lengkap</span>
         <ChevronRight size={16} aria-hidden="true" />
       </button>
-      <ProfileClosedReport business={business} post={post} ownerId={ownerId} />
     </aside>
   );
 }

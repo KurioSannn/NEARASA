@@ -1,3 +1,4 @@
+import { businessCover } from '@/types/business-images';
 import { Head, Link, router } from '@inertiajs/react';
 import { ArrowUpRight, Award, Calendar, ChevronRight, HelpCircle, Info, MapPin, Sparkles, X } from 'lucide-react';
 import { useState } from 'react';
@@ -10,6 +11,7 @@ interface AwardEntry {
   name: string;
   kind: string;
   cover_photo: string | null;
+  is_demo: boolean;
   rank: number;
   score: number;
   metrics: {
@@ -25,6 +27,9 @@ interface AwardEntry {
     smoothed_rate: number;
     ratio_score: number;
     total: number;
+    monthly_mean?: number;
+    monthly_median?: number;
+    months_with_data?: number;
   };
   badge: {
     eligible: boolean;
@@ -64,23 +69,6 @@ interface AwardsPageProps {
   selectedStart: string;
 }
 
-const placeCovers: Record<string, string> = {
-  'dapur-griya': '/images/demo/places/dapur-griya.png',
-  'pizza-sore': '/images/demo/places/pizza-sore.png',
-  'burger-pos': '/images/demo/places/burger-pos.png',
-  'dapur-bara': '/images/demo/grill.jpg',
-  'kopi-sudut': '/images/demo/coffee.jpg',
-  'rasa-segar': '/images/demo/salad.jpg',
-  'mie-malam': '/images/demo/noodles.jpg',
-  'roti-pagi': '/images/demo/toast.jpg',
-};
-
-function getPhoto(slug: string, fallback?: string | null): string {
-  if (placeCovers[slug]) return placeCovers[slug];
-  if (fallback) return fallback;
-  return '/images/brand/nearasa-food-hero-v1.png';
-}
-
 export default function Awards({
   ranking,
   selectedPeriod,
@@ -88,18 +76,20 @@ export default function Awards({
 }: AwardsPageProps) {
   const [activeModalEntry, setActiveModalEntry] = useState<AwardEntry | null>(null);
 
-  const top3PodiumItems: PodiumItem[] = ranking.entries.slice(0, 3).map(entry => ({
+  const qualifiedEntries = ranking.entries.filter(entry => entry.score > 0);
+  const hasPodium = qualifiedEntries.length >= ranking.minimum_participants;
+  const top3PodiumItems: PodiumItem[] = qualifiedEntries.slice(0, 3).map(entry => ({
     slug: entry.slug,
     name: entry.name,
     city: `${entry.kind} · ${selectedRegion}`,
     rank: entry.rank as 1 | 2 | 3,
     score: entry.score,
     highlightMetric: `${entry.metrics.intent} Peminat`,
-    photo: getPhoto(entry.slug, entry.cover_photo),
+    photo: businessCover({ ...entry, photo: entry.cover_photo ?? '' }),
   }));
 
   // List starts from rank 4 onwards (no repeating top 3!)
-  const nextEntries = ranking.entries.slice(3);
+  const nextEntries = qualifiedEntries.slice(hasPodium ? 3 : 0);
 
   const changeFilter = (newPeriod: string, newRegion: string) => {
     router.visit(`/awards?period=${newPeriod}&region=${newRegion}`, {
@@ -126,7 +116,7 @@ export default function Awards({
 
           <h1 className="awards-page-title">Tangga Kuliner {selectedRegion}</h1>
           <p className="awards-page-subtitle">
-            Gerai kuliner lokal paling diminati warga {selectedRegion} berdasarkan kunjungan profil, pencarian rute, dan kontak WhatsApp.
+            Contoh peringkat usaha di {selectedRegion} berdasarkan simulasi buka profil, klik peta, dan klik WhatsApp.
           </p>
 
           {/* Dual-Axis Filter Toolbar with Explicit Labels (Clear, Human, Anti-Slop) */}
@@ -198,7 +188,7 @@ export default function Awards({
         </header>
 
         {/* Podium Tahta 3 Besar (Reference 2 Inspired) */}
-        {top3PodiumItems.length >= 3 && (
+        {hasPodium && (
           <AwardsPodium
             items={top3PodiumItems}
             showLinkToAwards={false}
@@ -210,8 +200,8 @@ export default function Awards({
         <section className="awards-next-section" aria-labelledby="next-ranks-title">
           <div className="next-section-heading">
             <div>
-              <h2 id="next-ranks-title">Peringkat Selanjutnya</h2>
-              <p>Klasemen gerai kuliner peringkat 4 ke atas di {selectedRegion}</p>
+              <h2 id="next-ranks-title">{hasPodium ? 'Peringkat Selanjutnya' : 'Peringkat'}</h2>
+              <p>Klasemen gerai kuliner {hasPodium ? 'peringkat 4 ke atas ' : ''}di {selectedRegion}</p>
             </div>
             <span className="next-count-badge">
               {nextEntries.length} Gerai Kualifikasi
@@ -235,7 +225,7 @@ export default function Awards({
                     {/* Thumbnail */}
                     <div className="row-photo-wrap">
                       <img
-                        src={getPhoto(entry.slug, entry.cover_photo)}
+                        src={businessCover({ ...entry, photo: entry.cover_photo ?? '' })}
                         alt={`Foto ${entry.name}`}
                         className="row-photo-img"
                         width="70"
@@ -304,7 +294,7 @@ export default function Awards({
             </div>
           ) : (
             <div className="awards-empty-next-box">
-              <p>Semua gerai kuliner terdaftar di {selectedRegion} saat ini telah tampil di podium 3 besar.</p>
+              <p>{hasPodium ? 'Semua gerai yang memenuhi syarat tampil di podium.' : 'Belum ada gerai dengan skor di periode ini.'}</p>
             </div>
           )}
         </section>
@@ -343,7 +333,7 @@ export default function Awards({
 
               <div className="score-breakdown-card">
                 <div className="text-xs font-bold text-accent uppercase tracking-wider">
-                  Model Hybrid (Volume 60% + Smoothed Rate 40%)
+                  {selectedPeriod === 'annual' ? '70% rata-rata + 30% median skor bulanan' : 'Volume 60% + rasio minat 40%'}
                 </div>
 
                 <div className="score-math-grid">
@@ -357,15 +347,30 @@ export default function Awards({
                     <span className="math-item-val">{activeModalEntry.metrics.intent}</span>
                   </div>
 
-                  <div className="math-item">
-                    <span className="math-item-label">Skor Volume Log (L)</span>
-                    <span className="math-item-val">{activeModalEntry.score_parts.volume}</span>
-                  </div>
+                  {selectedPeriod === 'annual' ? (
+                    <>
+                      <div className="math-item">
+                        <span className="math-item-label">Rata-rata bulanan</span>
+                        <span className="math-item-val">{activeModalEntry.score_parts.monthly_mean} ({activeModalEntry.score_parts.months_with_data} bulan)</span>
+                      </div>
+                      <div className="math-item">
+                        <span className="math-item-label">Median bulanan</span>
+                        <span className="math-item-val">{activeModalEntry.score_parts.monthly_median}</span>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="math-item">
+                        <span className="math-item-label">Skor Volume Log (L)</span>
+                        <span className="math-item-val">{activeModalEntry.score_parts.volume}</span>
+                      </div>
 
-                  <div className="math-item">
-                    <span className="math-item-label">Smoothed Rate (R)</span>
-                    <span className="math-item-val">{activeModalEntry.score_parts.smoothed_rate}%</span>
-                  </div>
+                      <div className="math-item">
+                        <span className="math-item-label">Smoothed Rate (R)</span>
+                        <span className="math-item-val">{activeModalEntry.score_parts.smoothed_rate}%</span>
+                      </div>
+                    </>
+                  )}
                 </div>
 
                 <div className="score-total-bar">
@@ -377,7 +382,9 @@ export default function Awards({
               </div>
 
               <p className="score-explanation-text">
-                Formula hybrid ini dirancang untuk mencegah bias popularitas. Warung kecil dengan pengunjung sedikit namun memiliki tingkat minat rute yang tinggi tetap berpeluang meraih peringkat teratas secara adil.
+                {selectedPeriod === 'annual'
+                  ? 'Bulan tanpa data tidak masuk perhitungan rata-rata dan median.'
+                  : 'Skor menggabungkan jumlah peminat unik dan rasio minat yang disesuaikan.'}
               </p>
             </div>
           </div>

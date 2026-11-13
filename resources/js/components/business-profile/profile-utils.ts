@@ -1,5 +1,6 @@
 import type { SellingPost } from '@/types/catalog';
 import type { SpecialHours, WeeklyHours } from '@/types/business-profile';
+import { jsonRequestHeaders } from '../../types/request-headers.ts';
 
 export function externalUrl(value: string | null | undefined) {
   if (!value) return null;
@@ -54,11 +55,7 @@ export function postHoursUpdateLabel(value: string | null | undefined) {
 
 export function trackInteraction(businessId: number, postId: number, type: 'menu_open' | 'map_click' | 'whatsapp_click', menuId?: number) {
   try {
-    const cookie = document.cookie.split('; ').find(item => item.startsWith('XSRF-TOKEN='));
-    const token = cookie ? decodeURIComponent(cookie.slice('XSRF-TOKEN='.length)) : document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]')?.content;
-    const headers: Record<string, string> = { 'Content-Type': 'application/json', Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' };
-    if (token) headers[cookie ? 'X-XSRF-TOKEN' : 'X-CSRF-TOKEN'] = token;
-    void fetch('/interaksi', { method: 'POST', credentials: 'same-origin', keepalive: true, headers, body: JSON.stringify({ business_id: businessId, post_id: postId, type, ...(menuId !== undefined ? { menu_id: menuId } : {}) }) }).catch(() => {});
+    void fetch('/interaksi', { method: 'POST', credentials: 'same-origin', keepalive: true, headers: jsonRequestHeaders(), body: JSON.stringify({ business_id: businessId, post_id: postId, type, ...(menuId !== undefined ? { menu_id: menuId } : {}) }) }).catch(() => {});
   } catch {
     // Navigation and menu controls remain usable when analytics cannot be sent.
   }
