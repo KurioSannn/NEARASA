@@ -249,13 +249,13 @@ export default function PostScheduleCalendar({ business, selectedPostId }: Props
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Left: Interactive Monthly Calendar Card (8 Columns) */}
         <section
-          className="lg:col-span-8 bg-white border border-sand-border rounded-3xl p-5 sm:p-6 shadow-soft flex flex-col gap-5"
+          className="lg:col-span-8 bg-white border border-sand-border rounded-3xl p-3.5 sm:p-6 shadow-soft flex flex-col gap-3.5 sm:gap-5"
           data-purpose="deliveries-monthly-calendar"
         >
           {/* Header Toolbar: Title, Month Navigator & Legend */}
-          <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-sand-border">
+          <div className="flex flex-col sm:flex-row items-center text-center sm:text-left justify-between gap-3 sm:gap-4 pb-3.5 sm:pb-4 border-b border-sand-border">
             <div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center justify-center sm:justify-start gap-2">
                 <CalendarIcon className="w-5 h-5 text-terracotta" />
                 <h3 className="text-base sm:text-lg font-extrabold text-clay-900 tracking-tight">
                   Kalender Penjadwalan Gerai & Pos
@@ -267,7 +267,7 @@ export default function PostScheduleCalendar({ business, selectedPostId }: Props
             </div>
 
             {/* Month Switcher Toolbar */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center justify-center gap-2 flex-wrap">
               <div className="flex items-center gap-2 bg-clay-50/80 px-3.5 py-1.5 rounded-full border border-sand-border">
                 <button
                   type="button"
@@ -301,10 +301,10 @@ export default function PostScheduleCalendar({ business, selectedPostId }: Props
           </div>
 
           {/* Quick Legend Bar & Pos Filter */}
-          <div className="flex flex-wrap items-center justify-between gap-3 text-xs">
-            <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-2.5 sm:gap-3 text-xs">
+            <div className="flex items-center justify-center sm:justify-start gap-2 flex-wrap">
               <span className="text-clay-600 font-medium">Lihat jadwal pos:</span>
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center justify-center gap-1.5 flex-wrap">
                 {business.posts.map((post) => (
                   <button
                     key={post.id}
@@ -323,7 +323,7 @@ export default function PostScheduleCalendar({ business, selectedPostId }: Props
             </div>
 
             {/* Status Legend Pills */}
-            <div className="flex items-center gap-2 text-[10px] font-bold">
+            <div className="flex items-center justify-center gap-1.5 sm:gap-2 text-[10px] font-bold flex-wrap">
               <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-terracotta-50 text-terracotta border border-terracotta-200">
                 <span className="w-1.5 h-1.5 rounded-full bg-terracotta" /> Hari Ini
               </span>
@@ -337,11 +337,11 @@ export default function PostScheduleCalendar({ business, selectedPostId }: Props
           </div>
 
           {/* 7-Days Header (Senin - Minggu) */}
-          <div className="grid grid-cols-7 gap-1.5 text-center pt-2">
+          <div className="grid grid-cols-7 gap-1 sm:gap-1.5 text-center pt-1 sm:pt-2">
             {DAY_LABELS.map((dayLabel, idx) => (
               <span
                 key={dayLabel}
-                className={`text-[11px] font-bold uppercase tracking-wider py-1 ${
+                className={`text-[10px] sm:text-[11px] font-bold uppercase tracking-wider py-0.5 sm:py-1 ${
                   idx >= 5 ? 'text-terracotta' : 'text-clay-600'
                 }`}
               >
@@ -351,16 +351,16 @@ export default function PostScheduleCalendar({ business, selectedPostId }: Props
           </div>
 
           {/* 7-Columns Calendar Grid Tiles */}
-          <div className="grid grid-cols-7 gap-1.5">
+          <div className="grid grid-cols-7 gap-1 sm:gap-1.5">
             {/* Previous Month Padding Tiles */}
             {Array.from({ length: prevMonthPadding }).map((_, index) => {
               const dayNum = daysInPrevMonth - prevMonthPadding + index + 1;
               return (
                 <div
                   key={`prev-${index}`}
-                  className="h-20 sm:h-24 p-2 rounded-2xl bg-clay-50/40 border border-transparent opacity-35 flex flex-col justify-between select-none"
+                  className="aspect-square sm:aspect-auto sm:h-24 p-1 sm:p-2 rounded-xl sm:rounded-2xl bg-clay-50/40 border border-transparent opacity-35 flex items-center justify-center sm:items-start sm:justify-between select-none"
                 >
-                  <span className="text-xs font-semibold text-clay-400">{dayNum}</span>
+                  <span className="text-[11px] sm:text-xs font-semibold text-clay-400">{dayNum}</span>
                 </div>
               );
             })}
@@ -379,7 +379,7 @@ export default function PostScheduleCalendar({ business, selectedPostId }: Props
                 <div
                   key={dateKey}
                   onClick={() => handleDateClick(dateKey)}
-                  className={`h-20 sm:h-24 p-2 rounded-2xl border transition-colors cursor-pointer flex flex-col justify-between group ${
+                  className={`aspect-square sm:aspect-auto sm:h-24 p-1 sm:p-2 rounded-xl sm:rounded-2xl border transition-colors cursor-pointer flex flex-col items-center justify-center sm:items-stretch sm:justify-between group relative ${
                     isToday
                       ? 'bg-terracotta text-white shadow-md shadow-terracotta/25 border-terracotta'
                       : isSpecial && isClosed
@@ -390,22 +390,22 @@ export default function PostScheduleCalendar({ business, selectedPostId }: Props
                   }`}
                   title={`Klik untuk mengatur jadwal ${dayNum} ${MONTH_NAMES[currentMonth]}`}
                 >
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-center sm:justify-between w-full">
                     <span
-                      className={`text-xs font-extrabold ${
+                      className={`text-[11px] sm:text-xs font-extrabold leading-none ${
                         isToday ? 'text-white' : 'text-clay-900 group-hover:text-terracotta'
                       }`}
                     >
                       {dayNum}
                     </span>
                     {isToday && (
-                      <span className="text-[9px] uppercase font-black bg-white/20 text-white px-1.5 py-0.2 rounded-full">
+                      <span className="hidden sm:inline-block text-[9px] uppercase font-black bg-white/20 text-white px-1.5 py-0.2 rounded-full">
                         Hari Ini
                       </span>
                     )}
                     {isSpecial && !isToday && (
                       <span
-                        className={`w-1.5 h-1.5 rounded-full ${
+                        className={`hidden sm:inline-block w-1.5 h-1.5 rounded-full ${
                           isClosed ? 'bg-amber-500' : 'bg-emerald-500'
                         }`}
                         title={isClosed ? 'Tutup Khusus' : 'Jam Khusus'}
@@ -413,7 +413,23 @@ export default function PostScheduleCalendar({ business, selectedPostId }: Props
                     )}
                   </div>
 
-                  <div className="min-w-0">
+                  {/* Mobile Compact Status Dot */}
+                  <span className="sm:hidden mt-1 flex items-center justify-center" aria-hidden="true">
+                    <span
+                      className={`w-1.5 h-1.5 rounded-full ${
+                        isToday
+                          ? 'bg-white'
+                          : isClosed
+                          ? 'bg-amber-500'
+                          : isSpecial
+                          ? 'bg-emerald-600'
+                          : 'bg-emerald-500/70'
+                      }`}
+                    />
+                  </span>
+
+                  {/* Desktop Detail Labels */}
+                  <div className="hidden sm:block min-w-0">
                     <span
                       className={`block text-[10px] truncate leading-tight font-bold ${
                         isToday

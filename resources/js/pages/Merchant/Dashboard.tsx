@@ -61,7 +61,7 @@ export default function Dashboard({
         className="min-h-screen bg-sand-surface text-clay-900 antialiased"
         style={{ fontFamily: 'var(--font-sans)' }}
       >
-        <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 pt-0 pb-6 flex flex-col gap-6">
+        <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 pt-0 pb-24 lg:pb-6 flex flex-col gap-6">
           {/* BEGIN: TopNavigationBar (Clean header without middle nav pills) */}
           <TopNav
             merchantNavigation={merchantNavigation}
@@ -78,11 +78,11 @@ export default function Dashboard({
 
           {/* BEGIN: MainContentGrid */}
           <div className="flex flex-col lg:flex-row gap-6 items-start">
-            {/* Compact Curved Sidebar */}
+            {/* Compact Curved Sidebar & Mobile Floating Pill Nav */}
             <CurvedSidebar merchantNavigation={merchantNavigation} />
 
             {/* Center Main Column */}
-            <main className="flex-1 min-w-0 flex flex-col gap-6 overflow-hidden">
+            <main className="flex-1 min-w-0 w-full flex flex-col gap-6 overflow-hidden">
               {/* BEGIN: Greeting & Controls - Perfectly aligned with content below */}
               <section className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4" data-purpose="hero-controls">
                 <div>

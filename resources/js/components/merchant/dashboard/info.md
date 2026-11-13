@@ -5,8 +5,8 @@ Modul komponen antarmuka Dashboard Pemilik (`pages/Merchant/Dashboard.tsx`, rute
 ## Daftar Komponen:
 | File | Deskripsi & Fungsi |
 | :--- | :--- |
-| `TopNav.tsx` | Bar navigasi atas dengan badge logo heksagonal (`fill="#ffdbd0"`), pill navigation switcher, pencarian interaktif `⌘K`, notifikasi laporan, dan pill profil pemilik. |
-| `CurvedSidebar.tsx` | Dock ikon vertikal melengkung `w-16 rounded-3xl` dengan tautan cepat ke Beranda, Interaksi, Dashboard, Kelola Usaha, Laporan, Pengaturan, dan Keluar. |
+| `TopNav.tsx` | Bar navigasi atas dengan badge logo NEARASA, input pencarian responsif (termasuk mode seluler di Dashboard), notifikasi laporan, dan dropdown profil pemilik. |
+| `CurvedSidebar.tsx` | Dock ikon vertikal melengkung `w-16 rounded-3xl` pada desktop (`lg` ke atas) serta Floating Island Capsule Pill Navigation untuk mode seluler/HP (`lg:hidden`) berisi 5 navigasi utama (Dashboard, Kelola, Review, Akun, Publik). |
 | `BusinessWatchlist.tsx` | Kartu daftar usaha kuliner milik pemilik (kolom 4) dengan foto cover, jenis usaha, jumlah menu, dan pos aktif. |
 | `InteractionChart.tsx` | Grafik batang pilar interaktif (kolom 8) dengan garis grid putus-putus (*dashed lines*), tooltip angka riil, dan highlight terakota pada pilar tertinggi. |
 | `SummaryCards.tsx` | 4 kartu ringkasan metrik operasional (Usaha Terkelola, Laporan Tutup, Pos Jualan, dan Pos Buka Saat Ini). |

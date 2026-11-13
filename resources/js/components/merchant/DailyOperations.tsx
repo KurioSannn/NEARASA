@@ -288,18 +288,18 @@ export default function DailyOperations({ operations, selectedPostId, onSelectPo
   return (
     <div className="flex flex-col gap-6">
       {/* Pos Selector Card */}
-      <section className="bg-white p-5 rounded-3xl border border-sand-border shadow-soft flex flex-col sm:flex-row sm:items-center justify-between gap-4" aria-labelledby="owner-post-label">
-        <div className="flex-1 min-w-0">
+      <section className="bg-white p-5 rounded-3xl border border-sand-border shadow-soft flex flex-col items-center text-center sm:flex-row sm:items-center sm:text-left justify-between gap-3 sm:gap-4" aria-labelledby="owner-post-label">
+        <div className="flex-1 min-w-0 w-full flex flex-col items-center sm:items-start">
           <label id="owner-post-label" htmlFor="owner-post-select" className="block text-[11px] font-bold text-clay-700 uppercase tracking-wider mb-1.5">
             Lokasi jualan yang diatur
           </label>
-          <div className="flex items-center gap-3 flex-wrap">
+          <div className="flex flex-col sm:flex-row items-center justify-center sm:justify-start gap-2.5 sm:gap-3 flex-wrap w-full">
             {/* Custom Popover Dropdown for Pos (No OS Blue Hover) */}
-            <div className="relative w-full sm:w-auto">
+            <div className="relative w-auto">
               <button
                 type="button"
                 onClick={() => setPostSelectOpen(!postSelectOpen)}
-                className="w-full sm:w-auto flex items-center justify-between gap-3 bg-clay-50/90 hover:bg-[#fdeee9] text-clay-900 text-sm font-extrabold rounded-xl px-3.5 py-2 border border-sand-border hover:border-terracotta-300 cursor-pointer transition-all focus:ring-2 focus:ring-terracotta/20 outline-none shadow-xs"
+                className="w-auto min-w-[180px] flex items-center justify-center sm:justify-between gap-3 bg-clay-50/90 hover:bg-[#fdeee9] text-clay-900 text-sm font-extrabold rounded-xl px-3.5 py-2 border border-sand-border hover:border-terracotta-300 cursor-pointer transition-all focus:ring-2 focus:ring-terracotta/20 outline-none shadow-xs"
                 aria-expanded={postSelectOpen}
               >
                 <span>{selected.post.name}</span>
@@ -312,7 +312,7 @@ export default function DailyOperations({ operations, selectedPostId, onSelectPo
                     className="fixed inset-0 z-40"
                     onClick={() => setPostSelectOpen(false)}
                   />
-                  <div className="absolute left-0 top-full mt-1.5 min-w-[240px] bg-white border border-sand-border rounded-2xl shadow-xl p-1.5 z-50 space-y-1">
+                  <div className="absolute left-1/2 -translate-x-1/2 sm:left-0 sm:translate-x-0 top-full mt-1.5 min-w-[240px] bg-white border border-sand-border rounded-2xl shadow-xl p-1.5 z-50 space-y-1 text-left">
                     {operations.map((operation) => {
                       const isSelected = operation.post.id === selected.post.id;
                       return (
@@ -345,7 +345,7 @@ export default function DailyOperations({ operations, selectedPostId, onSelectPo
                 </>
               )}
             </div>
-            <p className="flex items-center gap-1.5 text-xs text-clay-700 font-medium">
+            <p className="flex items-center justify-center sm:justify-start gap-1.5 text-xs text-clay-700 font-medium">
               <MapPin size={14} className="text-terracotta shrink-0" aria-hidden="true" />
               <span className="truncate">{selected.post.address}</span>
             </p>

@@ -72,7 +72,7 @@ function BusinessWorkspace({ business, operations, merchantNavigation }: Props &
     <>
       <div className="flex flex-col gap-6">
         {/* Page Header - Aligned vertically with content cards */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex flex-col items-center text-center sm:flex-row sm:items-center sm:text-left justify-between gap-4">
           <div>
             <h1 className="text-2xl lg:text-3xl font-extrabold tracking-tight text-clay-900">
               Kelola Usaha
@@ -84,8 +84,8 @@ function BusinessWorkspace({ business, operations, merchantNavigation }: Props &
         </div>
 
         {/* Usaha Context Card */}
-        <div className="bg-white p-4 sm:p-5 rounded-3xl border border-sand-border shadow-soft flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="flex items-center gap-4 min-w-0">
+        <div className="bg-white p-4 sm:p-5 rounded-3xl border border-sand-border shadow-soft flex flex-col items-center text-center md:flex-row md:items-center md:text-left justify-between gap-4">
+          <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 min-w-0 w-full md:w-auto">
             <div className="relative w-14 h-14 rounded-2xl overflow-hidden bg-sand-surface border border-sand-border shadow-sm flex-none">
               <img
                 src={businessCover(business)}
@@ -93,11 +93,11 @@ function BusinessWorkspace({ business, operations, merchantNavigation }: Props &
                 className="w-full h-full object-cover"
               />
             </div>
-            <div className="flex flex-col min-w-0">
+            <div className="flex flex-col items-center sm:items-start min-w-0">
               <label htmlFor="owner-business-select" className="text-[11px] font-bold text-clay-700 uppercase tracking-wider">
                 Usaha yang Dikelola
               </label>
-              <div className="flex items-center gap-2 mt-1 flex-wrap">
+              <div className="flex items-center justify-center sm:justify-start gap-2 mt-1.5 flex-wrap">
                 {/* Custom Popover Dropdown for Usaha (No OS Blue Hover) */}
                 <div className="relative">
                   <button
@@ -116,7 +116,7 @@ function BusinessWorkspace({ business, operations, merchantNavigation }: Props &
                         className="fixed inset-0 z-40"
                         onClick={() => setBusinessDropdownOpen(false)}
                       />
-                      <div className="absolute left-0 top-full mt-1.5 min-w-[220px] bg-white border border-sand-border rounded-2xl shadow-xl p-1.5 z-50 space-y-1">
+                      <div className="absolute left-1/2 -translate-x-1/2 sm:left-0 sm:translate-x-0 top-full mt-1.5 min-w-[220px] bg-white border border-sand-border rounded-2xl shadow-xl p-1.5 z-50 space-y-1 text-left">
                         {merchantNavigation.businesses.map((item) => {
                           const isSelected = item.slug === business.slug;
                           return (
@@ -159,7 +159,7 @@ function BusinessWorkspace({ business, operations, merchantNavigation }: Props &
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center justify-center md:justify-end gap-3 w-full md:w-auto">
             {business.status === 'published' ? (
               <Link
                 className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-terracotta-50 text-terracotta hover:bg-terracotta hover:text-white border border-terracotta-200 transition-colors duration-150 shadow-xs"
@@ -175,8 +175,8 @@ function BusinessWorkspace({ business, operations, merchantNavigation }: Props &
         </div>
 
         {/* Work Tabs Nav Pill Switcher - Compact & Proportional */}
-        <nav aria-label="Bagian Kelola usaha" className="flex items-center overflow-x-auto pb-1 no-scrollbar">
-          <div className="flex items-center bg-white/95 p-1 rounded-full border border-sand-border shadow-sm gap-1 w-fit">
+        <nav aria-label="Bagian Kelola usaha" className="flex items-center justify-center sm:justify-start pb-1">
+          <div className="flex flex-wrap sm:flex-nowrap items-center justify-center bg-white/95 p-1.5 sm:p-1 rounded-3xl sm:rounded-full border border-sand-border shadow-sm gap-1 w-full sm:w-fit">
             {tabs.map((tab, index) => {
               const isSelected = active === tab.key;
               const hasDraftInTab = tab.drafts.some((key) => drafts[key]);
@@ -241,7 +241,7 @@ function BusinessWorkspace({ business, operations, merchantNavigation }: Props &
             <PostsSection business={business} selectedPostId={postId} requestHours={hoursRequest} onDirty={reportDirty} />
           </section>
           <section role="tabpanel" id="owner-panel-profile" aria-labelledby="owner-tab-profile" hidden={active !== 'profile'}>
-            <div className="flex items-center gap-2 bg-white/95 p-1 rounded-full border border-sand-border shadow-sm w-fit mb-5">
+            <div className="flex items-center justify-center mx-auto sm:mx-0 gap-2 bg-white/95 p-1 rounded-full border border-sand-border shadow-sm w-fit mb-5">
               {[['about', 'Tentang usaha'], ['contact', 'Kontak & tautan']].map(([key, label]) => (
                 <button
                   key={key}
@@ -269,7 +269,7 @@ function BusinessWorkspace({ business, operations, merchantNavigation }: Props &
             </div>
           </section>
           <section role="tabpanel" id="owner-panel-media" aria-labelledby="owner-tab-media" hidden={active !== 'media'}>
-            <div className="flex items-center gap-2 bg-white/95 p-1 rounded-full border border-sand-border shadow-sm w-fit mb-5">
+            <div className="flex items-center justify-center mx-auto sm:mx-0 gap-2 bg-white/95 p-1 rounded-full border border-sand-border shadow-sm w-fit mb-5">
               {[['photos', 'Foto & berkas'], ['updates', 'Kabar usaha']].map(([key, label]) => (
                 <button
                   key={key}

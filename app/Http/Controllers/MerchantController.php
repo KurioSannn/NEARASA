@@ -82,6 +82,35 @@ class MerchantController extends Controller
         ]);
     }
 
+    public function settings(Request $request)
+    {
+        $businesses = $request->user()->businesses()->withCount(['menuItems', 'sellingPosts'])->with(['menuItems.availabilityOverrides', 'sellingPosts.weeklySchedules', 'sellingPosts.scheduleExceptions'])->orderBy('name')->get();
+        $requestedSlug = $request->query('usaha');
+        $selected = ($requestedSlug ? $businesses->firstWhere('slug', $requestedSlug) : null)
+            ?? $businesses->firstWhere('id', $request->session()->get('merchant_business_id'))
+            ?? $businesses->first();
+
+        if ($selected) {
+            $request->session()->put('merchant_business_id', $selected->id);
+        }
+
+        $profile = app(BusinessProfile::class);
+        $businessData = $selected ? [
+            ...$selected->only(['id', 'slug', 'name', 'description', 'kind', 'photo', 'status', 'is_demo']),
+            ...$profile->information($selected),
+            'menus' => [],
+            'posts' => [],
+        ] : null;
+
+        return Inertia::render('Merchant/Settings', [
+            'business' => $businessData,
+            'businesses' => $this->businessOptions($businesses),
+            'publicName' => $request->user()->public_name ?? '',
+            'publicProfileAvailable' => $businesses->where('status', 'published')->isNotEmpty(),
+            'merchantNavigation' => $this->navigation($request, $businesses),
+        ]);
+    }
+
     private function businessOptions(Collection $businesses): Collection
     {
         return $businesses->map->only(['id', 'slug', 'name', 'kind', 'photo', 'status', 'is_demo', 'menu_items_count', 'selling_posts_count'])->values();

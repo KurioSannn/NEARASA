@@ -3,7 +3,7 @@ import { Link } from '@inertiajs/react';
 export default function Footer() {
   return (
     <footer
-      className="site-footer w-full !mb-0 !pb-1 mt-auto"
+      className="site-footer !hidden lg:!flex w-full !mb-0 !pb-1 mt-auto"
       style={{ marginBottom: 0, paddingBottom: 0, fontFamily: 'var(--font-sans)' }}
     >
       <Link className="footer-brand" href="/" aria-label="NEARASA beranda">

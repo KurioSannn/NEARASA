@@ -104,7 +104,7 @@ class MerchantRegisterController extends Controller
             }
 
             // 3. Simpan foto usaha atau fallback gambar kuliner
-            $photoPath = '/images/demo/resto-1.jpg';
+            $photoPath = '/images/demo/rice.jpg';
             if ($request->hasFile('photo')) {
                 $photoPath = $photos->store($request->file('photo'));
             }
