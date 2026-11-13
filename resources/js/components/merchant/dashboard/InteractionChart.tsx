@@ -49,8 +49,8 @@ export default function InteractionChart({ statistics }: { statistics: MerchantS
             <div key={idx} className="flex items-center gap-3">
               <span className="w-6 text-right font-mono">{Math.round(val)}</span>
               <div
-                className={`flex-1 border-b ${idx === gridSteps.length - 1 ? 'border-sand-border' : 'border-dashed border-sand-border'}`}
-                style={{ borderColor: 'rgba(183, 75, 40, 0.18)' }}
+                className={`flex-1 border-b ${idx === gridSteps.length - 1 ? 'border-transparent' : 'border-dashed border-sand-border'}`}
+                style={{ borderColor: idx === gridSteps.length - 1 ? 'transparent' : 'rgba(183, 75, 40, 0.18)' }}
               />
             </div>
           ))}

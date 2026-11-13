@@ -15,6 +15,7 @@ use App\Http\Controllers\MerchantMediaController;
 use App\Http\Controllers\MerchantMenuController;
 use App\Http\Controllers\MerchantOperationsController;
 use App\Http\Controllers\MerchantPostController;
+use App\Http\Controllers\MerchantRegisterController;
 use App\Http\Controllers\MerchantUpdateController;
 use App\Http\Controllers\PublicOwnerController;
 use App\Http\Controllers\StoreLocationController;
@@ -55,6 +56,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/kelola-usaha', [MerchantController::class, 'index'])->name('merchant.index');
     Route::get('/kelola-usaha/pengaturan', [MerchantController::class, 'manage'])->name('merchant.manage');
     Route::get('/kelola-usaha/laporan', [MerchantController::class, 'reportIndex'])->name('merchant.reports');
+    Route::get('/kelola-usaha/daftar', [MerchantRegisterController::class, 'create'])->name('merchant.register');
+    Route::post('/kelola-usaha/daftar', [MerchantRegisterController::class, 'store'])->name('merchant.register.store');
     Route::get('/kelola-usaha/{business:slug}', [MerchantController::class, 'edit'])->name('merchant.edit');
     Route::patch('/kelola-usaha/{business:slug}', [MerchantController::class, 'update'])->name('merchant.update');
     Route::post('/kelola-usaha/{business:slug}/menu', [MerchantMenuController::class, 'store']);

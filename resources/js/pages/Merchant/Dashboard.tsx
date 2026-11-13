@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Head, Link, usePage } from '@inertiajs/react';
-import { Plus } from 'lucide-react';
+import { Plus, Store } from 'lucide-react';
 import BusinessWatchlist from '@/components/merchant/dashboard/BusinessWatchlist';
 import CurvedSidebar from '@/components/merchant/dashboard/CurvedSidebar';
 import InteractionChart from '@/components/merchant/dashboard/InteractionChart';
@@ -95,16 +95,48 @@ export default function Dashboard({
                 </div>
 
                 {/* Action Tools */}
-                {businesses.length > 0 && (
+                <div className="flex items-center gap-2 flex-wrap">
                   <Link
-                    href={merchantNavigation.manage_url}
-                    className="flex items-center gap-1.5 bg-terracotta hover:bg-terracotta-600 text-white !text-white px-4 py-2 rounded-full text-xs font-bold shadow-pill transition-colors duration-150"
+                    href="/kelola-usaha/daftar"
+                    className="flex items-center gap-1.5 bg-white hover:bg-[#fdeee9] border border-sand-border hover:border-terracotta-300 text-clay-800 hover:text-terracotta px-3.5 py-2 rounded-full text-xs font-bold transition-colors duration-150 shadow-xs cursor-pointer"
                   >
-                    <Plus className="w-4 h-4 text-white !text-white" />
-                    <span className="text-white !text-white">Kelola usaha</span>
+                    <Plus className="w-4 h-4 text-terracotta" />
+                    <span>+ Tambah Usaha</span>
                   </Link>
-                )}
+                  {businesses.length > 0 && (
+                    <Link
+                      href={merchantNavigation.manage_url}
+                      className="flex items-center gap-1.5 bg-terracotta hover:bg-terracotta-600 text-white !text-white px-4 py-2 rounded-full text-xs font-bold shadow-pill transition-colors duration-150 cursor-pointer"
+                    >
+                      <Plus className="w-4 h-4 text-white !text-white" />
+                      <span className="text-white !text-white">Kelola usaha</span>
+                    </Link>
+                  )}
+                </div>
               </section>
+
+              {/* Onboarding Welcome Banner for Zero Business */}
+              {businesses.length === 0 && (
+                <div className="bg-gradient-to-r from-terracotta-50 to-sand-surface p-6 rounded-3xl border border-sand-border shadow-soft flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                  <div className="space-y-1">
+                    <span className="inline-flex items-center gap-1.5 text-xs font-bold text-terracotta bg-white px-3 py-1 rounded-full border border-terracotta-200 shadow-2xs">
+                      <Store className="w-3.5 h-3.5" />
+                      Mulai Kemitraan UMKM
+                    </span>
+                    <h2 className="text-base font-extrabold text-clay-900">Belum ada usaha kuliner yang terhubung</h2>
+                    <p className="text-xs text-clay-600 max-w-xl">
+                      Daftarkan warung makan, kedai kopi, atau gerai kulinermu untuk mulai mengelola menu, jadwal buka aktual, dan terhubung dengan pelanggan sekitar.
+                    </p>
+                  </div>
+                  <Link
+                    href="/kelola-usaha/daftar"
+                    className="px-5 py-2.5 rounded-full text-xs font-bold bg-terracotta hover:bg-terracotta-600 text-white shadow-pill transition flex items-center gap-2 shrink-0 cursor-pointer"
+                  >
+                    <Plus className="w-4 h-4 text-white" />
+                    <span>Daftarkan Usaha Pertama</span>
+                  </Link>
+                </div>
+              )}
 
               {/* Row 1: Watchlist & Engagement Chart */}
               <section className="grid grid-cols-1 xl:grid-cols-12 gap-6" data-purpose="charts-and-watchlist">

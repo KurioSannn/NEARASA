@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { ArrowLeft, Check, ChevronDown, Eye, Store } from 'lucide-react';
+import { ArrowLeft, Check, ChevronDown, Eye, Plus, Store } from 'lucide-react';
 import MerchantLayout from '@/layouts/MerchantLayout';
 import Dialog from '@/components/Dialog';
 import type { MerchantBusiness } from '@/types/business-profile';
@@ -353,14 +353,23 @@ export default function BusinessEdit(props: Props) {
             </div>
             <h2 className="text-xl font-extrabold text-clay-900">Belum ada usaha terhubung</h2>
             <p className="text-sm text-clay-500 max-w-md">
-              Akun UMKM uji menyediakan usaha contoh. Pendaftaran usaha baru belum tersedia.
+              Daftarkan warung makan atau tokomu untuk mulai mengelola profil, menu, dan jam buka.
             </p>
-            <Link
-              href="/akun"
-              className="px-5 py-2.5 rounded-full text-xs font-bold bg-terracotta text-white shadow-pill hover:bg-terracotta-600 transition"
-            >
-              Buka akun
-            </Link>
+            <div className="flex items-center gap-3 flex-wrap justify-center">
+              <Link
+                href="/kelola-usaha/daftar"
+                className="px-6 py-2.5 rounded-full text-xs font-bold bg-terracotta text-white shadow-pill hover:bg-terracotta-600 transition flex items-center gap-2 cursor-pointer"
+              >
+                <Plus className="w-4 h-4 text-white" />
+                <span>Daftarkan Usaha Sekarang</span>
+              </Link>
+              <Link
+                href="/akun"
+                className="px-5 py-2.5 rounded-full text-xs font-bold bg-white hover:bg-[#fdeee9] border border-sand-border text-clay-800 hover:text-terracotta transition"
+              >
+                Buka akun
+              </Link>
+            </div>
           </div>
         </div>
       )}

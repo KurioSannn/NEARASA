@@ -2,12 +2,11 @@ import { useEffect, useRef, useState } from 'react';
 import { Head, Link, router, useForm } from '@inertiajs/react';
 import { ArrowLeft, BookmarkCheck, Clock, Eye, EyeOff, Store, Utensils } from 'lucide-react';
 
-export default function Login({ demoEnabled }: { demoEnabled: boolean }) {
+export default function Login() {
   const form = useForm({ email: '', password: '' });
   const [showPassword, setShowPassword] = useState(false);
-  const [demoPending, setDemoPending] = useState(false);
   const error = form.errors.email || form.errors.password;
-  const busy = form.processing || demoPending;
+  const busy = form.processing;
   const summary = useRef<HTMLParagraphElement>(null);
 
   useEffect(() => {
@@ -155,37 +154,6 @@ export default function Login({ demoEnabled }: { demoEnabled: boolean }) {
                 </button>
               </fieldset>
             </form>
-
-            {demoEnabled && (
-              <div className="consumer-demo-card">
-                <div className="demo-card-head">
-                  <div className="demo-card-icon" aria-hidden="true">
-                    <Store size={20} />
-                  </div>
-                  <div className="demo-card-copy">
-                    <h2>Ingin mencoba sebagai pemilik?</h2>
-                    <p>Akses dasbor contoh untuk mengelola 2 usaha kuliner, menu, dan jam buka.</p>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  className="demo-card-button"
-                  disabled={busy}
-                  onClick={() =>
-                    router.post(
-                      '/masuk/demo',
-                      {},
-                      {
-                        onStart: () => setDemoPending(true),
-                        onFinish: () => setDemoPending(false),
-                      }
-                    )
-                  }
-                >
-                  {demoPending ? 'Sedang masuk…' : 'Coba Akun Mitra UMKM'}
-                </button>
-              </div>
-            )}
 
             <p className="consumer-auth-footnote">
               Gunakan akun yang sudah tersedia. Masuk dengan Google belum tersedia pada versi ini.

@@ -493,21 +493,35 @@ export default function Account({
                   <div className="hub-feature-top">
                     <span className="hub-feature-badge terracotta">
                       <UserCheck size={11} aria-hidden="true" />
-                      <span>{ownedCount > 0 ? `${ownedCount} Usaha Terhubung` : 'Mitra Kuliner'}</span>
+                      <span>{ownedCount > 0 ? `${ownedCount} Usaha Terhubung` : 'Pendaftaran UMKM'}</span>
                     </span>
                   </div>
                   <h3 className="hub-feature-title">Kelola Usaha Kuliner</h3>
                   <p className="hub-feature-desc">
-                    Pantau jam operasional aktual WIB, kelola status buka, ketersediaan menu masakan, dan perbarui foto warung.
+                    {ownedCount > 0
+                      ? 'Pantau jam operasional aktual WIB, kelola status buka, ketersediaan menu masakan, dan perbarui foto warung.'
+                      : 'Daftarkan warung makan, kedai, atau gerobak kulinermu agar mudah ditemukan pelanggan dan dikelola jam bukanya.'}
                   </p>
                   <div className="hub-feature-actions">
-                    <Link href="/kelola-usaha" className="hub-btn primary">
-                      <span>Buka Dasbor Usaha</span>
-                    </Link>
-                    {publicProfileAvailable && user && (
-                      <Link href={`/pemilik/${user.id}`} className="hub-link-secondary">
-                        <span>Lihat Profil Usaha Publik</span>
-                        <ArrowUpRight size={13} aria-hidden="true" />
+                    {ownedCount > 0 ? (
+                      <>
+                        <Link href="/kelola-usaha" className="hub-btn primary">
+                          <span>Buka Dasbor Usaha</span>
+                        </Link>
+                        <Link href="/kelola-usaha/daftar" className="hub-link-secondary">
+                          <span>+ Tambah Usaha Lain</span>
+                          <ArrowUpRight size={13} aria-hidden="true" />
+                        </Link>
+                        {publicProfileAvailable && user && (
+                          <Link href={`/pemilik/${user.id}`} className="hub-link-secondary">
+                            <span>Lihat Profil Usaha Publik</span>
+                            <ArrowUpRight size={13} aria-hidden="true" />
+                          </Link>
+                        )}
+                      </>
+                    ) : (
+                      <Link href="/kelola-usaha/daftar" className="hub-btn primary">
+                        <span>Daftarkan Usaha Kuliner</span>
                       </Link>
                     )}
                   </div>
