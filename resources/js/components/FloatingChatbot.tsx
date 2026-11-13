@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import {
   ArrowRight,
   ArrowUp,
@@ -26,13 +26,16 @@ type Place = {
   price: number;
 };
 
+type ChatAction = { href: string; label: string };
+
 interface ChatMessage {
   id: number;
   sender: 'user' | 'assistant';
   text: string;
   time: string;
   places?: Place[];
-  showExploreLink?: boolean;
+  action?: ChatAction | null;
+  source?: 'catalog' | 'gemini';
 }
 
 const priceFormat = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 });
@@ -44,6 +47,7 @@ function formatCurrentTime(): string {
 }
 
 export default function FloatingChatbot() {
+  const { assistantUsesGemini } = usePage<{ assistantUsesGemini?: boolean }>().props;
   const [isOpen, setIsOpen] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -393,7 +397,7 @@ export default function FloatingChatbot() {
         signal: request.signal,
       });
       if (!response.ok) throw new Error('Pencarian asisten gagal');
-      const result: { reply: string; places: Place[] } = await response.json();
+      const result: { reply: string; places: Place[]; source: 'catalog' | 'gemini'; action: ChatAction | null } = await response.json();
       if (activeRequest.current === request) {
         const reply: ChatMessage = {
           id: ++messageId.current,
@@ -401,7 +405,8 @@ export default function FloatingChatbot() {
           text: result.reply,
           time: formatCurrentTime(),
           places: result.places,
-          showExploreLink: result.places.length === 0,
+          source: result.source,
+          action: result.action,
         };
         setMessages(prev => [...prev, reply]);
       }
@@ -412,7 +417,7 @@ export default function FloatingChatbot() {
           sender: 'assistant',
           text: 'Pencarian asisten sedang bermasalah. Coba kirim lagi atau buka Jelajah.',
           time: formatCurrentTime(),
-          showExploreLink: true,
+          action: { href: '/jelajah', label: 'Buka Jelajah' },
         };
         setMessages(prev => [...prev, reply]);
       }
@@ -523,6 +528,7 @@ export default function FloatingChatbot() {
 
                 <p className="chatbot-orb-caption">
                   Mau cari rekomendasi kuliner apa hari ini? Tanyakan gerai terdekat atau menu favoritmu.
+                  {assistantUsesGemini && <><br />Teks pertanyaan dapat diproses oleh Google Gemini.</>}
                 </p>
 
                 {/* Quick Action Prompt Chips */}
@@ -573,7 +579,7 @@ export default function FloatingChatbot() {
                     key={msg.id}
                     className={`chatbot-bubble ${msg.sender === 'user' ? 'is-user' : 'is-assistant'}`}
                   >
-                    <p style={{ margin: 0 }}>{msg.text}</p>
+                    <p style={{ margin: 0, whiteSpace: 'pre-line' }}>{msg.text}</p>
 
                     {/* Interactive Place Cards */}
                     {Boolean(msg.places?.length) && (
@@ -607,8 +613,8 @@ export default function FloatingChatbot() {
                       </div>
                     )}
 
-                    {msg.showExploreLink && <Link href="/jelajah" className="text-link" onClick={closeChat}>Buka Jelajah</Link>}
-                    <div className="chatbot-bubble-time">{msg.time}</div>
+                    {msg.action && <Link href={msg.action.href} className="text-link" onClick={closeChat}>{msg.action.label}</Link>}
+                    <div className="chatbot-bubble-time">{msg.source === 'gemini' ? 'Gemini · ' : ''}{msg.time}</div>
                   </div>
                 ))}
 

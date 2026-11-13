@@ -34,7 +34,7 @@ Satu akun pemilik dapat mengelola beberapa usaha. Setiap usaha memiliki satu pro
 | Dashboard pemilik | `/kelola-usaha`, `/kelola-usaha/ulasan` | Lihat ringkasan usaha milik akun, jumlah buka profil, buka menu, klik peta, dan klik WhatsApp. Pemilik dapat membaca ulasan pelanggan dan memfilternya berdasarkan usaha. |
 | Editor usaha | `/kelola-usaha/pengaturan`, `/kelola-usaha/{slug}` | Pilih usaha dan pos, lalu atur jam hari ini, status tersedia atau habis, harga, jadwal rutin, profil, foto, dan Kabar. |
 | NEARASA Awards | `/awards` | Simulasi peringkat usaha berdasarkan interaksi contoh, dengan pilihan mingguan, bulanan, tahunan, Sidoarjo, dan Surabaya. |
-| Asisten pencarian | Halaman konsumen | Mencari menu tersedia di katalog berdasarkan kata kunci, area, dan anggaran. Server mengurutkan hasil memakai jarak, rating per pos, dan kunjungan profil 7 hari terakhir. Berjalan tanpa API AI. |
+| Asisten pencarian | Halaman konsumen | Mencari menu tersedia di katalog berdasarkan kata kunci, area, dan anggaran. Server mengurutkan hasil memakai jarak, rating per pos, dan kunjungan profil 7 hari terakhir. Gemini opsional untuk memahami maksud pencarian. |
 
 Jarak dihitung sebagai **garis lurus** dari titik pencarian ke pos. Setelah memilih titik, radius bawaan adalah 5 km dan tersedia pilihan **Tanpa batas**. Titik pencarian tersimpan di sesi. Filter seperti kata kunci, harga, dan radius dapat dibagikan melalui URL, misalnya `/jelajah?q=ayam&max_price=25000`. [Daftar rute](routes/web.php)
 
@@ -106,6 +106,7 @@ Salin konfigurasi awal dari [.env.example](.env.example). Gunakan `.env` di ling
 | `APP_KEY` | Dibuat dengan `php artisan key:generate`. |
 | `DB_CONNECTION`, `DB_DATABASE` | Gunakan `sqlite`. Path bawaan adalah `database/database.sqlite`; isi `DB_DATABASE` untuk file lain. |
 | `NEARASA_DEMO_AUTH` | Bawaan `false`. Aktifkan untuk tombol akun UMKM di lingkungan `local`. |
+| `GEMINI_API_KEY`, `GEMINI_MODEL` | Opsional. Isi kunci di `.env` server untuk mengirim teks pertanyaan ke Gemini. Model bawaan `gemini-3.5-flash-lite`. Tanpa kunci atau saat API gagal, asisten memakai pencarian katalog. |
 | `MAP_TILE_URL` | Opsional. Alamat template tile `{z}/{x}/{y}` yang dimuat browser. [Konfigurasi peta](config/nearasa.php) |
 | `DB_URL`, `ASSET_URL`, `SESSION_SECURE_COOKIE` | Pengaturan database, aset HTTPS, dan cookie untuk lingkungan online. [Panduan deployment](dokumentasi/deployment-demo.md) |
 

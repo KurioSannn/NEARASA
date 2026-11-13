@@ -21,7 +21,7 @@ class AssistantCatalog
 
     public function __construct(private CatalogService $catalog) {}
 
-    public function recommend(string $prompt, ?SearchLocation $location): array
+    public function recommend(string $prompt, ?SearchLocation $location, ?string $keywords = null): array
     {
         $query = preg_replace('/\s+/u', ' ', mb_strtolower(trim($prompt)));
         $budget = $this->budget($query);
@@ -32,7 +32,7 @@ class AssistantCatalog
         $openOnly = $night || (bool) preg_match('/\bbuka\b/u', $query);
         $query = preg_replace('/\b(buka malam(?: ini)?|malam ini|larut malam|(?:sedang |masih )?buka(?: sekarang)?|terdekat|(?:dekat|sekitar)(?: sini)?|(?:paling )?(?:terpopuler|populer))\b/u', ' ', $query);
         [$query, $area, $location] = $this->area($query, $location);
-        $terms = array_values(array_diff(preg_split('/[^\p{L}\p{N}]+/u', $query, -1, PREG_SPLIT_NO_EMPTY), self::FILLER));
+        $terms = array_values(array_diff(preg_split('/[^\p{L}\p{N}]+/u', $keywords === null ? $query : mb_strtolower($keywords), -1, PREG_SPLIT_NO_EMPTY), self::FILLER));
 
         $now = CarbonImmutable::now('Asia/Jakarta');
         $at = $night ? $now->setTime(19, 0) : $now;
