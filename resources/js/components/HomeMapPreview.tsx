@@ -53,7 +53,7 @@ export default function HomeMapPreview({ businesses, location, tileUrl }: HomeMa
         tiles.addTo(mapInstance);
 
         const markerLayer = L.layerGroup().addTo(mapInstance);
-        const previewPins = validPins.slice(0, 8);
+        const previewPins = validPins.slice(0, 30);
 
         if (previewPins.length > 0) {
           addBusinessMarkers(L, markerLayer, previewPins, null, () => {

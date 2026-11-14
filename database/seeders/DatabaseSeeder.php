@@ -17,8 +17,11 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             CatalogSeeder::class,
+            ScrapedMapCatalogSeeder::class,
             DemoAccountSeeder::class,
             UserAccountSeeder::class,
+            DemoEngagementSeeder::class,
+            AwardsDemoSeeder::class,
         ]);
     }
 }

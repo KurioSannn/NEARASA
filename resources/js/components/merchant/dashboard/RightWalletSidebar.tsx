@@ -108,9 +108,9 @@ export default function RightWalletSidebar({
           </Link>
 
           <Link
-            href="/akun"
+            href="/kelola-usaha/setelan?tab=owner"
             className="flex flex-col items-center gap-1.5 p-2.5 rounded-2xl bg-clay-100 hover:bg-[#fdeee9] border border-sand-border hover:border-terracotta-200 transition-colors duration-150 group text-center"
-            title="Pengaturan Akun"
+            title="Setelan Akun Pemilik"
           >
             <div className="w-8 h-8 rounded-xl bg-terracotta group-hover:bg-terracotta-600 shadow-xs flex items-center justify-center text-white border border-terracotta-600 transition-colors duration-150">
               <UserRound className="w-4 h-4 text-white" />

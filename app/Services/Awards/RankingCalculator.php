@@ -80,10 +80,11 @@ class RankingCalculator
         $endUtc = $endWib->setTimezone('UTC')->toDateTimeString();
 
         // 1. Fetch businesses in the requested region
+        $regionPattern = '%'.mb_strtolower($region).'%';
         $businesses = Business::query()
             ->where('status', 'published')
-            ->whereHas('sellingPosts', function ($q) use ($region) {
-                $q->where('address', 'like', "%{$region}%");
+            ->whereHas('sellingPosts', function ($q) use ($regionPattern) {
+                $q->whereRaw('LOWER(address) LIKE ?', [$regionPattern]);
             })
             ->get();
 

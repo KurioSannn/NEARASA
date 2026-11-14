@@ -142,7 +142,7 @@ export default function TodayPostsTable({ businesses, operations, manageUrl }: P
               : 'Daftarkan profil usaha kuliner terlebih dahulu untuk mulai berjualan.'}
           </p>
           <Link
-            href={businesses.length ? `${manageUrl}?tab=posts` : '/akun'}
+            href={businesses.length ? `${manageUrl}?tab=posts` : '/kelola-usaha/setelan?tab=owner'}
             className="mt-2 px-4 py-2 rounded-full text-xs font-bold bg-terracotta text-white shadow-pill hover:bg-terracotta-600 transition-colors duration-150"
           >
             {businesses.length ? 'Tambah Pos Jualan' : 'Buka Akun'}
