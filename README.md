@@ -12,14 +12,22 @@ NEARASA membantu pelanggan menemukan warung dan pedagang kuliner yang berjualan 
 
 [Jalankan lokal](#menjalankan-dari-checkout-baru) · [Alur demo](#alur-demo) · [Fitur](#fitur-yang-bisa-dicoba) · [Dokumentasi teknis](dokumentasi/info.md)
 
-## Masalah dan pengguna
+## Kenapa NEARASA ada?
 
-Sejumlah warung yang diamati tim sulit ditemukan secara online. Pelanggan juga perlu mengetahui lokasi yang tepat, waktu penjual berada di sana, serta harga makanan. Pengamatan dan percakapan informal dengan pedagang menjadi dasar rancangan. Sidoarjo dan Surabaya dipilih sebagai wilayah awal untuk menguji kebutuhan tersebut.
+NEARASA berangkat dari pengamatan dan obrolan awal dengan beberapa pedagang di Gedangan, Sidoarjo, tentang cara pelanggan menemukan warung sekitar dan mengetahui menu, harga, serta jam jualan sebelum berangkat. Kami menjumpai beberapa usaha yang belum tercantum di peta digital. Dari obrolan tersebut, kami juga mendengar bahwa melengkapi profil usaha lewat HP terasa rumit. Untuk pedagang yang berganti tempat jualan menurut jadwal, pelanggan juga perlu tahu di mana dan kapan harus datang.
 
-- **Konsumen** dapat membandingkan pilihan kuliner berdasarkan jarak, anggaran, dan jadwal pos.
-- **Pemilik UMKM** memperbarui informasi jualan dan melihat interaksi pelanggan untuk usaha miliknya.
+### Konteks di Sidoarjo dan Surabaya
 
-Satu akun pemilik dapat mengelola beberapa usaha. Setiap usaha memiliki satu profil serta daftar menu dan harga yang dipakai bersama oleh semua pos jualannya. Tiap pos memiliki titik, jadwal, ketersediaan menu, dan ulasan sendiri. [Glosarium usaha dan pos](CONTEXT.md)
+- **Klurak, Sidoarjo.** Laporan pengabdian UPN “Veteran” Jawa Timur mendokumentasikan pendampingan pelaku UMKM menggunakan Google Maps, WhatsApp Business, dan foto produk. [Jurnal Studi Administrasi Bisnis, 2025](https://jsinabis.upnjatim.ac.id/index.php/jsinabis/article/view/385)
+- **Kalijaten, Sidoarjo.** Dinas Koperasi dan Usaha Mikro Kabupaten Sidoarjo melatih puluhan pelaku UMKM setempat menggunakan media sosial dan marketplace untuk menampilkan produk. [Dinkopum Sidoarjo, 2025](https://diskopum.sidoarjokab.go.id/001/1756359644)
+- **Gebang Putih, Surabaya.** Tim ITS mendokumentasikan kesulitan pelaku UMKM mendaftarkan produk secara daring dan mengembangkan peta web yang menampilkan lokasi penjualan, menu, dan harga usaha makanan dan minuman setempat. [ITS News, 2024](https://www.its.ac.id/news/kkn-abmas-its-ciptakan-webgis-untuk-mendukung-umkm/)
+
+### Cara NEARASA menjawabnya
+
+- **Pelanggan** bisa mencari berdasarkan lokasi dan anggaran, lalu mengecek menu, harga, ketersediaan, dan jam jualan pada pos yang ingin didatangi.
+- **Pemilik UMKM** mengelola profil dan harga menu per usaha serta mengatur lokasi, jadwal, dan ketersediaan menu per pos dari satu dasbor.
+
+Contohnya, pedagang bisa menjadwalkan pos pagi di depan sekolah dan pos sore di dekat taman. Pelanggan dapat melihat lokasi yang dijadwalkan buka dan mengecek ketersediaan menu di pos tersebut. Sidoarjo dan Surabaya menjadi cakupan awal prototipe. [Glosarium usaha dan pos](CONTEXT.md)
 
 ## Fitur yang bisa dicoba
 
