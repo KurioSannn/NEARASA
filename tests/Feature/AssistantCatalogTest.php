@@ -53,6 +53,19 @@ class AssistantCatalogTest extends CatalogTestCase
         Http::assertNothingSent();
     }
 
+    public function test_compound_question_about_function_and_team_is_answered_completely(): void
+    {
+        $response = $this->postJson('/asisten/rekomendasi', [
+            'prompt' => 'Web NEARASA ini tentang apa dan siapa yang membuatnya?',
+        ])->assertOk()->assertJsonCount(0, 'places')->assertJsonPath('source', 'catalog');
+
+        $reply = $response->json('reply');
+        $this->assertStringContainsString('Sidoarjo dan Surabaya', $reply);
+        $this->assertStringContainsString('Firzan Syaroni', $reply);
+        $this->assertStringContainsString('bismillah alhamdulillah', $reply);
+        $response->assertJsonPath('action.href', '/jelajah');
+    }
+
     public function test_gemini_interprets_search_but_catalog_checks_price_and_area(): void
     {
         config(['services.gemini.key' => 'test-key']);

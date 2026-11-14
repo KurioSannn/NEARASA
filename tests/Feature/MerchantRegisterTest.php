@@ -66,4 +66,29 @@ class MerchantRegisterTest extends TestCase
         $this->assertEquals('Jl. Merdeka No. 45, Sidoarjo', $post->address);
         $this->assertCount(7, $post->weeklySchedules);
     }
+
+    public function test_registration_keeps_only_the_selected_active_days(): void
+    {
+        $user = User::factory()->create();
+
+        $payload = [
+            'name' => 'Warung Jadwal Khusus',
+            'kind' => 'warung',
+            'business_category' => 'Jajanan',
+            'description' => 'Buka khusus Senin, Rabu, dan Jumat saja.',
+            'address' => 'Jl. Pahlawan No. 10, Waru',
+            'latitude' => -7.387,
+            'longitude' => 112.734,
+            'opens_at' => '08:00',
+            'closes_at' => '16:00',
+            'active_days' => [1, 3, 5],
+        ];
+
+        $response = $this->actingAs($user)->post('/kelola-usaha/daftar', $payload);
+        $response->assertRedirect('/kelola-usaha');
+
+        $business = Business::where('slug', 'warung-jadwal-khusus')->firstOrFail();
+        $post = $business->sellingPosts()->firstOrFail();
+        $this->assertSame([1, 3, 5], $post->weeklySchedules()->orderBy('weekday')->pluck('weekday')->all());
+    }
 }

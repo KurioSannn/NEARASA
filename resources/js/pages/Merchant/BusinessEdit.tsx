@@ -8,6 +8,7 @@ import { businessCover } from '@/types/business-images';
 import { managementUrl, type MerchantNavigation } from '@/types/merchant';
 import AboutSection from '@/components/merchant/AboutSection';
 import ContactSection from '@/components/merchant/ContactSection';
+import StatusSection from '@/components/merchant/StatusSection';
 import MediaSection from '@/components/merchant/MediaSection';
 import MenuSection from '@/components/merchant/MenuSection';
 import PostsSection from '@/components/merchant/PostsSection';
@@ -152,7 +153,7 @@ function BusinessWorkspace({ business, operations, merchantNavigation }: Props &
                 ) : (
                   <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-full">
                     <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-                    Draf
+                    {business.status === 'archived' ? 'Diarsipkan' : 'Draf'}
                   </span>
                 )}
               </div>
@@ -169,7 +170,7 @@ function BusinessWorkspace({ business, operations, merchantNavigation }: Props &
                 <span>Lihat Publik</span>
               </Link>
             ) : (
-              <span className="text-xs text-clay-700 font-medium">Draf · Belum tampil di pencarian</span>
+              <span className="text-xs text-clay-700 font-medium">Tidak tampil di pencarian</span>
             )}
           </div>
         </div>
@@ -242,7 +243,7 @@ function BusinessWorkspace({ business, operations, merchantNavigation }: Props &
           </section>
           <section role="tabpanel" id="owner-panel-profile" aria-labelledby="owner-tab-profile" hidden={active !== 'profile'}>
             <div className="flex items-center justify-center mx-auto sm:mx-0 gap-2 bg-white/95 p-1 rounded-full border border-sand-border shadow-sm w-fit mb-5">
-              {[['about', 'Tentang usaha'], ['contact', 'Kontak & tautan']].map(([key, label]) => (
+              {[['about', 'Tentang usaha'], ['contact', 'Kontak & tautan'], ['status', 'Status & Arsip']].map(([key, label]) => (
                 <button
                   key={key}
                   type="button"
@@ -255,7 +256,7 @@ function BusinessWorkspace({ business, operations, merchantNavigation }: Props &
                   }`}
                 >
                   <span>{label}</span>
-                  {(key === 'about' ? drafts.about : drafts.contact) && (
+                  {drafts[key] && (
                     <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
                   )}
                 </button>
@@ -266,6 +267,9 @@ function BusinessWorkspace({ business, operations, merchantNavigation }: Props &
             </div>
             <div hidden={profilePart !== 'contact'}>
               <ContactSection business={business} onDirty={reportDirty} />
+            </div>
+            <div hidden={profilePart !== 'status'}>
+              <StatusSection business={business} />
             </div>
           </section>
           <section role="tabpanel" id="owner-panel-media" aria-labelledby="owner-tab-media" hidden={active !== 'media'}>

@@ -70,6 +70,8 @@ class MerchantRegisterController extends Controller
             // Jam Operasional Rutin
             'opens_at' => ['required', 'date_format:H:i'],
             'closes_at' => ['required', 'date_format:H:i'],
+            'active_days' => ['nullable', 'array'],
+            'active_days.*' => ['integer', 'between:1,7'],
         ], [
             'name.required' => 'Nama usaha kuliner wajib diisi.',
             'kind.required' => 'Pilih bentuk tempat jualan usahamu.',
@@ -77,6 +79,7 @@ class MerchantRegisterController extends Controller
             'address.required' => 'Alamat lokasi jualan pertama wajib diisi.',
             'opens_at.required' => 'Jam buka wajib diisi.',
             'closes_at.required' => 'Jam tutup wajib diisi.',
+            'active_days.*.between' => 'Hari operasional harus antara Senin (1) hingga Minggu (7).',
             'whatsapp.regex' => 'Nomor WhatsApp harus nomor ponsel Indonesia yang valid (contoh: 081234567890).',
             'photo.max' => 'Ukuran foto maksimal 2 MB.',
             'photo.mimes' => 'Pilih foto berformat JPG, PNG, atau WebP.',
@@ -135,8 +138,13 @@ class MerchantRegisterController extends Controller
                 'operating_status' => 'operating',
             ]);
 
-            // 6. Buat Jadwal Rutin 7 Hari
-            foreach (range(1, 7) as $day) {
+            // 6. Buat Jadwal Rutin sesuai hari aktif yang dipilih
+            $activeDays = ! empty($data['active_days'])
+                ? array_values(array_unique(array_map('intval', $data['active_days'])))
+                : range(1, 7);
+            sort($activeDays);
+
+            foreach ($activeDays as $day) {
                 $post->weeklySchedules()->create([
                     'weekday' => $day,
                     'opens_at' => $data['opens_at'],

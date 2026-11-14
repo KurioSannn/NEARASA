@@ -34,6 +34,7 @@ export default function LocationPicker({ location, areas, tileUrl, onClose }: { 
       <p className="dialog-intro">Pilih titik untuk mencari makanan di sekitarmu.</p>
       <div className="location-grid"><div className="location-controls">
         <button type="button" className="gps-button" onClick={locate} disabled={locating}><LocateFixed size={21} aria-hidden="true" /><span>{locating ? 'Mencari lokasi…' : 'Gunakan lokasi saya'}</span></button>
+        <p className="location-privacy-tip" style={{ fontSize: '12px', color: 'var(--muted)', marginTop: '6px', lineHeight: '1.4' }}>NEARASA hanya menggunakan koordinat untuk menghitung perkiraan jarak kuliner terdekat dari posisimu.</p>
         {gpsError && <div className="gps-feedback" role="alert"><AlertCircle size={20} aria-hidden="true" /><p>{gpsError}</p></div>}
         <h3>Atau pilih area</h3><div className="area-list">{areas.map(area => <button key={area.label} type="button" aria-pressed={form.data.label === area.label} onClick={() => { cancelLocate(); form.setData(draft(area)); }}><MapPin size={18} aria-hidden="true" /><span>{area.label}</span><span className="radio-dot" /></button>)}</div>
         <label className="field-label" htmlFor="location-label">Nama titik pencarian</label><input className="text-input" id="location-label" value={form.data.label} maxLength={120} required onChange={event => { cancelLocate(); form.setData('label', event.target.value); }} />

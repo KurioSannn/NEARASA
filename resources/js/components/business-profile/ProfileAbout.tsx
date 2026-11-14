@@ -72,7 +72,7 @@ export default function ProfileAbout({ business, post }: { business: Business; p
               <div className="dossier-row">
                 <dt>Status Operasional</dt>
                 <dd>
-                  {business.opened_on ? `Berjalan sejak ${dateLabel(business.opened_on)}` : 'Aktif terverifikasi di NEARASA'}
+                  {business.opened_on ? `Berjalan sejak ${dateLabel(business.opened_on)}` : 'Terdaftar aktif di NEARASA'}
                 </dd>
               </div>
             </dl>

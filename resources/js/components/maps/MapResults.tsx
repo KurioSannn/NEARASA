@@ -23,6 +23,7 @@ type ResultsProps = {
   onLocation: () => void;
   filters?: Filters;
   onFilter?: () => void;
+  isNavigating?: boolean;
 };
 
 function formatHours(business: BusinessCardData): string {
@@ -43,6 +44,7 @@ export function MapResults({
   onSelect,
   filters = defaultFilters,
   onFilter,
+  isNavigating = false,
 }: ResultsProps) {
   const [expanded, setExpanded] = useState(false);
 
@@ -70,8 +72,14 @@ export function MapResults({
         </button>
       </header>
 
-      <div id="map-result-content" className="map-result-content">
-        {pins.length ? (
+      <div id="map-result-content" className={`map-result-content ${isNavigating ? 'opacity-60 transition-opacity duration-200' : ''}`}>
+        {isNavigating && !pins.length ? (
+          <div className="p-4 flex flex-col gap-3 animate-pulse" aria-hidden="true">
+            <div className="h-16 bg-[#eadcd2] rounded-xl" />
+            <div className="h-16 bg-[#eadcd2] rounded-xl" />
+            <div className="h-16 bg-[#eadcd2] rounded-xl" />
+          </div>
+        ) : pins.length ? (
           <ul className="map-result-list">
             {pins.map(pin => {
               const isSelected = selectedId === pin.post.id;

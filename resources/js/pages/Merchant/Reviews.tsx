@@ -1,5 +1,6 @@
 import { Head, Link, router } from '@inertiajs/react';
 import MerchantLayout from '@/layouts/MerchantLayout';
+import BusinessFilter from '@/components/merchant/BusinessFilter';
 import { merchantDate } from '@/components/merchant/DailyOperations';
 import type { MerchantNavigation } from '@/types/merchant';
 
@@ -39,20 +40,13 @@ export default function Reviews({ merchantNavigation, businessId, reviews }: Pro
           </div>
         </header>
         <section className="owner-panel owner-reports-panel" aria-label="Daftar ulasan pelanggan">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 mb-4 border-b border-sand-border">
-            <label className="flex items-center gap-3 text-xs font-bold text-clay-700">
-              <span>Filter Usaha:</span>
-              <select className="rounded-xl border border-sand-border bg-white px-3 py-1.5 text-xs font-semibold text-clay-800 focus:border-terracotta focus:ring-2 focus:ring-terracotta/20 outline-none" value={businessId ?? ''} onChange={event => {
-                const business = event.currentTarget.value;
-                router.get('/kelola-usaha/ulasan', business ? { business } : {});
-              }}>
-                <option value="">Semua usaha ({merchantNavigation.businesses.length})</option>
-                {merchantNavigation.businesses.map(business => (
-                  <option key={business.id} value={business.id}>{business.name}</option>
-                ))}
-              </select>
-            </label>
-            <span className="text-xs font-bold text-clay-600 bg-sand-base/60 px-3 py-1 rounded-full border border-sand-border w-fit">{reviews.total} ulasan masuk</span>
+          <div className="owner-review-toolbar">
+            <BusinessFilter
+              businesses={merchantNavigation.businesses}
+              value={businessId}
+              onChange={business => router.get('/kelola-usaha/ulasan', business ? { business } : {}, { preserveScroll: true })}
+            />
+            <span className="owner-status neutral">{reviews.total} ulasan masuk</span>
           </div>
           {reviews.data.length > 0 ? (
             <ul className="owner-report-list">

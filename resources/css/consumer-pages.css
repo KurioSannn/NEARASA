@@ -25,6 +25,19 @@
   border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow: 0 16px 40px rgba(110, 36, 18, 0.16), 0 2px 6px rgba(110, 36, 18, 0.08);
 }
+.home-hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: var(--culinary-pattern);
+  background-size: cover;
+  background-position: center;
+  opacity: 0.08;
+  mix-blend-mode: overlay;
+  border-radius: inherit;
+}
 .home-hero::before {
   content: '';
   position: absolute;
@@ -606,7 +619,6 @@
 .home-merchant-callout p { margin-top:6px; font-size:14px; color:var(--muted); line-height:1.6; }
 .home-merchant-callout>.button { position:relative; z-index:1; flex:none; }
 .home-merchant-callout>img { width:160px; height:104px; border-radius:12px; margin-left:5px; object-fit:cover; }
-.home-shell .site-footer { width:calc(100% - 48px); max-width:1440px; margin:0 auto; padding:24px 36px 30px; }
 .collection-shell .app-main { max-width:1440px; padding:30px 40px 50px; }
 .consumer-collection-page {
   max-width: 980px;
@@ -1367,11 +1379,12 @@
   align-items: center;
   justify-content: center;
   gap: 6px;
-  height: 38px;
-  padding: 0 16px;
+  min-height: 44px;
+  padding: 8px 16px;
   border-radius: 10px;
   font-size: 12.5px;
   font-weight: 650;
+  text-align: center;
   text-decoration: none;
   transition: all .15s ease;
 }
@@ -1392,20 +1405,6 @@
 .hub-btn.secondary:hover {
   background: var(--soft);
   border-color: var(--accent);
-  color: var(--accent);
-  text-decoration: none;
-}
-.hub-link-secondary {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 11.5px;
-  font-weight: 600;
-  color: var(--muted);
-  text-decoration: none;
-  transition: color .15s ease;
-}
-.hub-link-secondary:hover {
   color: var(--accent);
   text-decoration: none;
 }
@@ -1486,7 +1485,6 @@
 .consumer-confirm-actions { display:flex; align-items:center; justify-content:flex-end; gap:12px; margin-top:25px; }
 .discovery-shell .button.consumer-danger { background:#ad3144; border-color:#ad3144; color:white; }
 html:has(.consumer-auth),body:has(.consumer-auth) { background:var(--paper); }
-body:has(.consumer-auth) #nprogress { display:none; }
 /* Auth Shell: Authentic Culinary Warmth & Modern Split Screen */
 .consumer-auth {
   display: grid;
@@ -1844,8 +1842,7 @@ body:has(.consumer-auth) #nprogress { display:none; }
 }
 @media (max-width:767px) {
   .home-shell .desktop-header { display:none; }
-  .home-shell .app-main { width:100%; padding:0; }
-  .home-shell .site-footer { width:calc(100% - 32px); padding:24px 16px calc(100px + env(safe-area-inset-bottom, 0px)); }
+  .home-shell .app-main { width:100%; padding:0 0 28px; }
   .home-overview {
     background:
       radial-gradient(circle at 85% 80%, rgba(255, 195, 138, 0.25) 0%, transparent 60%),
@@ -1905,7 +1902,7 @@ body:has(.consumer-auth) #nprogress { display:none; }
   .home-merchant-callout p { font-size:12.5px; line-height:1.55; }
   .home-merchant-callout>.button { grid-column:1; width:fit-content; font-size:13px; padding:9px 13px; gap:7px; }
   .home-merchant-callout>img { grid-column:2; grid-row:1/3; width:90px; height:120px; margin:0; border-radius:10px; }
-  .collection-shell .app-main { padding:16px 16px calc(100px + env(safe-area-inset-bottom, 0px)); }
+  .collection-shell .app-main { padding:16px 16px 28px; }
   .collection-back { font-size:13px; min-height:44px; }
   .collection-page-heading { margin:14px 0 20px; }
   .collection-page-heading h1 { font-size:26px; letter-spacing:-.7px; }

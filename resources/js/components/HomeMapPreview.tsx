@@ -40,6 +40,7 @@ export default function HomeMapPreview({ businesses, location, tileUrl }: HomeMa
           center: [defaultLat, defaultLng],
           zoom: 13,
           zoomControl: false,
+          zoomAnimation: false,
           scrollWheelZoom: false,
           doubleClickZoom: false,
           touchZoom: false,

@@ -24,6 +24,12 @@ class MerchantWorkspaceTest extends CatalogTestCase
             'user_id' => User::factory()->create()->id, 'note' => 'Catatan pelanggan uji', 'resolved_at' => $resolved ? now() : null]);
     }
 
+    public function test_empty_merchant_user_accessing_dashboard_is_redirected_to_registration(): void
+    {
+        $empty = User::factory()->create();
+        $this->actingAs($empty)->get('/kelola-usaha')->assertRedirect('/kelola-usaha/daftar');
+    }
+
     public function test_new_workspace_entry_and_reports_require_login(): void
     {
         $this->get('/kelola-usaha/pengaturan')->assertRedirect('/masuk');

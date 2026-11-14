@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react';
 import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
 import {
   ArrowLeft,
-  ArrowUpRight,
   Camera,
   CheckCircle2,
   Eye,
@@ -12,6 +11,7 @@ import {
   Lock,
   LogOut,
   Mail,
+  Plus,
   ShieldCheck,
   Store,
   Trash2,
@@ -354,7 +354,7 @@ export default function Account({
                 </div>
                 <div className="email-credential-badge">
                   <CheckCircle2 size={13} aria-hidden="true" />
-                  <span>Terverifikasi</span>
+                  <span>Terdaftar</span>
                 </div>
               </div>
 
@@ -508,14 +508,14 @@ export default function Account({
                         <Link href="/kelola-usaha" className="hub-btn primary">
                           <span>Buka Dasbor Usaha</span>
                         </Link>
-                        <Link href="/kelola-usaha/daftar" className="hub-link-secondary">
-                          <span>+ Tambah Usaha Lain</span>
-                          <ArrowUpRight size={13} aria-hidden="true" />
+                        <Link href="/kelola-usaha/daftar" className="hub-btn secondary">
+                          <Plus size={15} aria-hidden="true" />
+                          <span>Tambah Usaha Lain</span>
                         </Link>
                         {publicProfileAvailable && user && (
-                          <Link href={`/pemilik/${user.id}`} className="hub-link-secondary">
+                          <Link href={`/pemilik/${user.id}`} className="hub-btn secondary">
+                            <Eye size={15} aria-hidden="true" />
                             <span>Lihat Profil Usaha Publik</span>
-                            <ArrowUpRight size={13} aria-hidden="true" />
                           </Link>
                         )}
                       </>

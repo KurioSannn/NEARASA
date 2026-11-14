@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
-import { ArrowLeft, ArrowRight, Check, CheckCircle2, Clock, HelpCircle, MapPin, Store, Upload, Utensils } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Calendar, Check, CheckCircle2, Clock, HelpCircle, MapPin, Store, Upload, Utensils } from 'lucide-react';
 import type { SharedProps } from '@/types/catalog';
 
 type AreaOption = {
@@ -48,6 +48,7 @@ export default function RegisterBusiness({ options, kindOptions }: Props) {
 
   const [currentStep, setCurrentStep] = useState(1);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [isConfirmed, setIsConfirmed] = useState(false);
 
   const form = useForm({
     // Step 1: Informasi Pemilik
@@ -132,12 +133,23 @@ export default function RegisterBusiness({ options, kindOptions }: Props) {
       form.clearErrors('name', 'description', 'address');
       setCurrentStep(3);
     } else if (currentStep === 3) {
+      if (!form.data.active_days || form.data.active_days.length === 0) {
+        form.setError('opens_at', 'Pilih minimal satu hari buka operasional.');
+        return;
+      }
+      form.clearErrors('opens_at');
       setCurrentStep(4);
     }
   };
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
+    if (currentStep !== 4) {
+      handleNextStep();
+      return;
+    }
+    if (!isConfirmed) return;
+    if (form.processing) return;
     form.post('/kelola-usaha/daftar', {
       forceFormData: true,
       preserveScroll: true,
@@ -148,7 +160,7 @@ export default function RegisterBusiness({ options, kindOptions }: Props) {
     { num: 1, title: 'Informasi Pribadi & Pemilik', desc: 'Nama & kontak pemilik' },
     { num: 2, title: 'Detail Usaha & Gerai', desc: 'Warung, menu & kategori' },
     { num: 3, title: 'Jadwal & Operasional', desc: 'Hari & jam buka' },
-    { num: 4, title: 'Ringkasan & Konfirmasi', desc: 'Verifikasi tim Nearasa' },
+    { num: 4, title: 'Ringkasan & Konfirmasi', desc: 'Periksa data & terbitkan gerai' },
   ];
 
   return (
@@ -310,7 +322,18 @@ export default function RegisterBusiness({ options, kindOptions }: Props) {
 
             {/* BEGIN: RightFormColumn */}
             <section className="lg:col-span-8 p-6 sm:p-8 lg:p-10 flex flex-col justify-between bg-white">
-              <form onSubmit={handleSubmit} className="flex-1 flex flex-col justify-between">
+              <form
+                onSubmit={handleSubmit}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && (e.target as HTMLElement).tagName === 'INPUT') {
+                    e.preventDefault();
+                    if (currentStep < 4) {
+                      handleNextStep();
+                    }
+                  }
+                }}
+                className="flex-1 flex flex-col justify-between"
+              >
                 <div>
                   {/* STEP 1: INFORMASI PRIBADI & PEMILIK */}
                   {currentStep === 1 && (
@@ -851,6 +874,22 @@ export default function RegisterBusiness({ options, kindOptions }: Props) {
                               <Clock className="w-3.5 h-3.5 text-terracotta shrink-0" />
                               <span>Buka pukul {form.data.opens_at} - {form.data.closes_at} WIB</span>
                             </p>
+                            <p className="text-clay-600 text-xs flex items-center gap-1.5">
+                              <Calendar className="w-3.5 h-3.5 text-terracotta shrink-0" />
+                              <span>
+                                <strong>Hari:</strong>{' '}
+                                {form.data.active_days.length === 7
+                                  ? 'Setiap hari (Senin - Minggu)'
+                                  : form.data.active_days.length === 0
+                                  ? 'Belum ada hari yang dipilih'
+                                  : form.data.active_days
+                                      .slice()
+                                      .sort((a, b) => a - b)
+                                      .map((d) => daysList.find((dayItem) => dayItem.day === d)?.label)
+                                      .filter(Boolean)
+                                      .join(', ')}
+                              </span>
+                            </p>
                           </div>
 
                           {/* Card 3: Data Pemilik */}
@@ -860,13 +899,31 @@ export default function RegisterBusiness({ options, kindOptions }: Props) {
                             <p className="text-clay-600 text-[11px]">{form.data.owner_email} · +62 {form.data.owner_phone}</p>
                           </div>
 
-                          {/* Terms Check */}
-                          <div className="p-4 bg-[#fbf6f3] border border-[#ebdcd3] rounded-2xl flex items-start gap-3">
-                            <CheckCircle2 className="w-5 h-5 text-[#B74B28] shrink-0 mt-0.5" />
-                            <p className="text-xs text-clay-700 leading-relaxed font-medium">
-                              Dengan mendaftar, Anda menyatakan bahwa informasi usaha dan gerai kuliner di atas adalah benar dan siap dikelola di direktori NEARASA.
-                            </p>
-                          </div>
+                          {/* Interactive Confirmation Checkbox (FR-02) */}
+                          <label
+                            htmlFor="confirm-registration"
+                            className={`p-4 rounded-2xl flex items-start gap-3.5 cursor-pointer transition select-none border-2 ${
+                              isConfirmed
+                                ? 'bg-[#fdeee9] border-[#B74B28] text-[#8D3215]'
+                                : 'bg-[#fbf6f3] border-[#ebdcd3] hover:border-[#cbb3a3]'
+                            }`}
+                          >
+                            <input
+                              type="checkbox"
+                              id="confirm-registration"
+                              checked={isConfirmed}
+                              onChange={(e) => setIsConfirmed(e.target.checked)}
+                              className="w-5 h-5 mt-0.5 rounded text-[#B74B28] focus:ring-[#B74B28] accent-[#B74B28] cursor-pointer shrink-0"
+                            />
+                            <div className="flex-1">
+                              <span className="text-xs font-bold text-clay-900 block mb-0.5">
+                                Konfirmasi & Persetujuan Pendaftaran
+                              </span>
+                              <span className="text-xs text-clay-700 leading-relaxed font-medium block">
+                                Saya telah memeriksa dan memastikan seluruh ringkasan data usaha di atas sudah benar dan siap diterbitkan di direktori NEARASA.
+                              </span>
+                            </div>
+                          </label>
                         </div>
                       </div>
                     </div>
@@ -883,7 +940,7 @@ export default function RegisterBusiness({ options, kindOptions }: Props) {
                         className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full border border-sand-border hover:bg-clay-50 text-clay-700 text-xs font-bold transition cursor-pointer"
                       >
                         <ArrowLeft className="w-3.5 h-3.5" />
-                        <span>Kembali</span>
+                        <span>{currentStep === 4 ? 'Kembali & Edit' : 'Kembali'}</span>
                       </button>
                     )}
                     <span className="text-xs text-clay-600 font-medium ml-1">
@@ -893,6 +950,7 @@ export default function RegisterBusiness({ options, kindOptions }: Props) {
 
                   {currentStep < 4 ? (
                     <button
+                      key="btn-step-next"
                       type="button"
                       onClick={handleNextStep}
                       className="inline-flex items-center justify-center gap-2 px-7 py-3 bg-[#B74B28] hover:bg-[#9c3c1e] text-white font-bold text-xs rounded-full shadow-lg shadow-[#B74B28]/25 hover:shadow-[#9c3c1e]/35 transition-all duration-200 cursor-pointer"
@@ -908,16 +966,21 @@ export default function RegisterBusiness({ options, kindOptions }: Props) {
                     </button>
                   ) : (
                     <button
+                      key="btn-step-submit"
                       type="submit"
-                      disabled={form.processing}
-                      className="inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-[#B74B28] hover:bg-[#9c3c1e] text-white font-extrabold text-xs rounded-full shadow-lg shadow-[#B74B28]/25 hover:shadow-[#9c3c1e]/35 transition-all duration-200 cursor-pointer disabled:opacity-50"
+                      disabled={!isConfirmed || form.processing}
+                      className={`inline-flex items-center justify-center gap-2 px-8 py-3.5 text-white font-extrabold text-xs rounded-full shadow-lg transition-all duration-200 ${
+                        isConfirmed && !form.processing
+                          ? 'bg-[#B74B28] hover:bg-[#9c3c1e] shadow-[#B74B28]/25 hover:shadow-[#9c3c1e]/35 cursor-pointer'
+                          : 'bg-clay-300 shadow-none cursor-not-allowed opacity-50'
+                      }`}
                     >
                       {form.processing ? (
                         <span>Mendaftarkan Usaha...</span>
                       ) : (
                         <>
                           <Store className="w-4 h-4 text-white" />
-                          <span>Kirim Pendaftaran & Buka Dasbor</span>
+                          <span>Setujui & Daftarkan Gerai</span>
                         </>
                       )}
                     </button>

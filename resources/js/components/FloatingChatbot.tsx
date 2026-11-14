@@ -126,7 +126,8 @@ export default function FloatingChatbot() {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const initLX = 20;
-      const initLY = Math.max(12, window.innerHeight - 85);
+      const bottomOffset = window.matchMedia('(max-width: 767px)').matches ? 128 : 85;
+      const initLY = Math.max(12, window.innerHeight - bottomOffset);
       setLauncherPos({ x: initLX, y: initLY });
       setCardPos(computeInitialCardPos(initLX, initLY));
     }

@@ -49,7 +49,7 @@ export default function DiscoveryMap({ pins, location, radius, tileUrl, selected
     import('leaflet').then(L => {
       if (disposed || !container.current) return;
       leaflet.current = L;
-      const instance = L.map(container.current, { zoomControl: false, scrollWheelZoom: false, zoomAnimation: !matchMedia('(prefers-reduced-motion: reduce)').matches }).setView([-7.365, 112.72], 12);
+      const instance = L.map(container.current, { zoomControl: false, scrollWheelZoom: false, zoomAnimation: false }).setView([-7.365, 112.72], 12);
       map.current = instance;
       L.control.zoom({ position: 'bottomright', zoomInTitle: 'Perbesar peta', zoomOutTitle: 'Perkecil peta' }).addTo(instance);
       const tileLayer = L.tileLayer(tileUrl, { maxZoom: 19, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' });
@@ -65,7 +65,8 @@ export default function DiscoveryMap({ pins, location, radius, tileUrl, selected
     }).catch(() => { if (!disposed) { retryBusy.current = false; setFailed(true); setTileStatus('error'); } });
     return () => {
       disposed = true; cancelAnimationFrame(frame); unwatch?.(); clearTimeout(toastTimer.current);
-      map.current?.remove(); map.current = null; layers.current = null; tiles.current = null;
+      map.current?.remove();
+      map.current = null; layers.current = null; tiles.current = null;
     };
   }, [tileUrl, importVersion]);
 

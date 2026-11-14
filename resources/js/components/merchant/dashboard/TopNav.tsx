@@ -46,18 +46,19 @@ export default function TopNav({ merchantNavigation, searchQuery = '', onSearchC
 
         {/* Utility & Profile Area */}
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-          {/* Quick Search (Desktop / Tablet) */}
-          <div className="relative hidden sm:block">
-            <Search className="w-4 h-4 text-clay-400 absolute left-3.5 top-1/2 -translate-y-1/2" aria-hidden="true" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => onSearchChange?.(e.target.value)}
-              disabled={!onSearchChange}
-              className="pl-9 pr-4 py-2 bg-white/90 text-xs rounded-full border border-sand-border focus:border-terracotta focus:ring-0 w-44 lg:w-56 text-clay-800 font-medium placeholder-clay-400 shadow-sm transition-all outline-none"
-              placeholder="Cari usaha, pos..."
-            />
-          </div>
+          {/* Quick Search (Desktop / Tablet) - Only rendered when search handler is provided (FR-16) */}
+          {onSearchChange && (
+            <div className="relative hidden sm:block">
+              <Search className="w-4 h-4 text-clay-400 absolute left-3.5 top-1/2 -translate-y-1/2" aria-hidden="true" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => onSearchChange(e.target.value)}
+                className="pl-9 pr-4 py-2 bg-white/90 text-xs rounded-full border border-sand-border focus:border-terracotta focus:ring-0 w-44 lg:w-56 text-clay-800 font-medium placeholder-clay-400 shadow-sm transition-all outline-none"
+                placeholder="Cari usaha, pos..."
+              />
+            </div>
+          )}
 
           {/* Notification Bell */}
           <Link

@@ -79,7 +79,7 @@ export default function ProfileReviews({ business, post, reviews, owner }: { bus
                 />
               ))}
             </div>
-            <span className="review-count-text">Berdasarkan {rating?.count} ulasan terverifikasi</span>
+            <span className="review-count-text">Berdasarkan {rating?.count} ulasan pelanggan</span>
           </div>
         </div>
       )}

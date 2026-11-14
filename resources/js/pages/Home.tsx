@@ -21,7 +21,7 @@ type HomeProps = CatalogProps & {
 export default function Home({ businesses, filters, options, location, recommendations = [], awardHighlight }: HomeProps) {
   const [filterOpen, setFilterOpen] = useState(false);
   const { openLocation } = useUi();
-  const { mapTiles } = usePage<SharedProps>().props;
+  const { mapTiles, auth } = usePage<SharedProps>().props;
   const choices = groupBusinessLocations(businesses).slice(0, 3).map(group => group[0]);
   const personal = groupBusinessLocations(recommendations).slice(0, 4).map(group => group[0]);
 

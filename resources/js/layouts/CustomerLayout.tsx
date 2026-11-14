@@ -13,7 +13,6 @@ export const useUi = () => useContext(UiContext);
 export default function CustomerLayout({ children }: { children: ReactNode }) {
   const { props, url } = usePage<SharedProps>();
   const home = url.split('?')[0] === '/';
-  const isMap = url.split('?')[0] === '/peta';
   const collection = /^\/(akun|favorit|riwayat|pemilik)(?:[/?]|$)/.test(url);
   const [locationOpen, setLocationOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -30,7 +29,7 @@ export default function CustomerLayout({ children }: { children: ReactNode }) {
     else router.post('/favorit/' + slug, {}, options);
   };
   return <UiContext.Provider value={{ openLocation: () => setLocationOpen(true), openAccount, toggleFavorite, isNavigating: loading }}>
-    <div className={'customer-layout discovery-shell' + (home ? ' home-shell' : '') + (collection ? ' collection-shell' : '') + (isMap ? ' map-shell' : '')}>
+    <div className={'customer-layout discovery-shell' + (home ? ' home-shell' : '') + (collection ? ' collection-shell' : '')}>
       <a className="skip-link" href="#main">Langsung ke isi</a>
       <DesktopHeader discovery />
       <main id="main" className="app-main" tabIndex={-1} aria-busy={loading}>{children}</main>

@@ -28,6 +28,7 @@ export default function LocationMap({ latitude, longitude, tileUrl, onSelect }: 
       const isMobile = window.matchMedia('(max-width: 767px)').matches;
       const map = L.map(container.current, {
         scrollWheelZoom: false,
+        zoomAnimation: false,
         dragging: isPicker || !isMobile,
         touchZoom: isPicker,
       }).setView([point.latitude, point.longitude], 15);
@@ -43,7 +44,11 @@ export default function LocationMap({ latitude, longitude, tileUrl, onSelect }: 
       marker.on('dragend', () => { const point = marker.getLatLng(); update(point.lat, point.lng); });
       frame = requestAnimationFrame(() => { if (!disposed) map.invalidateSize(); });
     }).catch(() => { if (!disposed) setStatus('error'); });
-    return () => { disposed = true; cancelAnimationFrame(frame); unwatch?.(); mapRef.current?.remove(); mapRef.current = null; markerRef.current = null; };
+    return () => {
+      disposed = true; cancelAnimationFrame(frame); unwatch?.();
+      mapRef.current?.remove();
+      mapRef.current = null; markerRef.current = null;
+    };
   }, [tileUrl]);
   useEffect(() => { markerRef.current?.setLatLng([latitude, longitude]); mapRef.current?.setView([latitude, longitude]); }, [latitude, longitude]);
   const covered = !hasTiles && status !== 'ready';

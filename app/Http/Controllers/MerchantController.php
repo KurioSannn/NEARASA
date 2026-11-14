@@ -25,6 +25,10 @@ class MerchantController extends Controller
     {
         $businesses = $request->user()->businesses()->withCount(['menuItems', 'sellingPosts'])->with(['menuItems.availabilityOverrides', 'sellingPosts.weeklySchedules', 'sellingPosts.scheduleExceptions'])->orderBy('name')->get();
 
+        if ($businesses->isEmpty() && ! $request->has('dashboard')) {
+            return redirect()->route('merchant.register');
+        }
+
         return Inertia::render('Merchant/Dashboard', [
             'businesses' => $this->businessOptions($businesses),
             'operations' => $this->operations($businesses, includeMenus: false), 'statistics' => app(InteractionTracker::class)->statistics($request->user()),
@@ -234,5 +238,21 @@ class MerchantController extends Controller
         }
 
         return back(303)->with('success', 'Profil usaha berhasil disimpan.');
+    }
+
+    public function archive(Request $request, Business $business)
+    {
+        abort_unless($business->owner_id === $request->user()->id, 403);
+        $business->update(['status' => 'archived']);
+
+        return redirect()->route('merchant.edit', $business->slug)->with('success', "Usaha {$business->name} berhasil diarsipkan dan dinonaktifkan dari katalog publik.");
+    }
+
+    public function restore(Request $request, Business $business)
+    {
+        abort_unless($business->owner_id === $request->user()->id, 403);
+        $business->update(['status' => 'published']);
+
+        return redirect()->route('merchant.edit', $business->slug)->with('success', "Usaha {$business->name} berhasil diaktifkan kembali di katalog publik.");
     }
 }

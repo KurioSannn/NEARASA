@@ -10,7 +10,7 @@ import { catalogUrl, type MapCatalogProps } from '@/types/catalog';
 
 export default function MapExplore({ pins, focus, filters, options, location, mapTiles, selectedPostId }: MapCatalogProps) {
   const { url } = usePage();
-  const { openLocation } = useUi();
+  const { openLocation, isNavigating } = useUi();
   const [filterOpen, setFilterOpen] = useState(false);
   const [selection, setSelection] = useState<{ url: string; id: number | null; source: 'marker' | 'list' | 'profile' }>({ url, id: selectedPostId, source: 'profile' });
   const mapPins = useMemo(() => focus ? [...pins, focus] : pins, [pins, focus]);
@@ -55,6 +55,7 @@ export default function MapExplore({ pins, focus, filters, options, location, ma
             onLocation={openLocation}
             filters={filters}
             onFilter={() => setFilterOpen(true)}
+            isNavigating={isNavigating}
           />
 
           <section className="map-stage" aria-label="Kanvas peta interaktif">

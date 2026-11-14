@@ -14,7 +14,7 @@ export type PostReviews = { post_id: number; rating: Rating; items: Review[]; ow
 export type BusinessCardData = { id: number; slug: string; name: string; kind: string; business_category?: string | null; photo: string; is_demo: boolean; menus: MenuItem[]; min_price: number; is_open: boolean; distance: number | null; post: SellingPost; all_sold_out?: boolean; matched_menu?: MenuItem | null; rating?: Rating };
 export type Business = Partial<ProfileInfo> & { id: number; slug: string; name: string; description: string; kind: string; photo: string; is_demo: boolean; whatsapp: string | null; menus: MenuItem[]; posts: SellingPost[] };
 export type Options = { groups: string[]; categories: string[]; areas: Location[] };
-export type AccountUser = { id: number; name: string; email: string; is_demo: boolean; public_name?: string | null; avatar?: string | null };
+export type AccountUser = { id: number; name: string; email: string; is_demo: boolean; public_name?: string | null; avatar?: string | null; has_business?: boolean };
 export interface SharedProps extends Record<string, unknown> { location: Location | null; options: Options; errors: Record<string, string>; mapTiles: string; auth: { user: AccountUser | null; favorites: number[] }; flash: { success: string | null } }
 export type CatalogProps = SharedProps & { businesses: BusinessCardData[]; filters: Filters; recommendations?: BusinessCardData[] };
 export type MapCatalogProps = SharedProps & { pins: BusinessCardData[]; focus: BusinessCardData | null; filters: Filters; selectedPostId: number | null };

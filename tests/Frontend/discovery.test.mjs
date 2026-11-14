@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { EventEmitter } from 'node:events';
 import { watchTiles } from '../../resources/js/components/maps/tile-status.ts';
 import { addBusinessMarkers } from '../../resources/js/components/maps/marker-layers.ts';
+import { parseSearchIntent } from '../../resources/js/components/search-intent.ts';
 import { businessCover } from '../../resources/js/types/business-images.ts';
 
 test('an unavailable map can recover after retry without losing tile progress', () => {
@@ -104,4 +105,15 @@ test('nearby business pins keep their coordinates and render tooltip labels as t
     ['small', ' · <em>Nasi</em> (15rb)'],
   ]);
   assert.equal(markers[1].tooltip.children.length, 1);
+});
+
+test('discovery search extracts Indonesian budget amounts and preserves the food keyword', () => {
+  assert.deepEqual(parseSearchIntent(' ayam   di bawah Rp20.000 '), { q: 'ayam', maxPrice: 20000, chooseBudget: false });
+  assert.deepEqual(parseSearchIntent('kopi maksimal Rp20 ribu'), { q: 'kopi', maxPrice: 20000, chooseBudget: false });
+  assert.deepEqual(parseSearchIntent('bakso 17,5rb'), { q: 'bakso', maxPrice: 17500, chooseBudget: false });
+});
+
+test('discovery search asks for a budget when murah has no explicit amount', () => {
+  assert.deepEqual(parseSearchIntent('ayam murah'), { q: 'ayam', maxPrice: null, chooseBudget: true });
+  assert.deepEqual(parseSearchIntent('makan murah dekat sini'), { q: '', maxPrice: null, chooseBudget: true });
 });

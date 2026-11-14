@@ -64,6 +64,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/kelola-usaha/daftar', [MerchantRegisterController::class, 'store'])->name('merchant.register.store');
     Route::get('/kelola-usaha/{business:slug}', [MerchantController::class, 'edit'])->name('merchant.edit');
     Route::patch('/kelola-usaha/{business:slug}', [MerchantController::class, 'update'])->name('merchant.update');
+    Route::post('/kelola-usaha/{business:slug}/arsip', [MerchantController::class, 'archive'])->name('merchant.archive');
+    Route::post('/kelola-usaha/{business:slug}/pulihkan', [MerchantController::class, 'restore'])->name('merchant.restore');
     Route::post('/kelola-usaha/{business:slug}/menu', [MerchantMenuController::class, 'store']);
     Route::patch('/kelola-usaha/{business:slug}/menu/{menu}', [MerchantMenuController::class, 'update']);
     Route::delete('/kelola-usaha/{business:slug}/menu/{menu}', [MerchantMenuController::class, 'destroy']);

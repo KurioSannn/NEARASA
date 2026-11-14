@@ -1,11 +1,49 @@
-/* Discovery rollout: Authentic Local Culinary Warmth */
 .discovery-shell {
   --paper:#fff8f0; --surface:#fffdfa; --ink:#3b2b26; --muted:#77645b; --accent:#b74a2b; --accent-dark:#91381f;
   --tint:#f1d4bb; --line:#e9dcd0; --soft:#f5ece3; --green:#2e6930;
+  display:flex; flex-direction:column;
   min-height:100dvh; color:var(--ink); background:var(--paper);
+  position: relative;
+  isolation: isolate;
+  --culinary-pattern: url('/images/brand/nearasa-culinary-pattern.webp');
+  --culinary-pattern-opacity: .55;
+  --culinary-pattern-size: cover;
 }
-body:has(.discovery-shell) #nprogress { display:none; }
-html:has(.discovery-shell),body:has(.discovery-shell) { background:#fff8f0; }
+
+/* Keep the home pattern at the top of the page and let it fade into the footer. */
+.discovery-shell::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: min(100%, 100svh);
+  z-index: 0;
+  pointer-events: none;
+  background-image: var(--culinary-pattern);
+  background-repeat: no-repeat;
+  background-position: center top;
+  background-size: var(--culinary-pattern-size);
+  opacity: var(--culinary-pattern-opacity);
+  mix-blend-mode: multiply;
+  mask-image: linear-gradient(to bottom, #000 50%, transparent);
+}
+
+.discovery-shell :is(.app-main, .site-footer) {
+  position: relative;
+  z-index: 1;
+}
+
+@media (max-width: 1024px) {
+  .discovery-shell { --culinary-pattern-size:1400px auto; }
+}
+
+@media (max-width: 768px) {
+  .discovery-shell { --culinary-pattern-size:1100px auto; }
+}
+
+@media (max-width: 480px) {
+  .discovery-shell { --culinary-pattern-size:840px auto; }
+}
+
 /* Floating Rounded Capsule Header (Opsi B: Wide Island Pill Style ala MindFuel) */
 .discovery-shell .desktop-header {
   position: sticky;
@@ -313,7 +351,7 @@ html:has(.discovery-shell),body:has(.discovery-shell) { background:#fff8f0; }
   background: var(--accent);
   color: white;
 }
-.discovery-shell .app-main { max-width:1440px; padding:34px 40px 52px; margin:0 auto; width:100%; }
+.discovery-shell .app-main { flex:1; min-height:0; max-width:1440px; padding:34px 40px 52px; margin:0 auto; width:100%; }
 .discovery-shell .button { background:var(--accent); border-color:var(--accent); color:white; min-height:44px; font-size:14px; font-weight:600; border-radius:10px; gap:8px; box-shadow:0 3px 10px rgba(183,74,43,0.14); }
 .discovery-shell .button:hover { background:var(--accent-dark); }
 .discovery-shell .button-outline { color:var(--accent); background:white; border-color:#d49b88; box-shadow:none; }
@@ -454,7 +492,8 @@ html:has(.discovery-shell),body:has(.discovery-shell) { background:#fff8f0; }
 .catalog-results-count { font-size: 13.5px; color: var(--muted); font-weight: 550; }
 .catalog-results-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .active-filter-pill { display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 12px; border-radius: 20px; background: #fdeee9; color: var(--accent); border: 1px solid rgba(183, 74, 43, 0.2); font-size: 12.5px; font-weight: 650; }
-.active-filter-pill button { background: transparent; border: 0; color: var(--accent); cursor: pointer; display: grid; place-items: center; padding: 2px; border-radius: 50%; }
+.active-filter-pill button { background: transparent; border: 0; color: var(--accent); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; min-width: 32px; min-height: 32px; padding: 4px; margin-right: -6px; margin-left: 2px; border-radius: 50%; position: relative; }
+.active-filter-pill button::after { content: ''; position: absolute; inset: -6px; }
 .active-filter-pill button:hover { background: rgba(183, 74, 43, 0.15); }
 .catalog-filter-btn { display: inline-flex; align-items: center; gap: 7px; height: 38px; padding: 0 16px; border-radius: 20px; background: #ffffff; border: 1px solid var(--line); color: var(--ink); font-size: 13px; font-weight: 600; cursor: pointer; transition: all .15s ease; box-shadow: 0 1px 3px rgba(59, 43, 38, 0.04); }
 .catalog-filter-btn:hover { background: var(--soft); border-color: var(--accent); color: var(--accent); }
@@ -1520,9 +1559,9 @@ html:has(.discovery-shell),body:has(.discovery-shell) { background:#fff8f0; }
 
 /* Footer */
 .discovery-shell .site-footer {
-  margin:40px auto 0;
-  max-width:1440px;
-  padding:32px 40px;
+  width:min(calc(100% - 80px), 1360px);
+  margin:0 auto;
+  padding:24px 0 32px;
   border-top:1px solid var(--line);
   display:flex;
   align-items:center;
@@ -1547,6 +1586,7 @@ html:has(.discovery-shell),body:has(.discovery-shell) { background:#fff8f0; }
 /* Responsive */
 @media (max-width: 1024px) {
   .discovery-shell .app-main { padding: 24px 20px 40px; }
+  .discovery-shell .site-footer { width:calc(100% - 40px); }
   .discovery-shell .desktop-header { padding: 0 20px; }
   .discovery-shell .header-inner { padding: 0; }
   .discovery-result-card { gap: 16px; }
@@ -1576,7 +1616,7 @@ html:has(.discovery-shell),body:has(.discovery-shell) { background:#fff8f0; }
 
 @media (max-width: 767px) {
   .discovery-shell .desktop-header { display: none; }
-  .discovery-shell .app-main { padding: 18px 16px calc(96px + env(safe-area-inset-bottom, 0px)); }
+  .discovery-shell .app-main { padding:18px 16px 28px; }
 
   /* Compact 2-column mobile business cards: Refrensi 1 adaptations */
   .discovery-shell .business-card.ref-card-a {
@@ -1793,9 +1833,17 @@ html:has(.discovery-shell),body:has(.discovery-shell) { background:#fff8f0; }
     align-items: flex-start;
   }
   .discovery-shell .site-footer {
-    margin: 20px 16px calc(100px + env(safe-area-inset-bottom, 0px));
-    padding: 20px 0;
+    width:calc(100% - 32px);
+    display:grid;
+    grid-template-columns:auto minmax(0, 1fr);
+    justify-content:start;
+    column-gap:12px;
+    row-gap:4px;
+    padding:16px 0 calc(136px + env(safe-area-inset-bottom, 0px));
   }
+  .discovery-shell .footer-brand { grid-row:span 2; margin:0; }
+  .discovery-shell .site-footer p { margin:0; max-width:none; text-align:left; }
+  .discovery-shell .site-footer > span { width:auto; margin:0; }
 
   /* Location Modal Responsiveness in Discovery Shell */
   .discovery-shell .dialog-wide {

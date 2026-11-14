@@ -28,6 +28,7 @@ export default function BusinessWatchlist({ businesses, totalPosts }: {
             topBusinesses.map((biz, index) => {
               const postCount = biz.selling_posts_count ?? 1;
               const menuCount = biz.menu_items_count ?? 0;
+              const status = biz.status === 'published' ? 'Aktif publik' : biz.status === 'archived' ? 'Diarsipkan' : 'Draf';
               // Alternate background styling like in reference (Dark Clay, Terracotta-100, Minimal Clay-50)
               if (index === 0) {
                 return (
@@ -51,7 +52,7 @@ export default function BusinessWatchlist({ businesses, totalPosts }: {
                     </div>
                     <div className="text-right shrink-0">
                       <span className="text-xs font-bold !text-terracotta-200 text-terracotta-200 block">{postCount} Pos</span>
-                      <span className="text-[10px] !text-white/80 text-clay-200 capitalize">{biz.status}</span>
+                      <span className="text-[10px] !text-white/80 text-clay-200 capitalize">{status}</span>
                     </div>
                   </Link>
                 );
@@ -79,7 +80,7 @@ export default function BusinessWatchlist({ businesses, totalPosts }: {
                     </div>
                     <div className="text-right shrink-0">
                       <span className="text-xs font-extrabold text-terracotta-700 block">{postCount} Pos</span>
-                      <span className="text-[10px] text-clay-700 font-semibold capitalize">{biz.status}</span>
+                      <span className="text-[10px] text-clay-700 font-semibold capitalize">{status}</span>
                     </div>
                   </Link>
                 );
@@ -106,7 +107,7 @@ export default function BusinessWatchlist({ businesses, totalPosts }: {
                   </div>
                   <div className="text-right shrink-0">
                     <span className="text-xs font-bold text-emerald-700 block">{postCount} Pos</span>
-                    <span className="text-[10px] text-clay-700 font-semibold capitalize">{biz.status}</span>
+                    <span className="text-[10px] text-clay-700 font-semibold capitalize">{status}</span>
                   </div>
                 </Link>
               );

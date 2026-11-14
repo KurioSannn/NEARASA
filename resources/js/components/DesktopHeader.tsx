@@ -163,7 +163,7 @@ export default function DesktopHeader({ discovery = false }: { discovery?: boole
 
                 <div className="dropdown-nav-items">
                   <Link
-                    href="/kelola-usaha"
+                    href={user.has_business ? "/kelola-usaha" : "/kelola-usaha/daftar"}
                     className="dropdown-item"
                     role="menuitem"
                     onClick={() => setDropdownOpen(false)}
@@ -172,8 +172,8 @@ export default function DesktopHeader({ discovery = false }: { discovery?: boole
                       <Store size={16} aria-hidden="true" />
                     </span>
                     <div className="dropdown-item-copy">
-                      <strong>Kelola Usaha</strong>
-                      <small>Dasbor operasional & pos</small>
+                      <strong>{user.has_business ? 'Kelola Usaha' : 'Daftar Mitra'}</strong>
+                      <small>{user.has_business ? 'Dasbor operasional & pos' : 'Daftarkan gerai kuliner'}</small>
                     </div>
                   </Link>
 

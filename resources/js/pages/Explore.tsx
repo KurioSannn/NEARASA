@@ -32,8 +32,19 @@ export default function Explore({ businesses, filters, options }: CatalogProps) 
         <span className="consumer-sr-only" role="status">
           {isNavigating ? 'Memperbarui hasil pencarian. Hasil sebelumnya tetap terlihat.' : ''}
         </span>
-        {businesses.length ? (
-          <div className="business-grid">
+        {isNavigating && !businesses.length ? (
+          <div className="business-grid skeleton-grid" aria-hidden="true">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="business-card skeleton-card animate-pulse bg-white/70 rounded-2xl p-4 border border-[#e8dcd2]">
+                <div className="h-44 bg-[#eadcd2] rounded-xl mb-3" />
+                <div className="h-5 bg-[#eadcd2] rounded w-3/4 mb-2" />
+                <div className="h-4 bg-[#f2e7de] rounded w-1/2 mb-3" />
+                <div className="h-4 bg-[#f2e7de] rounded w-full mb-1" />
+              </div>
+            ))}
+          </div>
+        ) : businesses.length ? (
+          <div className={`business-grid ${isNavigating ? 'opacity-60 transition-opacity duration-200' : ''}`}>
             {businesses.map(business => (
               <BusinessCard key={cardKey(business)} business={business} />
             ))}
