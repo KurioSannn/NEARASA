@@ -46,7 +46,7 @@ Contohnya, pedagang bisa menjadwalkan pos pagi di depan sekolah dan pos sore di 
 
 Jarak dihitung sebagai **garis lurus** dari titik pencarian ke pos. Setelah memilih titik, radius bawaan adalah 5 km dan tersedia pilihan **Tanpa batas**. Titik pencarian tersimpan di sesi. Filter seperti kata kunci, harga, dan radius dapat dibagikan melalui URL, misalnya `/jelajah?q=ayam&max_price=25000`. [Daftar rute](routes/web.php)
 
-Katalog awal berisi usaha dan menu fiktif. Jam buka mengikuti jadwal dan perubahan yang dicatat pemilik. Dashboard menghitung buka profil, buka menu, klik peta, dan klik WhatsApp. Rekomendasi menggunakan kategori yang berkaitan dengan aktivitas dan favorit akun. Awards memakai kejadian sintetis untuk menunjukkan cara penghitungan peringkat. [Katalog demo](database/seeders/CatalogSeeder.php) · [Data Awards](database/seeders/AwardsDemoSeeder.php) · [Logika rekomendasi](app/Services/InteractionTracker.php)
+Katalog demo memuat usaha fiktif dan contoh lokasi kuliner nyata di Sidoarjo dan Surabaya yang diambil dari OpenStreetMap melalui Overpass API. Menu, harga, jadwal, dan ulasan pada entri demo dipakai untuk ilustrasi dan belum diverifikasi kepada pemilik usaha. Jam buka mengikuti jadwal dan perubahan yang dicatat pemilik. Dashboard menghitung buka profil, buka menu, klik peta, dan klik WhatsApp. Rekomendasi menggunakan kategori yang berkaitan dengan aktivitas dan favorit akun. Awards memakai kejadian sintetis untuk menunjukkan cara penghitungan peringkat. [Katalog demo](database/seeders/CatalogSeeder.php) · [Data Awards](database/seeders/AwardsDemoSeeder.php) · [Logika rekomendasi](app/Services/InteractionTracker.php)
 
 ## Teknologi dan arsitektur
 
@@ -66,6 +66,61 @@ flowchart LR
 
 Perubahan menu, jam, atau stok disimpan lewat Laravel. Halaman publik membaca perubahan tersebut dari database saat data halaman dimuat. Pos terpilih menentukan jadwal, ketersediaan, dan ulasan yang ditampilkan.
 
+## Dokumentasi backend
+
+### Endpoint utama
+
+Rute halaman menggunakan Laravel dan Inertia. Aksi yang mengubah data memakai sesi dan proteksi CSRF Laravel. Akses pengelolaan usaha dibatasi ke pemiliknya.
+
+| Metode | Endpoint | Akses | Fungsi |
+| --- | --- | --- | --- |
+| GET | `/jelajah`, `/peta` | Publik | Cari usaha atau menu dan tampilkan hasil per pos. Filter mencakup kata kunci, harga, kategori, dan radius. |
+| GET | `/usaha/{business:slug}` | Publik | Lihat profil usaha dan detail pos. Parameter `post` memilih pos yang ditampilkan. |
+| GET | `/awards` | Publik | Tampilkan peringkat simulasi menurut periode dan wilayah. |
+| POST / DELETE | `/lokasi` | Sesi pengunjung | Simpan atau hapus titik pencarian dari sesi. |
+| POST | `/asisten/rekomendasi` | Publik | Terima `prompt` dan kembalikan JSON berisi jawaban, daftar tempat, aksi opsional, serta sumber jawaban. |
+| POST | `/masuk` | Publik | Autentikasi akun menggunakan email dan kata sandi. |
+| POST / DELETE | `/favorit/{business:slug}` | Akun masuk | Simpan atau hapus usaha dari favorit. |
+| POST | `/usaha/{business:slug}/pos/{post}/ulasan` | Akun masuk | Simpan penilaian untuk pos terpilih. |
+| POST | `/kelola-usaha/daftar` | Akun masuk | Buat usaha baru, pos pertama, dan jadwal rutin. |
+| GET | `/kelola-usaha`, `/kelola-usaha/ulasan` | Pemilik | Lihat dashboard dan ulasan pelanggan untuk usaha milik akun. |
+| PATCH | `/kelola-usaha/{business:slug}/menu/{menu}` | Pemilik | Perbarui informasi menu dan harga. |
+| PATCH | `/kelola-usaha/{business:slug}/pos/{post}/menu/{menu}/ketersediaan` | Pemilik | Ubah ketersediaan menu pada satu pos. |
+| POST / DELETE | `/kelola-usaha/{business:slug}/pos/{post}/jam-hari-ini` | Pemilik | Atur jam khusus hari ini atau kembali ke jadwal rutin. |
+
+Lihat [definisi rute](routes/web.php) atau jalankan `php artisan route:list --except-vendor` untuk daftar lengkap. Variabel lingkungan tersedia di [.env.example](.env.example) dan bagian [Konfigurasi](#konfigurasi).
+
+### Skema database inti
+
+```mermaid
+erDiagram
+    users |o--o{ businesses : memiliki
+    businesses ||--o{ menu_items : menyediakan
+    businesses ||--o{ selling_posts : mempunyai
+    selling_posts ||--o{ weekly_schedules : menjadwalkan
+    selling_posts ||--o{ schedule_exceptions : memiliki
+    menu_items ||--o{ menu_item_post_availability : memakai
+    selling_posts ||--o{ menu_item_post_availability : memakai
+    users ||--o{ post_reviews : menulis
+    businesses ||--o{ post_reviews : menerima
+    selling_posts ||--o{ post_reviews : menerima
+    users ||--o{ business_user : menyimpan
+    businesses ||--o{ business_user : difavoritkan
+```
+
+| Tabel | Kolom penghubung dan data utama |
+| --- | --- |
+| `users`, `businesses` | `businesses.owner_id` merujuk ke `users.id`. Profil usaha menyimpan nama, slug, kategori usaha, dan status publikasi. |
+| `menu_items`, `selling_posts` | Keduanya memiliki `business_id`. Menu menyimpan nama, kategori, dan harga. Pos menyimpan alamat, koordinat, dan perubahan jam hari ini. |
+| `weekly_schedules`, `schedule_exceptions` | Keduanya memiliki `selling_post_id`. Jadwal rutin mengikuti hari, sedangkan pengecualian mengikuti tanggal. |
+| `menu_item_post_availability` | Pasangan `menu_item_id` dan `selling_post_id` menjadi kunci gabungan untuk status habis per pos. |
+| `post_reviews` | Menghubungkan `user_id`, `business_id`, dan `selling_post_id` dengan bintang, komentar, dan foto opsional. |
+| `business_user` | Menghubungkan `user_id` dan `business_id` untuk favorit. |
+| `business_photos`, `business_updates` | Foto dan kabar merujuk ke usaha melalui `business_id`. |
+| `interaction_events`, `award_demo_events` | Keduanya menyimpan referensi usaha dan pos. Interaksi aplikasi dan kejadian sintetis untuk Awards dicatat pada tabel masing-masing. |
+
+Definisi kolom, kunci, dan indeks lengkap ada di [migrasi database](database/migrations).
+
 ## Struktur proyek
 
 ```text
@@ -82,9 +137,15 @@ nearasa/
 └── tests/               Tes backend dan frontend
 ```
 
+### Struktur frontend
+
+- [Halaman Inertia](resources/js/pages) memuat layar konsumen. Halaman ruang pemilik berada di [pages/Merchant](resources/js/pages/Merchant).
+- [Layout](resources/js/layouts) menyediakan navigasi dan kerangka halaman konsumen serta ruang pemilik. [Komponen UI](resources/js/components) dipakai ulang untuk kartu, peta, profil usaha, dan editor UMKM.
+- [CSS](resources/css) memuat gaya umum dan gaya per fitur. [Aset publik](public/images) memuat logo, ilustrasi, dan foto katalog demo.
+
 ## Menjalankan dari checkout baru
 
-Siapkan **PHP 8.4.1 atau lebih baru pada seri 8.x** dengan ekstensi Laravel dan `pdo_sqlite`, **Composer**, serta **Node.js 22.13 atau lebih baru**. Gunakan akun GitHub yang punya akses ke repo dan jalankan perintah dari direktori yang berisi `artisan`.
+Siapkan **PHP 8.4.1 atau lebih baru pada seri 8.x** dengan ekstensi Laravel dan `pdo_sqlite`, **Composer**, serta **Node.js 22.13 atau lebih baru**. Repositori bisa dikloning tanpa login. Setelah masuk ke folder `NEARASA`, jalankan perintah berikutnya dari folder yang berisi `artisan`.
 
 ```sh
 git clone https://github.com/KurioSannn/NEARASA.git
@@ -126,20 +187,30 @@ Salin konfigurasi awal dari [.env.example](.env.example). Gunakan `.env` di ling
 2. Pilih titik pencarian, lalu sesuaikan radius. Bandingkan hasil daftar dengan pos yang muncul di **Peta**.
 3. Buka salah satu usaha dan ganti pos yang dipilih. Periksa jam, ulasan, dan ketersediaan menu untuk pos tersebut.
 
-### Mengelola usaha sebagai pemilik UMKM
+### Akun demo dan akses juri
 
-1. Pada lingkungan lokal, set `APP_ENV=local` dan `NEARASA_DEMO_AUTH=true` di `.env`.
-2. Jalankan `php artisan db:seed --class=DemoAccountSeeder` setelah seeder katalog.
-3. Pilih **Coba akun UMKM** di halaman masuk untuk membuka dashboard pemilik Dapur Griya dan Pizza Sore. [Buka halaman masuk](http://127.0.0.1:8787/masuk)
-4. Di **Kelola usaha**, pilih **Dapur Griya** dan salah satu pos. Pada tab **Operasional**, tandai satu menu habis.
-5. Pilih **Lihat publik** dan cek menu di pos yang sama. Bandingkan dengan pos lain untuk melihat ketersediaan masing-masing. Gunakan **Pos & jadwal** atau **Menu & harga** untuk pengaturan berikutnya.
+Pada instalasi lokal baru, `php artisan migrate --seed` menyiapkan dua akun untuk menguji peran berbeda. Gunakan formulir [Masuk di localhost](http://127.0.0.1:8787/masuk).
 
-Jika tombol demo belum tampil, periksa `APP_ENV`, `NEARASA_DEMO_AUTH`, dan hasil seeder. Jika Laravel menampilkan `could not find driver`, aktifkan `pdo_sqlite` pada PHP yang dipakai terminal. Jika manifest Vite belum tersedia, jalankan `npm ci` dan `npm run build`.
+| Peran | Email lokal | Kata sandi lokal | Yang bisa diuji |
+| --- | --- | --- | --- |
+| Konsumen | `user@nearasa.test` | `password` | Cari kuliner, simpan favorit, lihat riwayat, dan tulis ulasan. Akun mulai tanpa usaha dan bisa membuka pendaftaran mitra. |
+| Pemilik UMKM | `pemilik@nearasa.test` | `password` | Buka dasbor, pilih usaha dan pos, lalu kelola menu, ketersediaan, dan jam jualan. |
 
-### Awards dan demo online
+Akun pemilik sudah terhubung ke dua usaha contoh.
 
-- Isi data Awards dengan `php artisan db:seed --class=AwardsDemoSeeder`, lalu buka **Awards** dan pilih wilayah serta periode.
-- Untuk akun demo online, administrator menyiapkan katalog khusus demo dan membuat akun pemilik lewat perintah Artisan yang meminta sandi melalui terminal. Juri masuk melalui formulir email dan sandi. [Menyiapkan demo online](dokumentasi/deployment-demo.md)
+| Usaha | Gerai atau pos yang bisa dipilih |
+| --- | --- |
+| Dapur Griya | Pos pagi Griya dan Pos sore Gedangan |
+| Pizza Sore | Gerai Gedangan |
+
+Untuk mendemokan perbedaan stok per pos, masuk sebagai pemilik dan buka **Kelola usaha → Dapur Griya → Operasional**. Pilih **Pos sore Gedangan** dan tandai satu menu habis. Buka **Lihat publik**, pilih pos yang sama, lalu bandingkan dengan **Pos pagi Griya**. Pulihkan status menu setelah demo. Keluar dari akun atau pakai jendela privat untuk mencoba peran konsumen.
+
+Tabel di atas memakai akun bawaan dari [seeder lokal](database/seeders/UserAccountSeeder.php). Untuk [demo online di Render](https://nearasa.onrender.com/masuk), gunakan kredensial akun demo yang dibagikan tim melalui jalur penilaian. Tim menyiapkan dan menguji akses pemilik serta konsumen pada database demo online sesuai [panduan deployment](dokumentasi/deployment-demo.md).
+
+### Awards dan video demo
+
+- Buka **Awards**, lalu pilih wilayah dan periode. Instalasi lokal baru sudah mengisi contoh peringkat. Untuk database demo yang belum memilikinya, jalankan `php artisan db:seed --class=AwardsDemoSeeder`.
+- Lihat [video demo produk](https://youtu.be/ck1943eoYe0).
 
 ## Pengujian
 
@@ -169,9 +240,10 @@ Jalankan pengujian pada checkout yang dipakai untuk demo dan catat hash commit y
 
 | Sumber | Bagian yang menggunakan |
 | --- | --- |
-| OpenAI Codex | Bantuan perancangan, implementasi, pengujian, dan dokumentasi prototipe. |
+| OpenAI Codex dan Google Antigravity | Bantuan pengembangan, pengujian, dan dokumentasi prototipe. |
+| Google Gemini | Opsional pada asisten pencarian untuk memahami maksud pertanyaan. Katalog NEARASA menyediakan hasil pencarian. |
 | OpenAI Imagegen | [Ilustrasi kuliner Beranda dan Masuk](public/images/brand/SOURCES.md) serta [ilustrasi sampul usaha fiktif](public/images/demo/places/SOURCES.md). |
 | Unsplash | [Foto ilustrasi makanan katalog](public/images/demo/SOURCES.md). |
 | Laravel, Inertia, React, Vite, Tailwind CSS, Leaflet, dan Lucide | Struktur awal dan dependensi aplikasi tercatat di [composer.json](composer.json) serta [package.json](package.json), dengan versi terkunci pada lockfile. |
-| OpenStreetMap | Peta dasar yang dimuat di browser. [Atribusi kontributor](https://www.openstreetmap.org/copyright) · [Kebijakan tile](https://operations.osmfoundation.org/policies/tiles/) |
-| Data demo NEARASA | Usaha, lokasi contoh, menu, dan jadwal untuk demonstrasi. [CatalogSeeder](database/seeders/CatalogSeeder.php) |
+| OpenStreetMap | Peta dasar di browser dan [sumber sebagian titik kuliner demo](database/seeders/data/scraped_places.php) melalui Overpass API. [Atribusi kontributor](https://www.openstreetmap.org/copyright) · [Kebijakan tile](https://operations.osmfoundation.org/policies/tiles/) |
+| Data demo NEARASA | [Usaha fiktif dan menu contoh](database/seeders/CatalogSeeder.php), [ulasan dan interaksi simulasi](database/seeders/DemoEngagementSeeder.php), serta [kejadian sintetis Awards](database/seeders/AwardsDemoSeeder.php). |
