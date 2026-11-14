@@ -39,37 +39,37 @@ export default function Reviews({ merchantNavigation, businessId, reviews }: Pro
           </div>
         </header>
         <section className="owner-panel owner-reports-panel" aria-label="Daftar ulasan pelanggan">
-          <div className="owner-reports-controls">
-            <label className="flex items-center gap-3">
-              <span>Usaha</span>
-              <select className="rounded-xl border border-sand-border bg-white p-2" value={businessId ?? ''} onChange={event => {
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 mb-4 border-b border-sand-border">
+            <label className="flex items-center gap-3 text-xs font-bold text-clay-700">
+              <span>Filter Usaha:</span>
+              <select className="rounded-xl border border-sand-border bg-white px-3 py-1.5 text-xs font-semibold text-clay-800 focus:border-terracotta focus:ring-2 focus:ring-terracotta/20 outline-none" value={businessId ?? ''} onChange={event => {
                 const business = event.currentTarget.value;
                 router.get('/kelola-usaha/ulasan', business ? { business } : {});
               }}>
-                <option value="">Semua usaha</option>
+                <option value="">Semua usaha ({merchantNavigation.businesses.length})</option>
                 {merchantNavigation.businesses.map(business => (
                   <option key={business.id} value={business.id}>{business.name}</option>
                 ))}
               </select>
             </label>
-            <span>{reviews.total} ulasan</span>
+            <span className="text-xs font-bold text-clay-600 bg-sand-base/60 px-3 py-1 rounded-full border border-sand-border w-fit">{reviews.total} ulasan masuk</span>
           </div>
           {reviews.data.length > 0 ? (
             <ul className="owner-report-list">
               {reviews.data.map(review => (
-                <li key={review.id} className="owner-report p-4">
-                  <div className="flex flex-wrap items-start justify-between gap-2">
-                    <div>
-                      <h2 className="font-bold">{review.author}</h2>
-                      <p>{review.business_name} · {review.post_name}</p>
+                <li key={review.id} className="p-4 sm:p-5 rounded-2xl bg-clay-50/50 border border-sand-border mb-3 last:mb-0">
+                  <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2">
+                    <div className="min-w-0 flex-1">
+                      <h2 className="font-extrabold text-sm text-clay-900 leading-snug">{review.author}</h2>
+                      <p className="text-xs text-clay-600 mt-0.5">{review.business_name} · <span className="font-semibold text-clay-800">{review.post_name}</span></p>
                     </div>
-                    <div className="text-right">
-                      <p className="font-bold text-terracotta">{review.rating}/5 bintang</p>
-                      <time className="owner-caption" dateTime={review.created_at}>{merchantDate(review.created_at)}</time>
+                    <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-start gap-1 shrink-0">
+                      <span className="font-bold text-xs text-terracotta bg-terracotta-50 border border-terracotta-200 px-2 py-0.5 rounded-full">{review.rating}/5 bintang</span>
+                      <time className="text-[11px] text-clay-400 font-medium" dateTime={review.created_at}>{merchantDate(review.created_at)}</time>
                     </div>
                   </div>
-                  {review.comment && <p className="mt-2 whitespace-pre-wrap break-words">{review.comment}</p>}
-                  {review.photo && <img className="mt-3 max-h-48 max-w-full rounded-xl object-contain" src={review.photo} alt="Foto dari pelanggan" loading="lazy" />}
+                  {review.comment && <p className="mt-2.5 text-xs text-clay-800 leading-relaxed whitespace-pre-wrap break-words">{review.comment}</p>}
+                  {review.photo && <img className="mt-3 max-h-48 max-w-full rounded-xl object-contain border border-sand-border shadow-2xs" src={review.photo} alt="Foto dari pelanggan" loading="lazy" />}
                 </li>
               ))}
             </ul>

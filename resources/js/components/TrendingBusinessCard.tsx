@@ -84,7 +84,7 @@ export default function TrendingBusinessCard({
             className="trending-photo-img"
           />
           <span className={`trending-photo-status ${business.is_open ? 'is-open' : 'is-closed'}`}>
-            {business.is_open ? 'Buka terjadwal' : 'Di luar jadwal'}
+            {business.is_open ? 'Buka' : 'Tutup'}
           </span>
         </Link>
       </div>

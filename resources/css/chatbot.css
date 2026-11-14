@@ -675,8 +675,14 @@
 /* Mobile Responsive */
 @media (max-width: 480px) {
   .nearasa-chatbot-card {
-    width: calc(100vw - 20px);
-    height: 500px;
+    left: 10px !important;
+    right: 10px !important;
+    width: calc(100vw - 20px) !important;
+    max-width: calc(100vw - 20px) !important;
+    height: min(520px, calc(100dvh - 85px));
+    max-height: calc(100dvh - 75px);
     border-radius: 22px;
+    bottom: max(12px, env(safe-area-inset-bottom)) !important;
+    top: auto !important;
   }
 }

@@ -158,20 +158,59 @@ export default function RegisterBusiness({ options, kindOptions }: Props) {
         <main className="w-full max-w-6xl bg-white rounded-3xl shadow-[0_25px_60px_-15px_rgba(141,50,21,0.08),0_10px_25px_-10px_rgba(0,0,0,0.04)] border border-[#f0e7e1] overflow-hidden transition-all duration-300">
           <div className="grid grid-cols-1 lg:grid-cols-12 min-h-[760px]">
             {/* BEGIN: LeftStepperColumn */}
-            <aside className="lg:col-span-4 bg-[#fbf6f3]/80 p-6 sm:p-8 lg:p-10 border-b lg:border-b-0 lg:border-r border-[#ebdcd3] flex flex-col justify-between">
+            <aside className="lg:col-span-4 bg-[#fbf6f3]/80 p-4 sm:p-6 lg:p-10 border-b lg:border-b-0 lg:border-r border-[#ebdcd3] flex flex-col justify-between">
               <div>
                 {/* Brand Logo and Wordmark */}
-                <div className="flex items-center gap-3 mb-8">
-                  <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#8D3215] to-[#B74B28] flex items-center justify-center text-white shadow-md shadow-[#B74B28]/20">
-                    <Store className="w-5 h-5 text-white" />
+                <div className="flex items-center justify-between mb-4 lg:mb-8">
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 lg:w-10 lg:h-10 rounded-2xl bg-gradient-to-tr from-[#8D3215] to-[#B74B28] flex items-center justify-center text-white shadow-md shadow-[#B74B28]/20">
+                      <Store className="w-4 h-4 lg:w-5 lg:h-5 text-white" />
+                    </div>
+                    <span className="text-xl lg:text-2xl font-extrabold tracking-tight text-[#8D3215]">
+                      NEARASA
+                    </span>
                   </div>
-                  <span className="text-2xl font-extrabold tracking-tight text-[#8D3215]">
-                    NEARASA
-                  </span>
+                  <Link href="/kelola-usaha" className="lg:hidden text-xs font-bold text-[#B74B28] hover:underline flex items-center gap-1">
+                    <span>Batal</span>
+                  </Link>
                 </div>
 
-                {/* Section Heading */}
-                <div className="mb-8">
+                {/* Mobile Compact Progress Stepper (< lg) */}
+                <div className="lg:hidden mb-2">
+                  <div className="flex items-center justify-between gap-2 mb-2">
+                    <span className="text-xs font-bold text-[#8D3215] uppercase tracking-wider">
+                      Langkah {currentStep} dari {stepsConfig.length}
+                    </span>
+                    <span className="text-xs font-bold text-clay-900 truncate max-w-[200px]">
+                      {stepsConfig[currentStep - 1]?.title}
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-4 gap-1.5">
+                    {stepsConfig.map((step) => {
+                      const isActive = currentStep === step.num;
+                      const isCompleted = currentStep > step.num;
+                      return (
+                        <button
+                          key={step.num}
+                          type="button"
+                          onClick={() => { if (isCompleted) setCurrentStep(step.num); }}
+                          disabled={!isCompleted}
+                          aria-label={`Langkah ${step.num}: ${step.title}`}
+                          className={`h-2 rounded-full transition-all ${
+                            isCompleted
+                              ? 'bg-[#B74B28] cursor-pointer'
+                              : isActive
+                              ? 'bg-[#B74B28] ring-2 ring-[#B74B28]/30'
+                              : 'bg-[#e7d8ce] cursor-not-allowed'
+                          }`}
+                        />
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Desktop Section Heading (>= lg) */}
+                <div className="hidden lg:block mb-8">
                   <h1 className="text-2xl font-extrabold text-clay-900 tracking-tight">
                     Daftar Mitra & Akun
                   </h1>
@@ -180,8 +219,8 @@ export default function RegisterBusiness({ options, kindOptions }: Props) {
                   </p>
                 </div>
 
-                {/* Vertical Stepper Progress Navigation */}
-                <nav aria-label="Progress Stepper" className="relative pl-1">
+                {/* Desktop Vertical Stepper Progress Navigation (>= lg) */}
+                <nav aria-label="Progress Stepper" className="hidden lg:block relative pl-1">
                   <ol className="space-y-6 relative">
                     {stepsConfig.map((step, idx) => {
                       const isActive = currentStep === step.num;
@@ -253,7 +292,7 @@ export default function RegisterBusiness({ options, kindOptions }: Props) {
               </div>
 
               {/* Helper and Support Info */}
-              <div className="mt-8 pt-5 border-t border-[#ebdcd3]">
+              <div className="hidden lg:block mt-8 pt-5 border-t border-[#ebdcd3]">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full bg-white border border-sand-border flex items-center justify-center text-terracotta shrink-0 shadow-2xs">
                     <HelpCircle className="w-4 h-4" />

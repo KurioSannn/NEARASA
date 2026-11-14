@@ -106,16 +106,17 @@ export default function FloatingChatbot() {
   const bodyEndRef = useRef<HTMLDivElement>(null);
 
   const computeInitialCardPos = (lx: number, ly: number) => {
-    const cardW = 360;
-    const cardH = 540;
-    const cx = Math.max(12, Math.min(window.innerWidth - cardW - 12, lx));
+    const cardW = Math.min(360, window.innerWidth - 24);
+    const cardH = Math.min(540, window.innerHeight - 24);
+    const maxX = Math.max(12, window.innerWidth - cardW - 12);
+    const cx = Math.max(12, Math.min(maxX, lx));
     let cy: number;
     if (ly > window.innerHeight / 2) {
       // Launcher in bottom half -> open card above launcher
       cy = Math.max(12, ly - cardH - 12);
     } else {
       // Launcher in top half -> open card below launcher
-      cy = Math.min(window.innerHeight - cardH - 12, ly + 52 + 12);
+      cy = Math.min(Math.max(12, window.innerHeight - cardH - 12), ly + 52 + 12);
       if (cy < 12) cy = 12;
     }
     return { x: cx, y: cy };
@@ -138,9 +139,13 @@ export default function FloatingChatbot() {
         x: Math.max(12, Math.min(window.innerWidth - 64, prev.x)),
         y: Math.max(12, Math.min(window.innerHeight - 64, prev.y)),
       }));
+      const cardW = Math.min(360, window.innerWidth - 24);
+      const cardH = Math.min(540, window.innerHeight - 24);
+      const maxX = Math.max(12, window.innerWidth - cardW - 12);
+      const maxY = Math.max(12, window.innerHeight - cardH - 12);
       setCardPos(prev => ({
-        x: Math.max(12, Math.min(window.innerWidth - 372, prev.x)),
-        y: Math.max(12, Math.min(window.innerHeight - 552, prev.y)),
+        x: Math.max(12, Math.min(maxX, prev.x)),
+        y: Math.max(12, Math.min(maxY, prev.y)),
       }));
     };
     window.addEventListener('resize', handleResize);
@@ -182,10 +187,12 @@ export default function FloatingChatbot() {
         setLauncherPos({ x: newLX, y: newLY });
 
         // If card is currently open, move card in sync:
-        const cardW = 360;
-        const cardH = 540;
-        const newCX = Math.max(12, Math.min(window.innerWidth - cardW - 12, launcherDragInfo.current.origCardX + dx));
-        const newCY = Math.max(12, Math.min(window.innerHeight - cardH - 12, launcherDragInfo.current.origCardY + dy));
+        const cardW = Math.min(360, window.innerWidth - 24);
+        const cardH = Math.min(540, window.innerHeight - 24);
+        const maxX = Math.max(12, window.innerWidth - cardW - 12);
+        const maxY = Math.max(12, window.innerHeight - cardH - 12);
+        const newCX = Math.max(12, Math.min(maxX, launcherDragInfo.current.origCardX + dx));
+        const newCY = Math.max(12, Math.min(maxY, launcherDragInfo.current.origCardY + dy));
         setCardPos({ x: newCX, y: newCY });
       }
     };
@@ -229,10 +236,12 @@ export default function FloatingChatbot() {
         const newLY = Math.max(12, Math.min(window.innerHeight - 64, launcherDragInfo.current.origLauncherY + dy));
         setLauncherPos({ x: newLX, y: newLY });
 
-        const cardW = 360;
-        const cardH = 540;
-        const newCX = Math.max(12, Math.min(window.innerWidth - cardW - 12, launcherDragInfo.current.origCardX + dx));
-        const newCY = Math.max(12, Math.min(window.innerHeight - cardH - 12, launcherDragInfo.current.origCardY + dy));
+        const cardW = Math.min(360, window.innerWidth - 24);
+        const cardH = Math.min(540, window.innerHeight - 24);
+        const maxX = Math.max(12, window.innerWidth - cardW - 12);
+        const maxY = Math.max(12, window.innerHeight - cardH - 12);
+        const newCX = Math.max(12, Math.min(maxX, launcherDragInfo.current.origCardX + dx));
+        const newCY = Math.max(12, Math.min(maxY, launcherDragInfo.current.origCardY + dy));
         setCardPos({ x: newCX, y: newCY });
       }
     };
@@ -272,10 +281,12 @@ export default function FloatingChatbot() {
         headerDragInfo.current.hasDragged = true;
         setIsHeaderDragging(true);
 
-        const cardW = 360;
-        const cardH = 540;
-        const newCX = Math.max(12, Math.min(window.innerWidth - cardW - 12, headerDragInfo.current.origCardX + dx));
-        const newCY = Math.max(12, Math.min(window.innerHeight - cardH - 12, headerDragInfo.current.origCardY + dy));
+        const cardW = Math.min(360, window.innerWidth - 24);
+        const cardH = Math.min(540, window.innerHeight - 24);
+        const maxX = Math.max(12, window.innerWidth - cardW - 12);
+        const maxY = Math.max(12, window.innerHeight - cardH - 12);
+        const newCX = Math.max(12, Math.min(maxX, headerDragInfo.current.origCardX + dx));
+        const newCY = Math.max(12, Math.min(maxY, headerDragInfo.current.origCardY + dy));
         setCardPos({ x: newCX, y: newCY });
 
         const newLX = Math.max(12, Math.min(window.innerWidth - 64, headerDragInfo.current.origLauncherX + dx));
@@ -319,10 +330,12 @@ export default function FloatingChatbot() {
         headerDragInfo.current.hasDragged = true;
         setIsHeaderDragging(true);
 
-        const cardW = 360;
-        const cardH = 540;
-        const newCX = Math.max(12, Math.min(window.innerWidth - cardW - 12, headerDragInfo.current.origCardX + dx));
-        const newCY = Math.max(12, Math.min(window.innerHeight - cardH - 12, headerDragInfo.current.origCardY + dy));
+        const cardW = Math.min(360, window.innerWidth - 24);
+        const cardH = Math.min(540, window.innerHeight - 24);
+        const maxX = Math.max(12, window.innerWidth - cardW - 12);
+        const maxY = Math.max(12, window.innerHeight - cardH - 12);
+        const newCX = Math.max(12, Math.min(maxX, headerDragInfo.current.origCardX + dx));
+        const newCY = Math.max(12, Math.min(maxY, headerDragInfo.current.origCardY + dy));
         setCardPos({ x: newCX, y: newCY });
 
         const newLX = Math.max(12, Math.min(window.innerWidth - 64, headerDragInfo.current.origLauncherX + dx));

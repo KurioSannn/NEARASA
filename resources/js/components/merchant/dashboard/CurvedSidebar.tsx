@@ -109,7 +109,7 @@ export default function CurvedSidebar({ merchantNavigation }: { merchantNavigati
         className="lg:hidden fixed z-50 left-1/2 -translate-x-1/2 bottom-[max(14px,env(safe-area-inset-bottom))] w-auto max-w-[calc(100%-20px)] flex justify-center pointer-events-none"
         style={{ fontFamily: 'var(--font-sans)' }}
       >
-        <div className="pointer-events-auto inline-flex items-center justify-center gap-1.5 max-[370px]:gap-1 p-1.5 max-[370px]:p-1 rounded-full bg-[#fffdfa]/96 backdrop-blur-md border border-sand-border shadow-[0_8px_30px_rgba(59,43,38,0.14)]">
+        <div className="pointer-events-auto inline-flex items-center justify-center gap-1.5 max-[370px]:gap-1 max-[350px]:gap-0.5 p-1.5 max-[370px]:p-1 max-[350px]:p-0.5 rounded-full bg-[#fffdfa]/96 backdrop-blur-md border border-sand-border shadow-[0_8px_30px_rgba(59,43,38,0.14)]">
           {mobileItems.map(({ key, label, href, icon: Icon, active }) => (
             <Link
               key={key}
@@ -118,22 +118,22 @@ export default function CurvedSidebar({ merchantNavigation }: { merchantNavigati
               aria-current={active ? 'page' : undefined}
               className={
                 active
-                  ? 'relative h-[42px] max-[370px]:h-[38px] rounded-full bg-terracotta text-white !text-white pl-[4px] pr-3.5 max-[370px]:pr-2.5 gap-2 inline-flex items-center shrink-0 shadow-xs transition-all duration-200'
-                  : 'relative w-[42px] h-[42px] max-[370px]:w-[38px] max-[370px]:h-[38px] rounded-full bg-[#f5ece3] hover:bg-[#f1d4bb] text-[#77645b] hover:text-[#3b2b26] inline-flex items-center justify-center shrink-0 transition-all duration-150 active:scale-95'
+                  ? 'relative h-[42px] max-[370px]:h-[38px] max-[350px]:h-[34px] rounded-full bg-terracotta text-white !text-white pl-[4px] pr-3.5 max-[370px]:pr-2.5 max-[350px]:pr-2 gap-2 max-[350px]:gap-1 inline-flex items-center shrink-0 shadow-xs transition-all duration-200'
+                  : 'relative w-[42px] h-[42px] max-[370px]:w-[38px] max-[370px]:h-[38px] max-[350px]:w-[34px] max-[350px]:h-[34px] rounded-full bg-[#f5ece3] hover:bg-[#f1d4bb] text-[#77645b] hover:text-[#3b2b26] inline-flex items-center justify-center shrink-0 transition-all duration-150 active:scale-95'
               }
             >
               {active ? (
                 <>
-                  <span className="w-[34px] h-[34px] max-[370px]:w-[30px] max-[370px]:h-[30px] rounded-full bg-white text-terracotta grid place-items-center shrink-0">
-                    <Icon className="w-[18px] h-[18px] stroke-[2.2]" aria-hidden="true" />
+                  <span className="w-[34px] h-[34px] max-[370px]:w-[30px] max-[370px]:h-[30px] max-[350px]:w-[26px] max-[350px]:h-[26px] rounded-full bg-white text-terracotta grid place-items-center shrink-0">
+                    <Icon className="w-[18px] h-[18px] max-[350px]:w-[15px] max-[350px]:h-[15px] stroke-[2.2]" aria-hidden="true" />
                   </span>
-                  <span className="text-[13px] max-[370px]:text-[12px] font-bold text-white !text-white leading-none whitespace-nowrap tracking-[-0.2px]">
+                  <span className="text-[13px] max-[370px]:text-[12px] max-[350px]:text-[11px] font-bold text-white !text-white leading-none whitespace-nowrap tracking-[-0.2px]">
                     {label}
                   </span>
                 </>
               ) : (
                 <>
-                  <Icon className="w-[20px] h-[20px] stroke-[1.9]" aria-hidden="true" />
+                  <Icon className="w-[20px] h-[20px] max-[350px]:w-[17px] max-[350px]:h-[17px] stroke-[1.9]" aria-hidden="true" />
                   <span className="sr-only">{label}</span>
                 </>
               )}

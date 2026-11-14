@@ -215,13 +215,13 @@ export default function Settings({
 
         {/* Main 2-Tab Switcher */}
         <nav aria-label="Kategori setelan" className="flex items-center justify-center sm:justify-start pb-1">
-          <div className="flex flex-wrap sm:flex-nowrap items-center justify-center bg-white/95 p-1.5 sm:p-1 rounded-3xl sm:rounded-full border border-sand-border shadow-sm gap-1 w-full sm:w-fit">
+          <div className="flex flex-col sm:flex-row items-center justify-center bg-white/95 p-1.5 sm:p-1 rounded-2xl sm:rounded-full border border-sand-border shadow-sm gap-1 w-full sm:w-fit">
             <button
               type="button"
               role="tab"
               aria-selected={activeTab === 'store'}
               onClick={() => setActiveTab('store')}
-              className={`px-4 py-2 rounded-full text-xs transition-colors duration-150 flex items-center gap-1.5 cursor-pointer ${
+              className={`w-full sm:w-auto justify-center px-4 py-2 rounded-xl sm:rounded-full text-xs transition-colors duration-150 flex items-center gap-1.5 cursor-pointer ${
                 activeTab === 'store'
                   ? 'font-bold bg-terracotta text-white !text-white shadow-pill'
                   : 'font-semibold text-clay-800 hover:text-terracotta hover:bg-[#fdeee9]'
@@ -238,7 +238,7 @@ export default function Settings({
               role="tab"
               aria-selected={activeTab === 'owner'}
               onClick={() => setActiveTab('owner')}
-              className={`px-4 py-2 rounded-full text-xs transition-colors duration-150 flex items-center gap-1.5 cursor-pointer ${
+              className={`w-full sm:w-auto justify-center px-4 py-2 rounded-xl sm:rounded-full text-xs transition-colors duration-150 flex items-center gap-1.5 cursor-pointer ${
                 activeTab === 'owner'
                   ? 'font-bold bg-terracotta text-white !text-white shadow-pill'
                   : 'font-semibold text-clay-800 hover:text-terracotta hover:bg-[#fdeee9]'
